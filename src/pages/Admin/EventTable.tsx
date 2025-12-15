@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import ViewEventModal from "./ViewEventModal";
 import EditEventModal from "./EditEventModal";
-import DeleteEventModal from "./DeleteEventModal";
+import DeleteModal from "./DeleteModal";
 import AddEventModal from "./AddEventModal";
 
 interface Event {
@@ -205,8 +205,9 @@ const EventTable = () => {
             onSuccess={() => queryClient.invalidateQueries({ queryKey: ['events'] })}
           />
 
-          <DeleteEventModal
-            event={deleteEvent}
+          <DeleteModal
+            type="event"
+            item={deleteEvent}
             isOpen={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
             onConfirm={confirmDelete}

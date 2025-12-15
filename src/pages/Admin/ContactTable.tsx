@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "./EditStatusModal";
-import DeleteContactModal from "./DeleteContactModal";
+import DeleteModal from "./DeleteModal";
 
 interface Contact {
   _id: string;
@@ -232,8 +232,9 @@ const ContactTable = () => {
             isUpdating={updateStatusMutation.isPending}
           />
 
-          <DeleteContactModal
-            contact={deleteContact}
+          <DeleteModal
+            type="contact"
+            item={deleteContact}
             isOpen={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
             onConfirm={confirmDelete}

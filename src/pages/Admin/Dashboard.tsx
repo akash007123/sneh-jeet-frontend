@@ -19,15 +19,13 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "./EditStatusModal";
-import DeleteContactModal from "./DeleteContactModal";
 import ViewEventModal from "./ViewEventModal";
 import EditEventModal from "./EditEventModal";
-import DeleteEventModal from "./DeleteEventModal";
 import AddEventModal from "./AddEventModal";
 import ViewGalleryModal from "./ViewGalleryModal";
 import EditGalleryModal from "./EditGalleryModal";
-import DeleteGalleryModal from "./DeleteGalleryModal";
 import AddGalleryModal from "./AddGalleryModal";
+import DeleteModal from "./DeleteModal";
 
 interface Contact {
   _id: string;
@@ -61,6 +59,8 @@ interface GalleryItem {
   createdAt: string;
 }
 
+type DeletableItem = Contact | Event | GalleryItem;
+
 const Dashboard = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -70,16 +70,12 @@ const Dashboard = () => {
   const [viewContactModalOpen, setViewContactModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [editContactModalOpen, setEditContactModalOpen] = useState(false);
-  const [deleteContact, setDeleteContact] = useState<Contact | null>(null);
-  const [deleteContactModalOpen, setDeleteContactModalOpen] = useState(false);
 
   // Event states
   const [viewEvent, setViewEvent] = useState<Event | null>(null);
   const [viewEventModalOpen, setViewEventModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [editEventModalOpen, setEditEventModalOpen] = useState(false);
-  const [deleteEvent, setDeleteEvent] = useState<Event | null>(null);
-  const [deleteEventModalOpen, setDeleteEventModalOpen] = useState(false);
   const [addEventModalOpen, setAddEventModalOpen] = useState(false);
 
   // Gallery states
@@ -87,9 +83,12 @@ const Dashboard = () => {
   const [viewGalleryModalOpen, setViewGalleryModalOpen] = useState(false);
   const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
   const [editGalleryModalOpen, setEditGalleryModalOpen] = useState(false);
-  const [deleteGalleryItem, setDeleteGalleryItem] = useState<GalleryItem | null>(null);
-  const [deleteGalleryModalOpen, setDeleteGalleryModalOpen] = useState(false);
   const [addGalleryModalOpen, setAddGalleryModalOpen] = useState(false);
+
+  // Delete states
+  const [deleteItem, setDeleteItem] = useState<DeletableItem | null>(null);
+  const [deleteType, setDeleteType] = useState<'contact' | 'event' | 'gallery' | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   // Queries
   const { data: contacts, isLoading: contactsLoading } = useQuery({
@@ -152,8 +151,9 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
       toast({ title: "Success", description: "Contact deleted successfully" });
-      setDeleteContact(null);
-      setDeleteContactModalOpen(false);
+      setDeleteItem(null);
+      setDeleteType(null);
+      setDeleteModalOpen(false);
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to delete contact", variant: "destructive" });
@@ -171,8 +171,9 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast({ title: "Success", description: "Event deleted successfully" });
-      setDeleteEvent(null);
-      setDeleteEventModalOpen(false);
+      setDeleteItem(null);
+      setDeleteType(null);
+      setDeleteModalOpen(false);
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to delete event", variant: "destructive" });
@@ -190,8 +191,9 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gallery'] });
       toast({ title: "Success", description: "Gallery item deleted successfully" });
-      setDeleteGalleryItem(null);
-      setDeleteGalleryModalOpen(false);
+      setDeleteItem(null);
+      setDeleteType(null);
+      setDeleteModalOpen(false);
     },
     onError: () => {
       toast({ title: "Error", description: "Failed to delete gallery item", variant: "destructive" });
@@ -216,13 +218,14 @@ const Dashboard = () => {
   };
 
   const handleDeleteContact = (contact: Contact) => {
-    setDeleteContact(contact);
-    setDeleteContactModalOpen(true);
+    setDeleteItem(contact);
+    setDeleteType('contact');
+    setDeleteModalOpen(true);
   };
 
   const confirmDeleteContact = () => {
-    if (deleteContact) {
-      deleteContactMutation.mutate(deleteContact._id);
+    if (deleteItem && deleteType === 'contact') {
+      deleteContactMutation.mutate(deleteItem._id);
     }
   };
 
@@ -237,13 +240,14 @@ const Dashboard = () => {
   };
 
   const handleDeleteEvent = (event: Event) => {
-    setDeleteEvent(event);
-    setDeleteEventModalOpen(true);
+    setDeleteItem(event);
+    setDeleteType('event');
+    setDeleteModalOpen(true);
   };
 
   const confirmDeleteEvent = () => {
-    if (deleteEvent) {
-      deleteEventMutation.mutate(deleteEvent._id);
+    if (deleteItem && deleteType === 'event') {
+      deleteEventMutation.mutate(deleteItem._id);
     }
   };
 
@@ -258,13 +262,14 @@ const Dashboard = () => {
   };
 
   const handleDeleteGalleryItem = (item: GalleryItem) => {
-    setDeleteGalleryItem(item);
-    setDeleteGalleryModalOpen(true);
+    setDeleteItem(item);
+    setDeleteType('gallery');
+    setDeleteModalOpen(true);
   };
 
   const confirmDeleteGalleryItem = () => {
-    if (deleteGalleryItem) {
-      deleteGalleryMutation.mutate(deleteGalleryItem._id);
+    if (deleteItem && deleteType === 'gallery') {
+      deleteGalleryMutation.mutate(deleteItem._id);
     }
   };
 
@@ -665,12 +670,21 @@ const Dashboard = () => {
         isUpdating={updateContactStatusMutation.isPending}
       />
 
-      <DeleteContactModal
-        contact={deleteContact}
-        isOpen={deleteContactModalOpen}
-        onClose={() => setDeleteContactModalOpen(false)}
-        onConfirm={confirmDeleteContact}
-        isDeleting={deleteContactMutation.isPending}
+      <DeleteModal
+        type={deleteType!}
+        item={deleteItem}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (deleteType === 'contact') confirmDeleteContact();
+          else if (deleteType === 'event') confirmDeleteEvent();
+          else if (deleteType === 'gallery') confirmDeleteGalleryItem();
+        }}
+        isDeleting={
+          deleteType === 'contact' ? deleteContactMutation.isPending :
+          deleteType === 'event' ? deleteEventMutation.isPending :
+          deleteGalleryMutation.isPending
+        }
       />
 
       <ViewEventModal
@@ -684,14 +698,6 @@ const Dashboard = () => {
         isOpen={editEventModalOpen}
         onClose={() => setEditEventModalOpen(false)}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ['events'] })}
-      />
-
-      <DeleteEventModal
-        event={deleteEvent}
-        isOpen={deleteEventModalOpen}
-        onClose={() => setDeleteEventModalOpen(false)}
-        onConfirm={confirmDeleteEvent}
-        isDeleting={deleteEventMutation.isPending}
       />
 
       <AddEventModal
@@ -711,14 +717,6 @@ const Dashboard = () => {
         isOpen={editGalleryModalOpen}
         onClose={() => setEditGalleryModalOpen(false)}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ['gallery'] })}
-      />
-
-      <DeleteGalleryModal
-        galleryItem={deleteGalleryItem}
-        isOpen={deleteGalleryModalOpen}
-        onClose={() => setDeleteGalleryModalOpen(false)}
-        onConfirm={confirmDeleteGalleryItem}
-        isDeleting={deleteGalleryMutation.isPending}
       />
 
       <AddGalleryModal
