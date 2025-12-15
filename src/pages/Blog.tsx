@@ -1,18 +1,44 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { Search, Calendar, Clock, ArrowRight, User } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { blogPosts, blogCategories } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+
+  // Fetch blogs
+  const { data: blogsData, isLoading: blogsLoading } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`);
+      if (!response.ok) throw new Error('Failed to fetch blogs');
+      return response.json();
+    },
+  });
+
+  // Fetch blog categories
+  const { data: categoriesData } = useQuery({
+    queryKey: ['blog-categories'],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/categories`);
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      return response.json();
+    },
+  });
+
+  const blogPosts = blogsData?.blogs || [];
+  const blogCategories = [
+    { id: "all", label: "All Posts" },
+    ...(categoriesData?.map((cat: string) => ({ id: cat, label: cat.replace("-", " ") })) || [])
+  ];
 
   const filteredPosts = useMemo(() => {
     return blogPosts.filter((post) => {
@@ -117,14 +143,23 @@ const Blog = () => {
                         transition={{ delay: index * 0.1 }}
                         className="group"
                       >
-                        <Link to={`/blog/${post.id}`}>
-                          <div className="bg-card rounded-2xl border border-border/50 overflow-hidden hover:shadow-medium transition-all duration-300 h-full flex flex-col">
-                            {/* Gradient Header */}
-                            <div className="h-32 pride-gradient opacity-80 relative">
-                              <Badge className="absolute top-4 left-4 bg-background/90 text-foreground">
-                                Featured
-                              </Badge>
-                            </div>
+                        <Link to={`/blog/${post.slug}`}>
+                           <div className="bg-card rounded-2xl border border-border/50 overflow-hidden hover:shadow-medium transition-all duration-300 h-full flex flex-col">
+                             {/* Featured Image or Gradient Header */}
+                             <div className="h-32 relative overflow-hidden">
+                               {post.featuredImage ? (
+                                 <img
+                                   src={`${import.meta.env.VITE_API_BASE_URL}${post.featuredImage}`}
+                                   alt={post.title}
+                                   className="w-full h-full object-cover"
+                                 />
+                               ) : (
+                                 <div className="h-32 pride-gradient opacity-80"></div>
+                               )}
+                               <Badge className="absolute top-4 left-4 bg-background/90 text-foreground">
+                                 Featured
+                               </Badge>
+                             </div>
 
                             <div className="p-6 flex flex-col flex-grow">
                               <Badge
@@ -145,12 +180,12 @@ const Blog = () => {
                               <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border/50">
                                 <div className="flex items-center gap-2">
                                   <User className="w-4 h-4" />
-                                  <span>{post.author}</span>
+                                  <span>{post.authorName}</span>
                                 </div>
                                 <div className="flex items-center gap-4">
                                   <span className="flex items-center gap-1">
                                     <Calendar className="w-4 h-4" />
-                                    {new Date(post.date).toLocaleDateString(
+                                    {new Date(post.publishedDate).toLocaleDateString(
                                       "en-US",
                                       {
                                         month: "short",
@@ -188,45 +223,54 @@ const Blog = () => {
                         transition={{ delay: index * 0.05 }}
                         className="group"
                       >
-                        <Link to={`/blog/${post.id}`}>
-                          <div className="bg-card rounded-xl border border-border/50 p-6 hover:shadow-soft transition-all duration-300 flex flex-col h-full">
-                            <div className="flex items-start justify-between gap-4 mb-3">
-                              <Badge
-                                variant="secondary"
-                                className="capitalize shrink-0"
-                              >
-                                {post.category.replace("-", " ")}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground flex items-center gap-1">
-                                <Clock className="w-4 h-4" />
-                                {post.readTime}
-                              </span>
-                            </div>
+                        <Link to={`/blog/${post.slug}`}>
+                          <div className="bg-card rounded-xl border border-border/50 overflow-hidden hover:shadow-soft transition-all duration-300 flex flex-col h-full">
+                            {post.featuredImage && (
+                              <img
+                                src={`${import.meta.env.VITE_API_BASE_URL}${post.featuredImage}`}
+                                alt={post.title}
+                                className="w-full h-48 object-cover"
+                              />
+                            )}
+                            <div className="p-6 flex flex-col flex-grow">
+                              <div className="flex items-start justify-between gap-4 mb-3">
+                                <Badge
+                                  variant="secondary"
+                                  className="capitalize shrink-0"
+                                >
+                                  {post.category.replace("-", " ")}
+                                </Badge>
+                                <span className="text-sm text-muted-foreground flex items-center gap-1">
+                                  <Clock className="w-4 h-4" />
+                                  {post.readTime}
+                                </span>
+                              </div>
 
-                            <h3 className="text-lg font-display font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                              {post.title}
-                            </h3>
+                              <h3 className="text-lg font-display font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                                {post.title}
+                              </h3>
 
-                            <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
-                              {post.excerpt}
-                            </p>
+                              <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
+                                {post.excerpt}
+                              </p>
 
-                            <div className="flex items-center justify-between text-sm text-muted-foreground">
-                              <span className="flex items-center gap-2">
-                                <User className="w-4 h-4" />
-                                {post.author}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                {new Date(post.date).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  }
-                                )}
-                              </span>
+                              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                                <span className="flex items-center gap-2">
+                                  <User className="w-4 h-4" />
+                                  {post.authorName}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-4 h-4" />
+                                  {new Date(post.publishedDate).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    }
+                                  )}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </Link>

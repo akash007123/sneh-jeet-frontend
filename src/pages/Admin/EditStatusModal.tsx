@@ -48,7 +48,7 @@ const EditStatusModal = ({ contact, isOpen, onClose, onUpdate, isUpdating }: Edi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Status</DialogTitle>
         </DialogHeader>

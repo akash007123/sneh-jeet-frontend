@@ -39,10 +39,22 @@ interface GalleryItem {
   createdAt: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem;
+interface Blog {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  isFeatured: boolean;
+  category: string;
+  authorName: string;
+  publishedDate: string;
+  createdAt: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog;
 
 interface DeleteModalProps {
-  type: 'contact' | 'event' | 'gallery';
+  type: 'contact' | 'event' | 'gallery' | 'blog';
   item: DeletableItem | null;
   isOpen: boolean;
   onClose: () => void;
@@ -56,6 +68,7 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting }: Del
       case 'contact': return 'Delete Contact';
       case 'event': return 'Delete Event';
       case 'gallery': return 'Delete Gallery Item';
+      case 'blog': return 'Delete Blog Post';
       default: return 'Delete Item';
     }
   };
@@ -71,6 +84,7 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting }: Del
       case 'contact': return `${(item as Contact).name} - ${(item as Contact).subject}`;
       case 'event': return (item as Event).title;
       case 'gallery': return (item as GalleryItem).title;
+      case 'blog': return (item as Blog).title;
       default: return '';
     }
   };

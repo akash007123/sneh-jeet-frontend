@@ -37,7 +37,7 @@ const ViewEventModal = ({ event, isOpen, onClose }: ViewEventModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Event Details</DialogTitle>
         </DialogHeader>

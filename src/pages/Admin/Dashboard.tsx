@@ -26,6 +26,10 @@ import ViewGalleryModal from "./ViewGalleryModal";
 import EditGalleryModal from "./EditGalleryModal";
 import AddGalleryModal from "./AddGalleryModal";
 import DeleteModal from "./DeleteModal";
+import BlogTable from "./BlogTable";
+import ViewBlogModal from "./ViewBlogModal";
+import EditBlogModal from "./EditBlogModal";
+import AddBlogModal from "./AddBlogModal";
 
 interface Contact {
   _id: string;
@@ -59,7 +63,19 @@ interface GalleryItem {
   createdAt: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem;
+interface Blog {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  isFeatured: boolean;
+  category: string;
+  authorName: string;
+  publishedDate: string;
+  createdAt: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog;
 
 const Dashboard = () => {
   const { toast } = useToast();
@@ -85,9 +101,16 @@ const Dashboard = () => {
   const [editGalleryModalOpen, setEditGalleryModalOpen] = useState(false);
   const [addGalleryModalOpen, setAddGalleryModalOpen] = useState(false);
 
+  // Blog states
+  const [viewBlog, setViewBlog] = useState<Blog | null>(null);
+  const [viewBlogModalOpen, setViewBlogModalOpen] = useState(false);
+  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
+  const [editBlogModalOpen, setEditBlogModalOpen] = useState(false);
+  const [addBlogModalOpen, setAddBlogModalOpen] = useState(false);
+
   // Delete states
   const [deleteItem, setDeleteItem] = useState<DeletableItem | null>(null);
-  const [deleteType, setDeleteType] = useState<'contact' | 'event' | 'gallery' | null>(null);
+  const [deleteType, setDeleteType] = useState<'contact' | 'event' | 'gallery' | 'blog' | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   // Queries
@@ -114,6 +137,15 @@ const Dashboard = () => {
     queryFn: async () => {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`);
       if (!response.ok) throw new Error('Failed to fetch gallery');
+      return response.json();
+    },
+  });
+
+  const { data: blogs, isLoading: blogsLoading } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`);
+      if (!response.ok) throw new Error('Failed to fetch blogs');
       return response.json();
     },
   });
@@ -200,6 +232,26 @@ const Dashboard = () => {
     },
   });
 
+  const deleteBlogMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete blog post');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      toast({ title: "Success", description: "Blog post deleted successfully" });
+      setDeleteItem(null);
+      setDeleteType(null);
+      setDeleteModalOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete blog post", variant: "destructive" });
+    },
+  });
+
   // Handlers
   const handleViewContact = (contact: Contact) => {
     setViewContact(contact);
@@ -273,6 +325,28 @@ const Dashboard = () => {
     }
   };
 
+  const handleViewBlog = (blog: Blog) => {
+    setViewBlog(blog);
+    setViewBlogModalOpen(true);
+  };
+
+  const handleEditBlog = (blog: Blog) => {
+    setSelectedBlog(blog);
+    setEditBlogModalOpen(true);
+  };
+
+  const handleDeleteBlog = (blog: Blog) => {
+    setDeleteItem(blog);
+    setDeleteType('blog');
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDeleteBlog = () => {
+    if (deleteItem && deleteType === 'blog') {
+      deleteBlogMutation.mutate(deleteItem._id);
+    }
+  };
+
   const getContactStatusColor = (status: string) => {
     switch (status) {
       case 'New': return 'bg-blue-100 text-blue-800';
@@ -300,6 +374,8 @@ const Dashboard = () => {
     resolvedContacts: contacts?.filter(c => c.status === 'Resolved').length || 0,
     totalEvents: events?.length || 0,
     totalGallery: gallery?.length || 0,
+    totalBlogs: blogs?.blogs?.length || 0,
+    featuredBlogs: blogs?.blogs?.filter((b: Blog) => b.isFeatured).length || 0,
   };
 
   return (
@@ -410,6 +486,25 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalBlogs}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.featuredBlogs} featured
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
 
           <motion.div
@@ -418,10 +513,11 @@ const Dashboard = () => {
             transition={{ delay: 0.6 }}
           >
             <Tabs defaultValue="contacts" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="contacts">Contacts</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
                 <TabsTrigger value="gallery">Gallery</TabsTrigger>
+                <TabsTrigger value="blogs">Blogs</TabsTrigger>
               </TabsList>
 
               <TabsContent value="contacts" className="mt-6">
@@ -651,6 +747,15 @@ const Dashboard = () => {
                   </CardContent>
                 </Card>
               </TabsContent>
+
+              <TabsContent value="blogs" className="mt-6">
+                <BlogTable
+                  onView={handleViewBlog}
+                  onEdit={handleEditBlog}
+                  onAdd={() => setAddBlogModalOpen(true)}
+                  onDelete={handleDeleteBlog}
+                />
+              </TabsContent>
             </Tabs>
           </motion.div>
         </div>
@@ -679,11 +784,13 @@ const Dashboard = () => {
           if (deleteType === 'contact') confirmDeleteContact();
           else if (deleteType === 'event') confirmDeleteEvent();
           else if (deleteType === 'gallery') confirmDeleteGalleryItem();
+          else if (deleteType === 'blog') confirmDeleteBlog();
         }}
         isDeleting={
           deleteType === 'contact' ? deleteContactMutation.isPending :
           deleteType === 'event' ? deleteEventMutation.isPending :
-          deleteGalleryMutation.isPending
+          deleteType === 'gallery' ? deleteGalleryMutation.isPending :
+          deleteBlogMutation.isPending
         }
       />
 
@@ -723,6 +830,25 @@ const Dashboard = () => {
         isOpen={addGalleryModalOpen}
         onClose={() => setAddGalleryModalOpen(false)}
         onSuccess={() => queryClient.invalidateQueries({ queryKey: ['gallery'] })}
+      />
+
+      <ViewBlogModal
+        blog={viewBlog}
+        isOpen={viewBlogModalOpen}
+        onClose={() => setViewBlogModalOpen(false)}
+      />
+
+      <EditBlogModal
+        blog={selectedBlog}
+        isOpen={editBlogModalOpen}
+        onClose={() => setEditBlogModalOpen(false)}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['blogs'] })}
+      />
+
+      <AddBlogModal
+        isOpen={addBlogModalOpen}
+        onClose={() => setAddBlogModalOpen(false)}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['blogs'] })}
       />
     </MainLayout>
   );

@@ -36,7 +36,7 @@ const ViewContactModal = ({ contact, isOpen, onClose }: ViewContactModalProps) =
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Contact Details</DialogTitle>
         </DialogHeader>

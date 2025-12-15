@@ -20,7 +20,7 @@ const ViewGalleryModal = ({ galleryItem, isOpen, onClose }: ViewGalleryModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>View Gallery Item</DialogTitle>
         </DialogHeader>
