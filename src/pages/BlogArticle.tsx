@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Calendar,
@@ -13,6 +13,7 @@ import {
   Linkedin,
   Copy,
   Tag,
+  BookOpen,
 } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ const BlogArticle = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [readingProgress, setReadingProgress] = useState(0);
 
   // Fetch current blog post
   const { data: articleData, isLoading: articleLoading } = useQuery({
@@ -102,6 +104,19 @@ const BlogArticle = () => {
     };
   }, [article]);
 
+  // Reading progress
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setReadingProgress(progress);
+    };
+
+    window.addEventListener('scroll', updateProgress);
+    return () => window.removeEventListener('scroll', updateProgress);
+  }, []);
+
   if (articleLoading) {
     return (
       <MainLayout>
@@ -152,51 +167,64 @@ const BlogArticle = () => {
 
   return (
     <MainLayout>
+      {/* Reading Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-1 bg-muted z-50">
+        <div
+          className="h-full bg-primary transition-all duration-150 ease-out"
+          style={{ width: `${readingProgress}%` }}
+        />
+      </div>
+
       {/* Hero Section */}
-      <section className="pt-24 md:pt-32 pb-12 bg-gradient-to-b from-muted/50 to-background">
-        <div className="container-padding mx-auto max-w-4xl">
+      <section className="pt-24 md:pt-32 pb-12 relative overflow-hidden">
+        {article.featuredImage ? (
+          <div className="absolute inset-0">
+            <img
+              src={`${import.meta.env.VITE_API_BASE_URL}${article.featuredImage}`}
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20" />
+        )}
+        <div className="relative container-padding mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            className="text-center"
           >
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate("/blog")}
-              className="mb-6"
+              className="mb-6 text-white hover:bg-white/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Blog
             </Button>
 
-            <Badge variant="secondary" className="mb-4 capitalize">
+            <Badge variant="secondary" className="mb-4 capitalize bg-white/90 text-foreground">
               {article.category.replace("-", " ")}
             </Badge>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6 leading-tight drop-shadow-lg">
               {article.title}
             </h1>
 
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow">
               {article.excerpt}
             </p>
 
-            {article.featuredImage && (
-              <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${article.featuredImage}`}
-                alt={article.title}
-                className="w-full max-w-2xl mx-auto rounded-lg mb-6"
-              />
-            )}
-
-            <div className="flex flex-wrap items-center gap-6 text-muted-foreground">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-white/80">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                  <User className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">{article.author}</p>
-                  <p className="text-sm">{article.authorBio}</p>
+                  <p className="font-medium text-white">{article.author}</p>
+                  <p className="text-sm text-white/70">{article.authorBio}</p>
                 </div>
               </div>
 
@@ -218,6 +246,39 @@ const BlogArticle = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Table of Contents */}
+      {article.sections && article.sections.length > 0 && (
+        <section className="py-8 bg-muted/30">
+          <div className="container-padding mx-auto max-w-4xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-card rounded-xl border border-border/50 p-6"
+            >
+              <h2 className="text-lg font-display font-bold text-foreground mb-4 flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                Table of Contents
+              </h2>
+              <nav>
+                <ul className="space-y-2">
+                  {article.sections.map((section, index) => (
+                    <li key={index}>
+                      <a
+                        href={`#section-${index}`}
+                        className="text-primary hover:text-primary/80 transition-colors text-sm"
+                      >
+                        {section.sectionTitle}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Article Content */}
       <article className="py-12 md:py-16 bg-background">
@@ -264,15 +325,23 @@ const BlogArticle = () => {
 
               {/* Dynamic sections */}
               {article.sections && article.sections.map((section, sectionIndex) => (
-                <div key={sectionIndex} className="mt-8">
+                <motion.div
+                  key={sectionIndex}
+                  id={`section-${sectionIndex}`}
+                  className="mt-12 scroll-mt-24"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: sectionIndex * 0.1 }}
+                >
                   {section.sectionImage && (
                     <div className="mb-6">
                       <img
                         src={`${import.meta.env.VITE_API_BASE_URL}${section.sectionImage}`}
                         alt={section.sectionTitle}
-                        className="w-full max-w-2xl mx-auto rounded-lg"
+                        className="w-full max-w-3xl mx-auto rounded-xl shadow-soft"
                       />
-                      <div className="text-sm text-muted-foreground mt-2 text-center">
+                      <div className="text-sm text-muted-foreground mt-3 text-center">
                         By {article.author} on {new Date(article.date).toLocaleDateString("en-US", {
                           month: "long",
                           day: "numeric",
@@ -281,47 +350,64 @@ const BlogArticle = () => {
                       </div>
                     </div>
                   )}
-                  <h2 className="text-2xl font-display font-bold text-foreground mb-4">
+                  <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 leading-tight">
                     {section.sectionTitle}
                   </h2>
-                  <div className="prose prose-lg max-w-none">
+                  <div className="prose prose-lg max-w-none
+                    prose-headings:font-display prose-headings:text-foreground
+                    prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+                    prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-base
+                    prose-li:text-muted-foreground
+                    prose-strong:text-foreground
+                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                    prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground">
                     {section.sectionContent.split("\n\n").map((paragraph, index) => {
                       if (paragraph.startsWith("### ")) {
                         return (
-                          <h3 key={index}>{paragraph.replace("### ", "")}</h3>
+                          <h3 key={index} className="text-xl font-display font-semibold text-foreground mt-8 mb-4">
+                            {paragraph.replace("### ", "")}
+                          </h3>
                         );
                       }
                       if (paragraph.startsWith("- ")) {
                         const items = paragraph.split("\n").filter((item) => item.startsWith("- "));
                         return (
-                          <ul key={index}>
+                          <ul key={index} className="list-disc list-inside space-y-2">
                             {items.map((item, i) => (
-                              <li key={i}>{item.replace("- ", "")}</li>
+                              <li key={i} className="text-muted-foreground">{item.replace("- ", "")}</li>
                             ))}
                           </ul>
                         );
                       }
-                      return <p key={index}>{paragraph}</p>;
+                      return <p key={index} className="text-muted-foreground leading-relaxed">{paragraph}</p>;
                     })}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
 
             {/* Sidebar */}
-            <aside className="lg:sticky lg:top-24 h-fit space-y-8">
+            <aside className="lg:sticky lg:top-24 h-fit space-y-6">
               {/* Share */}
-              <div className="bg-muted/50 rounded-xl p-6">
+              <motion.div
+                className="bg-card rounded-2xl border border-border/50 p-6 shadow-soft hover:shadow-medium transition-shadow duration-300"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+              >
                 <h3 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Share2 className="w-4 h-4" />
+                  <Share2 className="w-5 h-5 text-primary" />
                   Share Article
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Help spread awareness by sharing this article
+                </p>
+                <div className="grid grid-cols-2 gap-3">
                   <Button
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     asChild
-                    className="rounded-full"
+                    className="rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors"
                   >
                     <a
                       href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
@@ -329,14 +415,14 @@ const BlogArticle = () => {
                       rel="noopener noreferrer"
                       aria-label="Share on Facebook"
                     >
-                      <Facebook className="w-4 h-4" />
+                      <Facebook className="w-4 h-4 mr-2" />
                     </a>
                   </Button>
                   <Button
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     asChild
-                    className="rounded-full"
+                    className="rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors"
                   >
                     <a
                       href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`}
@@ -344,14 +430,14 @@ const BlogArticle = () => {
                       rel="noopener noreferrer"
                       aria-label="Share on Twitter"
                     >
-                      <Twitter className="w-4 h-4" />
+                      <Twitter className="w-4 h-4 mr-2" />
                     </a>
                   </Button>
                   <Button
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     asChild
-                    className="rounded-full"
+                    className="rounded-xl hover:bg-blue-50 hover:border-blue-200 transition-colors"
                   >
                     <a
                       href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${shareTitle}`}
@@ -359,35 +445,47 @@ const BlogArticle = () => {
                       rel="noopener noreferrer"
                       aria-label="Share on LinkedIn"
                     >
-                      <Linkedin className="w-4 h-4" />
+                      <Linkedin className="w-4 h-4 mr-2" />
                     </a>
                   </Button>
                   <Button
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     onClick={handleCopyLink}
-                    className="rounded-full"
+                    className="rounded-xl hover:bg-primary/10 hover:border-primary/20 transition-colors"
                     aria-label="Copy link"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-4 h-4 mr-2" />
                   </Button>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Tags */}
-              <div>
+              <motion.div
+                className="bg-card rounded-2xl border border-border/50 p-6 shadow-soft"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 }}
+              >
                 <h3 className="font-display font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Tag className="w-4 h-4" />
+                  <Tag className="w-5 h-5 text-primary" />
                   Tags
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {article.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="capitalize">
-                      {tag}
-                    </Badge>
+                  {article.tags.map((tag, index) => (
+                    <motion.div
+                      key={tag}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                    >
+                      <Badge variant="secondary" className="capitalize hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+                        {tag}
+                      </Badge>
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </aside>
           </div>
         </div>
@@ -395,33 +493,74 @@ const BlogArticle = () => {
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
-        <section className="py-16 bg-muted/30">
+        <section className="py-16 md:py-20 bg-gradient-to-b from-muted/20 to-background">
           <div className="container-padding mx-auto max-w-7xl">
-            <h2 className="text-2xl font-display font-bold text-foreground mb-8">
-              Related Articles
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {relatedPosts.map((post) => (
-                <Link
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+                Related Articles
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Discover more content that might interest you
+              </p>
+            </motion.div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedPosts.map((post, index) => (
+                <motion.div
                   key={post.id}
-                  to={`/blog/${post.slug}`}
-                  className="group"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
                 >
-                  <div className="bg-card rounded-xl border border-border/50 p-6 hover:shadow-soft transition-all duration-300 h-full">
-                    <Badge
-                      variant="secondary"
-                      className="mb-3 capitalize"
-                    >
-                      {post.category.replace("-", " ")}
-                    </Badge>
-                    <h3 className="text-lg font-display font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm line-clamp-2">
-                      {post.excerpt}
-                    </p>
-                  </div>
-                </Link>
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    className="group block h-full"
+                  >
+                    <div className="bg-card rounded-2xl border border-border/50 overflow-hidden hover:shadow-medium transition-all duration-300 h-full hover:-translate-y-1">
+                      {post.featuredImage && (
+                        <div className="h-40 overflow-hidden">
+                          <img
+                            src={`${import.meta.env.VITE_API_BASE_URL}${post.featuredImage}`}
+                            alt={post.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <div className="p-6">
+                        <Badge
+                          variant="secondary"
+                          className="mb-3 capitalize bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                        >
+                          {post.category.replace("-", " ")}
+                        </Badge>
+                        <h3 className="text-lg font-display font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2 leading-tight">
+                          {post.title}
+                        </h3>
+                        <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
+                          {post.excerpt}
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {post.readTime}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(post.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -429,17 +568,28 @@ const BlogArticle = () => {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-background">
+      <section className="py-16 md:py-20 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5">
         <div className="container-padding mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl font-display font-bold text-foreground mb-4">
-            Stay Updated
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Subscribe to our newsletter to receive the latest articles and community news.
-          </p>
-          <Button asChild variant="hero" size="lg">
-            <Link to="/contact">Subscribe Now</Link>
-          </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+              Stay Updated
+            </h2>
+            <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
+              Subscribe to our newsletter to receive the latest articles, community news, and exclusive content.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild variant="hero" size="lg" className="px-8">
+                <Link to="/contact">Subscribe Now</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="px-8">
+                <Link to="/blog">View All Articles</Link>
+              </Button>
+            </div>
+          </motion.div>
         </div>
       </section>
     </MainLayout>
