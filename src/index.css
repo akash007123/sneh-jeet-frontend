@@ -1,0 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm cream background */
+    --background: 40 33% 98%;
+    --foreground: 230 25% 18%;
+
+    /* Cards with subtle warmth */
+    --card: 0 0% 100%;
+    --card-foreground: 230 25% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 25% 18%;
+
+    /* Coral/Orange primary - warmth & energy */
+    --primary: 12 76% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft violet secondary */
+    --secondary: 280 45% 65%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Teal accent - trust & calm */
+    --accent: 174 58% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Muted tones */
+    --muted: 40 20% 94%;
+    --muted-foreground: 230 15% 45%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 20% 88%;
+    --input: 40 20% 88%;
+    --ring: 12 76% 61%;
+
+    --radius: 0.75rem;
+
+    /* Pride gradient colors */
+    --pride-red: 0 85% 60%;
+    --pride-orange: 25 95% 55%;
+    --pride-yellow: 45 100% 60%;
+    --pride-green: 145 65% 45%;
+    --pride-blue: 210 85% 55%;
+    --pride-purple: 280 70% 55%;
+    --pride-pink: 330 80% 65%;
+
+    /* Custom semantic colors */
+    --warm: 30 80% 95%;
+    --warm-foreground: 25 60% 35%;
+    --safe: 174 45% 92%;
+    --safe-foreground: 174 50% 30%;
+    --hope: 280 40% 94%;
+    --hope-foreground: 280 45% 35%;
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(230 25% 18% / 0.08);
+    --shadow-medium: 0 8px 30px -6px hsl(230 25% 18% / 0.12);
+    --shadow-glow: 0 0 40px hsl(12 76% 61% / 0.15);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 230 25% 10%;
+    --foreground: 40 20% 96%;
+
+    --card: 230 22% 14%;
+    --card-foreground: 40 20% 96%;
+
+    --popover: 230 22% 14%;
+    --popover-foreground: 40 20% 96%;
+
+    --primary: 12 76% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 280 45% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 174 58% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 230 20% 18%;
+    --muted-foreground: 40 15% 65%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 230 20% 22%;
+    --input: 230 20% 22%;
+    --ring: 12 76% 61%;
+
+    --warm: 30 40% 18%;
+    --warm-foreground: 30 60% 75%;
+    --safe: 174 30% 16%;
+    --safe-foreground: 174 45% 70%;
+    --hope: 280 30% 18%;
+    --hope-foreground: 280 40% 75%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .pride-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--pride-red)) 0%,
+      hsl(var(--pride-orange)) 17%,
+      hsl(var(--pride-yellow)) 33%,
+      hsl(var(--pride-green)) 50%,
+      hsl(var(--pride-blue)) 67%,
+      hsl(var(--pride-purple)) 83%,
+      hsl(var(--pride-pink)) 100%
+    );
+  }
+
+  .pride-gradient-subtle {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--pride-red) / 0.1) 0%,
+      hsl(var(--pride-orange) / 0.1) 17%,
+      hsl(var(--pride-yellow) / 0.1) 33%,
+      hsl(var(--pride-green) / 0.1) 50%,
+      hsl(var(--pride-blue) / 0.1) 67%,
+      hsl(var(--pride-purple) / 0.1) 83%,
+      hsl(var(--pride-pink) / 0.1) 100%
+    );
+  }
+
+  .pride-text {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--pride-red)) 0%,
+      hsl(var(--pride-orange)) 20%,
+      hsl(var(--pride-yellow)) 40%,
+      hsl(var(--pride-green)) 60%,
+      hsl(var(--pride-blue)) 80%,
+      hsl(var(--pride-purple)) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-medium hover:-translate-y-1;
+  }
+
+  .glass {
+    @apply bg-background/80 backdrop-blur-lg;
+  }
+
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
