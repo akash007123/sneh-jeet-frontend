@@ -1,19 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Clock, User, Tag, ArrowRight } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
-import { stories } from "@/data/mockData";
 
-const categories = [
-  { id: "all", label: "All Stories" },
-  { id: "personal", label: "Personal" },
-  { id: "community", label: "Community" },
-  { id: "resources", label: "Resources" },
-  { id: "allies", label: "Allies" },
-];
+interface Story {
+  _id: string;
+  title: string;
+  excerpt: string;
+  content?: string;
+  image?: string;
+  isFeatured: boolean;
+  readTime: string;
+  author: string;
+  publishedDate: string;
+  category: string;
+  type?: string;
+}
 
 const categoryColors: Record<string, string> = {
   personal: "bg-warm text-warm-foreground",
@@ -24,13 +29,50 @@ const categoryColors: Record<string, string> = {
 
 const Stories = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const [stories, setStories] = useState<Story[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<{ id: string; label: string }[]>([
+    { id: "all", label: "All Stories" },
+  ]);
 
-  const filteredStories = activeCategory === "all"
-    ? stories
-    : stories.filter(story => story.category === activeCategory);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/categories`);
+        const data = await response.json();
+        const dynamicCategories = data.map((cat: string) => ({
+          id: cat,
+          label: cat.charAt(0).toUpperCase() + cat.slice(1),
+        }));
+        setCategories([{ id: "all", label: "All Stories" }, ...dynamicCategories]);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
 
-  const featuredStories = filteredStories.filter(s => s.featured);
-  const otherStories = filteredStories.filter(s => !s.featured);
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story?category=${activeCategory}`);
+        const data = await response.json();
+        setStories(data.stories || []);
+      } catch (error) {
+        console.error('Error fetching stories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStories();
+  }, [activeCategory]);
+
+  const filteredStories = stories;
+
+  const featuredStories = filteredStories.filter(s => s.isFeatured);
+  const otherStories = filteredStories.filter(s => !s.isFeatured);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -81,20 +123,28 @@ const Stories = () => {
             <div className="grid md:grid-cols-2 gap-8">
               {featuredStories.map((story, index) => (
                 <motion.article
-                  key={story.id}
+                  key={story._id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   className="bg-card rounded-2xl border border-border overflow-hidden card-hover"
                 >
-                  {/* Image placeholder */}
-                  <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
+                  {/* Image */}
+                  {story.image ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                      alt={story.title}
+                      className="aspect-video object-cover"
+                    />
+                  ) : (
+                    <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
+                  )}
 
                   <div className="p-6">
                     <div className="flex items-center gap-3 mb-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${categoryColors[story.category] || "bg-muted text-muted-foreground"}`}>
-                        {story.category}
+                        {story.type || story.category}
                       </span>
                       <span className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Clock className="w-4 h-4" />
@@ -115,7 +165,7 @@ const Stories = () => {
                         <User className="w-4 h-4" />
                         {story.author}
                         <span>•</span>
-                        {formatDate(story.date)}
+                        {formatDate(story.publishedDate)}
                       </div>
 
                       <Button variant="ghost" size="sm">
@@ -146,16 +196,27 @@ const Stories = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {otherStories.map((story, index) => (
                 <motion.article
-                  key={story.id}
+                  key={story._id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
                   className="bg-card rounded-xl p-5 border border-border card-hover"
                 >
+                  <div className="mb-2 rounded">
+                  {story.image ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                      alt={story.title}
+                      className="aspect-video object-cover rounded-sm"
+                    />
+                  ) : (
+                    <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
+                  )}
+                  </div>
                   <div className="flex items-center gap-2 mb-3">
                     <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColors[story.category] || "bg-muted text-muted-foreground"}`}>
-                      {story.category}
+                      {story.type || story.category}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {story.readTime}
@@ -173,7 +234,7 @@ const Stories = () => {
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{story.author}</span>
                     <span>•</span>
-                    <span>{formatDate(story.date)}</span>
+                    <span>{formatDate(story.publishedDate)}</span>
                   </div>
                 </motion.article>
               ))}

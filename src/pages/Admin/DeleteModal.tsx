@@ -71,10 +71,19 @@ interface Idea {
   createdAt: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea;
+interface Story {
+  _id: string;
+  title: string;
+  excerpt: string;
+  author: string;
+  category: string;
+  publishedDate: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story;
 
 interface DeleteModalProps {
-  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea';
+  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story';
   item: DeletableItem | null;
   isOpen: boolean;
   onClose: () => void;
@@ -92,6 +101,7 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, delet
       case 'blog': return 'Delete Blog Post';
       case 'media': return 'Delete Media';
       case 'idea': return 'Delete Idea';
+      case 'story': return 'Delete Story';
       default: return 'Delete Item';
     }
   };
@@ -110,6 +120,7 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, delet
       case 'blog': return (item as Blog).title;
       case 'media': return (item as Media).title;
       case 'idea': return (item as Idea).title;
+      case 'story': return (item as Story).title;
       default: return '';
     }
   };

@@ -27,6 +27,7 @@ import ContactsPage from "./pages/Admin/ContactsPage";
 import EventsPage from "./pages/Admin/EventsPage";
 import GalleryPage from "./pages/Admin/GalleryPage";
 import BlogsPage from "./pages/Admin/BlogsPage";
+import StoriesPage from "./pages/Admin/StoriesPage";
 import MediaPage from "./pages/Admin/MediaPage";
 import IdeasPage from "./pages/Admin/IdeasPage";
 import MembersPage from "./pages/Admin/MembersPage";
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/admin/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
             <Route path="/admin/gallery" element={<ProtectedRoute><GalleryPage /></ProtectedRoute>} />
             <Route path="/admin/blogs" element={<ProtectedRoute><BlogsPage /></ProtectedRoute>} />
+            <Route path="/admin/stories" element={<ProtectedRoute><StoriesPage /></ProtectedRoute>} />
             <Route path="/admin/media" element={<ProtectedRoute><MediaPage /></ProtectedRoute>} />
             <Route path="/admin/ideas" element={<ProtectedRoute><IdeasPage /></ProtectedRoute>} />
             <Route path="/admin/members" element={<ProtectedRoute><MembersPage /></ProtectedRoute>} />
