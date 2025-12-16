@@ -371,7 +371,7 @@ const BlogArticle = () => {
                   <User className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">{article.author}</p>
+                  <p className="font-medium text-white">{article.authorName}</p>
                   <p className="text-sm text-white/70">{article.authorBio}</p>
                 </div>
               </div>
@@ -379,7 +379,7 @@ const BlogArticle = () => {
               <div className="flex items-center gap-4 text-sm">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  {new Date(article.date).toLocaleDateString("en-US", {
+                  {new Date(article.publishedDate).toLocaleDateString("en-US", {
                     month: "long",
                     day: "numeric",
                     year: "numeric",
@@ -490,7 +490,7 @@ const BlogArticle = () => {
                         className="w-full max-w-3xl mx-auto rounded-xl shadow-soft"
                       />
                       <div className="text-sm text-muted-foreground mt-3 text-center">
-                        By {article.author} on {new Date(article.date).toLocaleDateString("en-US", {
+                        By {article.authorName} on {new Date(article.publishedDate).toLocaleDateString("en-US", {
                           month: "long",
                           day: "numeric",
                           year: "numeric",
@@ -899,7 +899,7 @@ const BlogArticle = () => {
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            {new Date(post.date).toLocaleDateString("en-US", {
+                            {new Date(post.publishedDate).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
                             })}

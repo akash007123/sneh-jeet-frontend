@@ -147,13 +147,22 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
     // Add featured image
     if (featuredImage) {
       submitData.append('featuredImage', featuredImage);
+    } else if (blog?.featuredImage && featuredImage === null) {
+      // Special case: remove existing featured image
+      submitData.append('removeFeaturedImage', 'true');
     }
 
+    // Prepare sections data without File objects
+    const sectionsData = sections.map(section => ({
+      ...section,
+      sectionImage: typeof section.sectionImage === 'string' ? section.sectionImage : null
+    }));
+
     // Add sections as JSON
-    submitData.append('sections', JSON.stringify(sections));
+    submitData.append('sections', JSON.stringify(sectionsData));
 
     // Add section images
-    sections.forEach((section, index) => {
+    sections.forEach((section) => {
       if (section.sectionImage instanceof File) {
         submitData.append('sectionImages', section.sectionImage);
       }
@@ -255,13 +264,57 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
               </div>
 
               <div>
-                <Label htmlFor="featuredImage">Featured Image (leave empty to keep current)</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="featuredImage">Featured Image</Label>
+                  {blog?.featuredImage && !featuredImage && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        // To remove featured image, we need to send an empty string or null
+                        // But since FormData doesn't handle null well, we'll handle this in backend
+                        setFeaturedImage(null);
+                      }}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      Remove Image
+                    </Button>
+                  )}
+                </div>
                 <Input
                   id="featuredImage"
                   type="file"
                   accept="image/*"
                   onChange={(e) => setFeaturedImage(e.target.files?.[0] || null)}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Leave empty to keep current image, or select a new file to replace it
+                </p>
+                {blog?.featuredImage && !featuredImage && (
+                  <div className="mt-2">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Current image: {blog.featuredImage.split('/').pop()}
+                    </p>
+                    <img
+                      src={`${import.meta.env.VITE_API_BASE_URL}${blog.featuredImage}`}
+                      alt="Current featured image"
+                      className="w-32 h-20 object-cover rounded border"
+                    />
+                  </div>
+                )}
+                {featuredImage && (
+                  <div className="mt-2">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      New image: {featuredImage.name}
+                    </p>
+                    <img
+                      src={URL.createObjectURL(featuredImage)}
+                      alt="New featured image"
+                      className="w-32 h-20 object-cover rounded border"
+                    />
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -337,16 +390,51 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
                       />
                     </div>
                     <div>
-                      <Label>Section Image (leave empty to keep current)</Label>
+                      <div className="flex items-center justify-between">
+                        <Label>Section Image</Label>
+                        {(typeof section.sectionImage === 'string' && section.sectionImage) || section.sectionImage instanceof File ? (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => updateSection(index, 'sectionImage', '')}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            Remove Image
+                          </Button>
+                        ) : null}
+                      </div>
                       <Input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => updateSection(index, 'sectionImage', e.target.files?.[0])}
+                        onChange={(e) => updateSection(index, 'sectionImage', e.target.files?.[0] || '')}
                       />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Leave empty to keep current image, or select a new file to replace it
+                      </p>
                       {typeof section.sectionImage === 'string' && section.sectionImage && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Current image: {section.sectionImage.split('/').pop()}
-                        </p>
+                        <div className="mt-2">
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Current image: {section.sectionImage.split('/').pop()}
+                          </p>
+                          <img
+                            src={`${import.meta.env.VITE_API_BASE_URL}${section.sectionImage}`}
+                            alt="Current section image"
+                            className="w-32 h-20 object-cover rounded border"
+                          />
+                        </div>
+                      )}
+                      {section.sectionImage instanceof File && (
+                        <div className="mt-2">
+                          <p className="text-sm text-muted-foreground mb-2">
+                            New image: {section.sectionImage.name}
+                          </p>
+                          <img
+                            src={URL.createObjectURL(section.sectionImage)}
+                            alt="New section image"
+                            className="w-32 h-20 object-cover rounded border"
+                          />
+                        </div>
                       )}
                     </div>
                   </CardContent>
