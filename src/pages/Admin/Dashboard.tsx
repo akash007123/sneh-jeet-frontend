@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Users,
@@ -6,130 +5,17 @@ import {
   CheckCircle,
   Clock,
   Calendar,
-  Edit,
-  Trash2,
-  Eye,
-  Plus,
   Image,
+  FileText,
 } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import MainLayout from "@/layouts/MainLayout";
-import PageHero from "@/components/PageHero";
+import AdminLayout from "@/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import ViewContactModal from "./ViewContactModal";
-import EditStatusModal from "./EditStatusModal";
-import ViewEventModal from "./ViewEventModal";
-import EditEventModal from "./EditEventModal";
-import AddEventModal from "./AddEventModal";
-import ViewGalleryModal from "./ViewGalleryModal";
-import EditGalleryModal from "./EditGalleryModal";
-import AddGalleryModal from "./AddGalleryModal";
-import DeleteModal from "./DeleteModal";
-import BlogTable from "./BlogTable";
-import ViewBlogModal from "./ViewBlogModal";
-import EditBlogModal from "./EditBlogModal";
-import AddBlogModal from "./AddBlogModal";
 
-interface Contact {
-  _id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  subject: string;
-  message: string;
-  status: "New" | "Pending" | "Talk" | "Resolved";
-  createdAt: string;
-}
-
-interface Event {
-  _id: string;
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  category: string;
-  description: string;
-  image?: string;
-  createdAt: string;
-}
-
-interface GalleryItem {
-  _id: string;
-  title: string;
-  category: string;
-  imageUrl?: string;
-  description?: string;
-  createdAt: string;
-}
-
-interface Blog {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  isFeatured: boolean;
-  category: string;
-  authorName: string;
-  publishedDate: string;
-  createdAt: string;
-}
-
-type DeletableItem = Contact | Event | GalleryItem | Blog;
 
 const Dashboard = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const { user, logout, token } = useAuth();
-
-  // Contact states
-  const [viewContact, setViewContact] = useState<Contact | null>(null);
-  const [viewContactModalOpen, setViewContactModalOpen] = useState(false);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [editContactModalOpen, setEditContactModalOpen] = useState(false);
-
-  // Event states
-  const [viewEvent, setViewEvent] = useState<Event | null>(null);
-  const [viewEventModalOpen, setViewEventModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [editEventModalOpen, setEditEventModalOpen] = useState(false);
-  const [addEventModalOpen, setAddEventModalOpen] = useState(false);
-
-  // Gallery states
-  const [viewGalleryItem, setViewGalleryItem] = useState<GalleryItem | null>(
-    null
-  );
-  const [viewGalleryModalOpen, setViewGalleryModalOpen] = useState(false);
-  const [selectedGalleryItem, setSelectedGalleryItem] =
-    useState<GalleryItem | null>(null);
-  const [editGalleryModalOpen, setEditGalleryModalOpen] = useState(false);
-  const [addGalleryModalOpen, setAddGalleryModalOpen] = useState(false);
-
-  // Blog states
-  const [viewBlog, setViewBlog] = useState<Blog | null>(null);
-  const [viewBlogModalOpen, setViewBlogModalOpen] = useState(false);
-  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
-  const [editBlogModalOpen, setEditBlogModalOpen] = useState(false);
-  const [addBlogModalOpen, setAddBlogModalOpen] = useState(false);
-
-  // Delete states
-  const [deleteItem, setDeleteItem] = useState<DeletableItem | null>(null);
-  const [deleteType, setDeleteType] = useState<
-    "contact" | "event" | "gallery" | "blog" | null
-  >(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { token } = useAuth();
 
   // Queries
   const { data: contacts, isLoading: contactsLoading } = useQuery({
@@ -196,284 +82,7 @@ const Dashboard = () => {
     },
   });
 
-  // Mutations
-  const updateContactStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      toast({ title: "Success", description: "Status updated successfully" });
-      setSelectedContact(null);
-      setEditContactModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
-      });
-    },
-  });
 
-  const deleteContactMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete contact");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      toast({ title: "Success", description: "Contact deleted successfully" });
-      setDeleteItem(null);
-      setDeleteType(null);
-      setDeleteModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete contact",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteEventMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/event/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete event");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["events"] });
-      toast({ title: "Success", description: "Event deleted successfully" });
-      setDeleteItem(null);
-      setDeleteType(null);
-      setDeleteModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete event",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteGalleryMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/gallery/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete gallery item");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gallery"] });
-      toast({
-        title: "Success",
-        description: "Gallery item deleted successfully",
-      });
-      setDeleteItem(null);
-      setDeleteType(null);
-      setDeleteModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete gallery item",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteBlogMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete blog post");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      toast({
-        title: "Success",
-        description: "Blog post deleted successfully",
-      });
-      setDeleteItem(null);
-      setDeleteType(null);
-      setDeleteModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete blog post",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Handlers
-  const handleViewContact = (contact: Contact) => {
-    setViewContact(contact);
-    setViewContactModalOpen(true);
-  };
-
-  const handleEditContactStatus = (contact: Contact) => {
-    setSelectedContact(contact);
-    setEditContactModalOpen(true);
-  };
-
-  const handleUpdateContactStatus = (status: string) => {
-    if (selectedContact) {
-      updateContactStatusMutation.mutate({ id: selectedContact._id, status });
-    }
-  };
-
-  const handleDeleteContact = (contact: Contact) => {
-    setDeleteItem(contact);
-    setDeleteType("contact");
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDeleteContact = () => {
-    if (deleteItem && deleteType === "contact") {
-      deleteContactMutation.mutate(deleteItem._id);
-    }
-  };
-
-  const handleViewEvent = (event: Event) => {
-    setViewEvent(event);
-    setViewEventModalOpen(true);
-  };
-
-  const handleEditEvent = (event: Event) => {
-    setSelectedEvent(event);
-    setEditEventModalOpen(true);
-  };
-
-  const handleDeleteEvent = (event: Event) => {
-    setDeleteItem(event);
-    setDeleteType("event");
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDeleteEvent = () => {
-    if (deleteItem && deleteType === "event") {
-      deleteEventMutation.mutate(deleteItem._id);
-    }
-  };
-
-  const handleViewGalleryItem = (item: GalleryItem) => {
-    setViewGalleryItem(item);
-    setViewGalleryModalOpen(true);
-  };
-
-  const handleEditGalleryItem = (item: GalleryItem) => {
-    setSelectedGalleryItem(item);
-    setEditGalleryModalOpen(true);
-  };
-
-  const handleDeleteGalleryItem = (item: GalleryItem) => {
-    setDeleteItem(item);
-    setDeleteType("gallery");
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDeleteGalleryItem = () => {
-    if (deleteItem && deleteType === "gallery") {
-      deleteGalleryMutation.mutate(deleteItem._id);
-    }
-  };
-
-  const handleViewBlog = (blog: Blog) => {
-    setViewBlog(blog);
-    setViewBlogModalOpen(true);
-  };
-
-  const handleEditBlog = (blog: Blog) => {
-    setSelectedBlog(blog);
-    setEditBlogModalOpen(true);
-  };
-
-  const handleDeleteBlog = (blog: Blog) => {
-    setDeleteItem(blog);
-    setDeleteType("blog");
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDeleteBlog = () => {
-    if (deleteItem && deleteType === "blog") {
-      deleteBlogMutation.mutate(deleteItem._id);
-    }
-  };
-
-  const getContactStatusColor = (status: string) => {
-    switch (status) {
-      case "New":
-        return "bg-blue-100 text-blue-800";
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "Talk":
-        return "bg-purple-100 text-purple-800";
-      case "Resolved":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const formatEventDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  // Mock data - in real app, fetch from API
   const stats = {
     totalContacts: contacts?.length || 0,
     newContacts: contacts?.filter((c) => c.status === "New").length || 0,
@@ -484,557 +93,162 @@ const Dashboard = () => {
     totalEvents: events?.length || 0,
     totalGallery: gallery?.length || 0,
     totalBlogs: blogs?.blogs?.length || 0,
-    featuredBlogs: blogs?.blogs?.filter((b: Blog) => b.isFeatured).length || 0,
+    featuredBlogs: blogs?.blogs?.filter((b) => b.isFeatured).length || 0,
   };
 
   return (
-    <MainLayout>
-      <div className="flex flex-col gap-6">
-        {/* Page Hero */}
-        <PageHero
-          badge="Admin"
-          title="Dashboard"
-          subtitle="Manage your NGO's contact submissions and communications."
-        />
-
-        {/* Admin Header Bar */}
-        <div className="bg-white border rounded-lg shadow-sm">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-            <div>
-              <p className="text-sm font-semibold text-gray-900">
-                Welcome, {user?.name}
-              </p>
-              <p className="text-xs text-gray-500">
-                {user?.email} · {user?.role}
-              </p>
-            </div>
-
-            <Button
-              onClick={logout}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              Logout
-            </Button>
-          </div>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+          <p className="text-muted-foreground">
+            Welcome to your admin dashboard. Here's an overview of your NGO's data.
+          </p>
         </div>
-      </div>
 
-      <section className="section-padding bg-background">
-        <div className="container-padding mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Contacts
-                  </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.totalContacts}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Contacts
+                </CardTitle>
+                <Users className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats.totalContacts}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">New</CardTitle>
-                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.newContacts}</div>
-                </CardContent>
-              </Card>
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">New</CardTitle>
+                <MessageSquare className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.newContacts}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.pendingContacts}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Pending</CardTitle>
+                <Clock className="h-4 w-4 text-yellow-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats.pendingContacts}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Resolved
-                  </CardTitle>
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {stats.resolvedContacts}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Resolved
+                </CardTitle>
+                <CheckCircle className="h-4 w-4 text-purple-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {stats.resolvedContacts}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Events
-                  </CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalEvents}</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Gallery Items
-                  </CardTitle>
-                  <Image className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalGallery}</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Blog Posts
-                  </CardTitle>
-                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalBlogs}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {stats.featuredBlogs} featured
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Events
+                </CardTitle>
+                <Calendar className="h-4 w-4 text-orange-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalEvents}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
+            whileHover={{ scale: 1.02, y: -5 }}
           >
-            <Tabs defaultValue="contacts" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="contacts">Contacts</TabsTrigger>
-                <TabsTrigger value="events">Events</TabsTrigger>
-                <TabsTrigger value="gallery">Gallery</TabsTrigger>
-                <TabsTrigger value="blogs">Blogs</TabsTrigger>
-              </TabsList>
+            <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Gallery Items
+                </CardTitle>
+                <Image className="h-4 w-4 text-pink-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalGallery}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-              <TabsContent value="contacts" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Contact Submissions</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {contactsLoading ? (
-                      <div className="text-center py-8">Loading...</div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Phone</TableHead>
-                            <TableHead>Subject</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {contacts?.map((contact: Contact) => (
-                            <TableRow key={contact._id}>
-                              <TableCell className="font-medium">
-                                {contact.name}
-                              </TableCell>
-                              <TableCell>{contact.email}</TableCell>
-                              <TableCell>{contact.phone || "N/A"}</TableCell>
-                              <TableCell>{contact.subject}</TableCell>
-                              <TableCell>
-                                <Badge
-                                  className={getContactStatusColor(
-                                    contact.status
-                                  )}
-                                >
-                                  {contact.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                {new Date(
-                                  contact.createdAt
-                                ).toLocaleDateString()}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewContact(contact)}
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                  </Button>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleEditContactStatus(contact)
-                                    }
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleDeleteContact(contact)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="events" className="mt-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Events</CardTitle>
-                    <Button onClick={() => setAddEventModalOpen(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Event
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {eventsLoading ? (
-                      <div className="text-center py-8">Loading...</div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Time</TableHead>
-                            <TableHead>Location</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {events?.map((event: Event) => (
-                            <TableRow key={event._id}>
-                              <TableCell className="font-medium">
-                                {event.title}
-                              </TableCell>
-                              <TableCell>
-                                {formatEventDate(event.date)}
-                              </TableCell>
-                              <TableCell>{event.time}</TableCell>
-                              <TableCell>{event.location}</TableCell>
-                              <TableCell>
-                                <Badge variant="secondary">
-                                  {event.category}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewEvent(event)}
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                  </Button>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleEditEvent(event)}
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleDeleteEvent(event)}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="gallery" className="mt-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle>Gallery</CardTitle>
-                    <Button onClick={() => setAddGalleryModalOpen(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Gallery Item
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {galleryLoading ? (
-                      <div className="text-center py-8">Loading...</div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Category</TableHead>
-                            <TableHead>Image</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {gallery?.map((item: GalleryItem) => (
-                            <TableRow key={item._id}>
-                              <TableCell className="font-medium">
-                                {item.title}
-                              </TableCell>
-                              <TableCell>
-                                <Badge
-                                  variant="secondary"
-                                  className="capitalize"
-                                >
-                                  {item.category}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                {item.imageUrl ? (
-                                  <img
-                                    src={`${import.meta.env.VITE_API_BASE_URL}${
-                                      item.imageUrl
-                                    }`}
-                                    alt={item.title}
-                                    className="w-12 h-12 object-cover rounded"
-                                  />
-                                ) : (
-                                  <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
-                                    <Image className="w-6 h-6 text-muted-foreground" />
-                                  </div>
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                {new Date(item.createdAt).toLocaleDateString()}
-                              </TableCell>
-                              <TableCell>
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleViewGalleryItem(item)}
-                                  >
-                                    <Eye className="w-4 h-4" />
-                                  </Button>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleEditGalleryItem(item)}
-                                  >
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleDeleteGalleryItem(item)
-                                    }
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="blogs" className="mt-6">
-                <BlogTable
-                  onView={handleViewBlog}
-                  onEdit={handleEditBlog}
-                  onAdd={() => setAddBlogModalOpen(true)}
-                  onDelete={handleDeleteBlog}
-                />
-              </TabsContent>
-            </Tabs>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Blog Posts
+                </CardTitle>
+                <FileText className="h-4 w-4 text-teal-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalBlogs}</div>
+                <p className="text-xs text-muted-foreground">
+                  {stats.featuredBlogs} featured
+                </p>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
-      </section>
-
-      <ViewContactModal
-        contact={viewContact}
-        isOpen={viewContactModalOpen}
-        onClose={() => setViewContactModalOpen(false)}
-      />
-
-      <EditStatusModal
-        contact={selectedContact}
-        isOpen={editContactModalOpen}
-        onClose={() => setEditContactModalOpen(false)}
-        onUpdate={handleUpdateContactStatus}
-        isUpdating={updateContactStatusMutation.isPending}
-      />
-
-      <DeleteModal
-        type={deleteType!}
-        item={deleteItem}
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          if (deleteType === "contact") confirmDeleteContact();
-          else if (deleteType === "event") confirmDeleteEvent();
-          else if (deleteType === "gallery") confirmDeleteGalleryItem();
-          else if (deleteType === "blog") confirmDeleteBlog();
-        }}
-        isDeleting={
-          deleteType === "contact"
-            ? deleteContactMutation.isPending
-            : deleteType === "event"
-            ? deleteEventMutation.isPending
-            : deleteType === "gallery"
-            ? deleteGalleryMutation.isPending
-            : deleteBlogMutation.isPending
-        }
-      />
-
-      <ViewEventModal
-        event={viewEvent}
-        isOpen={viewEventModalOpen}
-        onClose={() => setViewEventModalOpen(false)}
-      />
-
-      <EditEventModal
-        event={selectedEvent}
-        isOpen={editEventModalOpen}
-        onClose={() => setEditEventModalOpen(false)}
-        onSuccess={() =>
-          queryClient.invalidateQueries({ queryKey: ["events"] })
-        }
-      />
-
-      <AddEventModal
-        isOpen={addEventModalOpen}
-        onClose={() => setAddEventModalOpen(false)}
-        onSuccess={() =>
-          queryClient.invalidateQueries({ queryKey: ["events"] })
-        }
-      />
-
-      <ViewGalleryModal
-        galleryItem={viewGalleryItem}
-        isOpen={viewGalleryModalOpen}
-        onClose={() => setViewGalleryModalOpen(false)}
-      />
-
-      <EditGalleryModal
-        galleryItem={selectedGalleryItem}
-        isOpen={editGalleryModalOpen}
-        onClose={() => setEditGalleryModalOpen(false)}
-        onSuccess={() =>
-          queryClient.invalidateQueries({ queryKey: ["gallery"] })
-        }
-      />
-
-      <AddGalleryModal
-        isOpen={addGalleryModalOpen}
-        onClose={() => setAddGalleryModalOpen(false)}
-        onSuccess={() =>
-          queryClient.invalidateQueries({ queryKey: ["gallery"] })
-        }
-      />
-
-      <ViewBlogModal
-        blog={viewBlog}
-        isOpen={viewBlogModalOpen}
-        onClose={() => setViewBlogModalOpen(false)}
-      />
-
-      <EditBlogModal
-        blog={selectedBlog}
-        isOpen={editBlogModalOpen}
-        onClose={() => setEditBlogModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["blogs"] })}
-      />
-
-      <AddBlogModal
-        isOpen={addBlogModalOpen}
-        onClose={() => setAddBlogModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["blogs"] })}
-      />
-    </MainLayout>
+      </div>
+    </AdminLayout>
   );
 };
 

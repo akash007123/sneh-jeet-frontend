@@ -22,6 +22,10 @@ import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import MediaHub from "./pages/MediaHub";
 import Dashboard from "./pages/Admin/Dashboard";
+import ContactsPage from "./pages/Admin/ContactsPage";
+import EventsPage from "./pages/Admin/EventsPage";
+import GalleryPage from "./pages/Admin/GalleryPage";
+import BlogsPage from "./pages/Admin/BlogsPage";
 import Login from "./pages/Admin/Login";
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +57,10 @@ const App = () => (
             <Route path="/media" element={<MediaHub />} />
             <Route path="/admin/login" element={<Login />} />
             <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/admin/contacts" element={<ProtectedRoute><ContactsPage /></ProtectedRoute>} />
+            <Route path="/admin/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
+            <Route path="/admin/gallery" element={<ProtectedRoute><GalleryPage /></ProtectedRoute>} />
+            <Route path="/admin/blogs" element={<ProtectedRoute><BlogsPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
