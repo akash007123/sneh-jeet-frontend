@@ -1,7 +1,19 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Users, MessageSquare, CheckCircle, Clock, Calendar, Edit, Trash2, Eye, Plus, Image } from "lucide-react";
+import {
+  Users,
+  MessageSquare,
+  CheckCircle,
+  Clock,
+  Calendar,
+  Edit,
+  Trash2,
+  Eye,
+  Plus,
+  Image,
+} from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +50,7 @@ interface Contact {
   phone?: string;
   subject: string;
   message: string;
-  status: 'New' | 'Pending' | 'Talk' | 'Resolved';
+  status: "New" | "Pending" | "Talk" | "Resolved";
   createdAt: string;
 }
 
@@ -80,6 +92,7 @@ type DeletableItem = Contact | Event | GalleryItem | Blog;
 const Dashboard = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, logout, token } = useAuth();
 
   // Contact states
   const [viewContact, setViewContact] = useState<Contact | null>(null);
@@ -95,9 +108,12 @@ const Dashboard = () => {
   const [addEventModalOpen, setAddEventModalOpen] = useState(false);
 
   // Gallery states
-  const [viewGalleryItem, setViewGalleryItem] = useState<GalleryItem | null>(null);
+  const [viewGalleryItem, setViewGalleryItem] = useState<GalleryItem | null>(
+    null
+  );
   const [viewGalleryModalOpen, setViewGalleryModalOpen] = useState(false);
-  const [selectedGalleryItem, setSelectedGalleryItem] = useState<GalleryItem | null>(null);
+  const [selectedGalleryItem, setSelectedGalleryItem] =
+    useState<GalleryItem | null>(null);
   const [editGalleryModalOpen, setEditGalleryModalOpen] = useState(false);
   const [addGalleryModalOpen, setAddGalleryModalOpen] = useState(false);
 
@@ -110,42 +126,72 @@ const Dashboard = () => {
 
   // Delete states
   const [deleteItem, setDeleteItem] = useState<DeletableItem | null>(null);
-  const [deleteType, setDeleteType] = useState<'contact' | 'event' | 'gallery' | 'blog' | null>(null);
+  const [deleteType, setDeleteType] = useState<
+    "contact" | "event" | "gallery" | "blog" | null
+  >(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   // Queries
   const { data: contacts, isLoading: contactsLoading } = useQuery({
-    queryKey: ['contacts'],
+    queryKey: ["contacts"],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
-      if (!response.ok) throw new Error('Failed to fetch contacts');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/contact`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch contacts");
       return response.json();
     },
   });
 
   const { data: events, isLoading: eventsLoading } = useQuery({
-    queryKey: ['events'],
+    queryKey: ["events"],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event`);
-      if (!response.ok) throw new Error('Failed to fetch events');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/event`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch events");
       return response.json();
     },
   });
 
   const { data: gallery, isLoading: galleryLoading } = useQuery({
-    queryKey: ['gallery'],
+    queryKey: ["gallery"],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`);
-      if (!response.ok) throw new Error('Failed to fetch gallery');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/gallery`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch gallery");
       return response.json();
     },
   });
 
   const { data: blogs, isLoading: blogsLoading } = useQuery({
-    queryKey: ['blogs'],
+    queryKey: ["blogs"],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`);
-      if (!response.ok) throw new Error('Failed to fetch blogs');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/blog`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch blogs");
       return response.json();
     },
   });
@@ -153,102 +199,158 @@ const Dashboard = () => {
   // Mutations
   const updateContactStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) throw new Error('Failed to update status');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update status");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
       toast({ title: "Success", description: "Status updated successfully" });
       setSelectedContact(null);
       setEditContactModalOpen(false);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to update status", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
     },
   });
 
   const deleteContactMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete contact');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete contact");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
       toast({ title: "Success", description: "Contact deleted successfully" });
       setDeleteItem(null);
       setDeleteType(null);
       setDeleteModalOpen(false);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete contact", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete contact",
+        variant: "destructive",
+      });
     },
   });
 
   const deleteEventMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete event');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/event/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete event");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({ title: "Success", description: "Event deleted successfully" });
       setDeleteItem(null);
       setDeleteType(null);
       setDeleteModalOpen(false);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete event", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete event",
+        variant: "destructive",
+      });
     },
   });
 
   const deleteGalleryMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete gallery item');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/gallery/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete gallery item");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['gallery'] });
-      toast({ title: "Success", description: "Gallery item deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ["gallery"] });
+      toast({
+        title: "Success",
+        description: "Gallery item deleted successfully",
+      });
       setDeleteItem(null);
       setDeleteType(null);
       setDeleteModalOpen(false);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete gallery item", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete gallery item",
+        variant: "destructive",
+      });
     },
   });
 
   const deleteBlogMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete blog post');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete blog post");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      toast({ title: "Success", description: "Blog post deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      toast({
+        title: "Success",
+        description: "Blog post deleted successfully",
+      });
       setDeleteItem(null);
       setDeleteType(null);
       setDeleteModalOpen(false);
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete blog post", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete blog post",
+        variant: "destructive",
+      });
     },
   });
 
@@ -271,12 +373,12 @@ const Dashboard = () => {
 
   const handleDeleteContact = (contact: Contact) => {
     setDeleteItem(contact);
-    setDeleteType('contact');
+    setDeleteType("contact");
     setDeleteModalOpen(true);
   };
 
   const confirmDeleteContact = () => {
-    if (deleteItem && deleteType === 'contact') {
+    if (deleteItem && deleteType === "contact") {
       deleteContactMutation.mutate(deleteItem._id);
     }
   };
@@ -293,12 +395,12 @@ const Dashboard = () => {
 
   const handleDeleteEvent = (event: Event) => {
     setDeleteItem(event);
-    setDeleteType('event');
+    setDeleteType("event");
     setDeleteModalOpen(true);
   };
 
   const confirmDeleteEvent = () => {
-    if (deleteItem && deleteType === 'event') {
+    if (deleteItem && deleteType === "event") {
       deleteEventMutation.mutate(deleteItem._id);
     }
   };
@@ -315,12 +417,12 @@ const Dashboard = () => {
 
   const handleDeleteGalleryItem = (item: GalleryItem) => {
     setDeleteItem(item);
-    setDeleteType('gallery');
+    setDeleteType("gallery");
     setDeleteModalOpen(true);
   };
 
   const confirmDeleteGalleryItem = () => {
-    if (deleteItem && deleteType === 'gallery') {
+    if (deleteItem && deleteType === "gallery") {
       deleteGalleryMutation.mutate(deleteItem._id);
     }
   };
@@ -337,23 +439,28 @@ const Dashboard = () => {
 
   const handleDeleteBlog = (blog: Blog) => {
     setDeleteItem(blog);
-    setDeleteType('blog');
+    setDeleteType("blog");
     setDeleteModalOpen(true);
   };
 
   const confirmDeleteBlog = () => {
-    if (deleteItem && deleteType === 'blog') {
+    if (deleteItem && deleteType === "blog") {
       deleteBlogMutation.mutate(deleteItem._id);
     }
   };
 
   const getContactStatusColor = (status: string) => {
     switch (status) {
-      case 'New': return 'bg-blue-100 text-blue-800';
-      case 'Pending': return 'bg-yellow-100 text-yellow-800';
-      case 'Talk': return 'bg-purple-100 text-purple-800';
-      case 'Resolved': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "New":
+        return "bg-blue-100 text-blue-800";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "Talk":
+        return "bg-purple-100 text-purple-800";
+      case "Resolved":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -369,9 +476,11 @@ const Dashboard = () => {
   // Mock data - in real app, fetch from API
   const stats = {
     totalContacts: contacts?.length || 0,
-    newContacts: contacts?.filter(c => c.status === 'New').length || 0,
-    pendingContacts: contacts?.filter(c => c.status === 'Pending').length || 0,
-    resolvedContacts: contacts?.filter(c => c.status === 'Resolved').length || 0,
+    newContacts: contacts?.filter((c) => c.status === "New").length || 0,
+    pendingContacts:
+      contacts?.filter((c) => c.status === "Pending").length || 0,
+    resolvedContacts:
+      contacts?.filter((c) => c.status === "Resolved").length || 0,
     totalEvents: events?.length || 0,
     totalGallery: gallery?.length || 0,
     totalBlogs: blogs?.blogs?.length || 0,
@@ -380,11 +489,36 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <PageHero
-        badge="Admin"
-        title="Dashboard"
-        subtitle="Manage your NGO's contact submissions and communications."
-      />
+      <div className="flex flex-col gap-6">
+        {/* Page Hero */}
+        <PageHero
+          badge="Admin"
+          title="Dashboard"
+          subtitle="Manage your NGO's contact submissions and communications."
+        />
+
+        {/* Admin Header Bar */}
+        <div className="bg-white border rounded-lg shadow-sm">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">
+                Welcome, {user?.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {user?.email} · {user?.role}
+              </p>
+            </div>
+
+            <Button
+              onClick={logout}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <section className="section-padding bg-background">
         <div className="container-padding mx-auto max-w-7xl">
@@ -396,11 +530,15 @@ const Dashboard = () => {
             >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Contacts</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Contacts
+                  </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalContacts}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalContacts}
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -432,7 +570,9 @@ const Dashboard = () => {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.pendingContacts}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.pendingContacts}
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -444,11 +584,15 @@ const Dashboard = () => {
             >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Resolved</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Resolved
+                  </CardTitle>
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.resolvedContacts}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.resolvedContacts}
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -462,7 +606,9 @@ const Dashboard = () => {
             >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Events
+                  </CardTitle>
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -478,7 +624,9 @@ const Dashboard = () => {
             >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Gallery Items</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Gallery Items
+                  </CardTitle>
                   <Image className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -494,7 +642,9 @@ const Dashboard = () => {
             >
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Blog Posts</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Blog Posts
+                  </CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -544,17 +694,25 @@ const Dashboard = () => {
                         <TableBody>
                           {contacts?.map((contact: Contact) => (
                             <TableRow key={contact._id}>
-                              <TableCell className="font-medium">{contact.name}</TableCell>
+                              <TableCell className="font-medium">
+                                {contact.name}
+                              </TableCell>
                               <TableCell>{contact.email}</TableCell>
-                              <TableCell>{contact.phone || 'N/A'}</TableCell>
+                              <TableCell>{contact.phone || "N/A"}</TableCell>
                               <TableCell>{contact.subject}</TableCell>
                               <TableCell>
-                                <Badge className={getContactStatusColor(contact.status)}>
+                                <Badge
+                                  className={getContactStatusColor(
+                                    contact.status
+                                  )}
+                                >
                                   {contact.status}
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                {new Date(contact.createdAt).toLocaleDateString()}
+                                {new Date(
+                                  contact.createdAt
+                                ).toLocaleDateString()}
                               </TableCell>
                               <TableCell>
                                 <div className="flex gap-2">
@@ -569,7 +727,9 @@ const Dashboard = () => {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handleEditContactStatus(contact)}
+                                    onClick={() =>
+                                      handleEditContactStatus(contact)
+                                    }
                                   >
                                     <Edit className="w-4 h-4" />
                                   </Button>
@@ -619,8 +779,12 @@ const Dashboard = () => {
                         <TableBody>
                           {events?.map((event: Event) => (
                             <TableRow key={event._id}>
-                              <TableCell className="font-medium">{event.title}</TableCell>
-                              <TableCell>{formatEventDate(event.date)}</TableCell>
+                              <TableCell className="font-medium">
+                                {event.title}
+                              </TableCell>
+                              <TableCell>
+                                {formatEventDate(event.date)}
+                              </TableCell>
                               <TableCell>{event.time}</TableCell>
                               <TableCell>{event.location}</TableCell>
                               <TableCell>
@@ -690,16 +854,23 @@ const Dashboard = () => {
                         <TableBody>
                           {gallery?.map((item: GalleryItem) => (
                             <TableRow key={item._id}>
-                              <TableCell className="font-medium">{item.title}</TableCell>
+                              <TableCell className="font-medium">
+                                {item.title}
+                              </TableCell>
                               <TableCell>
-                                <Badge variant="secondary" className="capitalize">
+                                <Badge
+                                  variant="secondary"
+                                  className="capitalize"
+                                >
                                   {item.category}
                                 </Badge>
                               </TableCell>
                               <TableCell>
                                 {item.imageUrl ? (
                                   <img
-                                    src={`${import.meta.env.VITE_API_BASE_URL}${item.imageUrl}`}
+                                    src={`${import.meta.env.VITE_API_BASE_URL}${
+                                      item.imageUrl
+                                    }`}
                                     alt={item.title}
                                     className="w-12 h-12 object-cover rounded"
                                   />
@@ -733,7 +904,9 @@ const Dashboard = () => {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handleDeleteGalleryItem(item)}
+                                    onClick={() =>
+                                      handleDeleteGalleryItem(item)
+                                    }
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </Button>
@@ -781,16 +954,19 @@ const Dashboard = () => {
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={() => {
-          if (deleteType === 'contact') confirmDeleteContact();
-          else if (deleteType === 'event') confirmDeleteEvent();
-          else if (deleteType === 'gallery') confirmDeleteGalleryItem();
-          else if (deleteType === 'blog') confirmDeleteBlog();
+          if (deleteType === "contact") confirmDeleteContact();
+          else if (deleteType === "event") confirmDeleteEvent();
+          else if (deleteType === "gallery") confirmDeleteGalleryItem();
+          else if (deleteType === "blog") confirmDeleteBlog();
         }}
         isDeleting={
-          deleteType === 'contact' ? deleteContactMutation.isPending :
-          deleteType === 'event' ? deleteEventMutation.isPending :
-          deleteType === 'gallery' ? deleteGalleryMutation.isPending :
-          deleteBlogMutation.isPending
+          deleteType === "contact"
+            ? deleteContactMutation.isPending
+            : deleteType === "event"
+            ? deleteEventMutation.isPending
+            : deleteType === "gallery"
+            ? deleteGalleryMutation.isPending
+            : deleteBlogMutation.isPending
         }
       />
 
@@ -804,13 +980,17 @@ const Dashboard = () => {
         event={selectedEvent}
         isOpen={editEventModalOpen}
         onClose={() => setEditEventModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['events'] })}
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: ["events"] })
+        }
       />
 
       <AddEventModal
         isOpen={addEventModalOpen}
         onClose={() => setAddEventModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['events'] })}
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: ["events"] })
+        }
       />
 
       <ViewGalleryModal
@@ -823,13 +1003,17 @@ const Dashboard = () => {
         galleryItem={selectedGalleryItem}
         isOpen={editGalleryModalOpen}
         onClose={() => setEditGalleryModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['gallery'] })}
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: ["gallery"] })
+        }
       />
 
       <AddGalleryModal
         isOpen={addGalleryModalOpen}
         onClose={() => setAddGalleryModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['gallery'] })}
+        onSuccess={() =>
+          queryClient.invalidateQueries({ queryKey: ["gallery"] })
+        }
       />
 
       <ViewBlogModal
@@ -842,13 +1026,13 @@ const Dashboard = () => {
         blog={selectedBlog}
         isOpen={editBlogModalOpen}
         onClose={() => setEditBlogModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['blogs'] })}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["blogs"] })}
       />
 
       <AddBlogModal
         isOpen={addBlogModalOpen}
         onClose={() => setAddBlogModalOpen(false)}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['blogs'] })}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ["blogs"] })}
       />
     </MainLayout>
   );
