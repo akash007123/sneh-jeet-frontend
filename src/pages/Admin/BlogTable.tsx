@@ -13,18 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-
-interface Blog {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  isFeatured: boolean;
-  category: string;
-  authorName: string;
-  publishedDate: string;
-  createdAt: string;
-}
+import { Blog } from "@/types/blog";
 
 interface BlogTableProps {
   onView: (blog: Blog) => void;

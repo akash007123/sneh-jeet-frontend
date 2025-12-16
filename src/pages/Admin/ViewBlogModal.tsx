@@ -7,32 +7,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-interface Section {
-  sectionTitle: string;
-  sectionContent: string;
-  sectionImage?: string;
-}
-
-interface Blog {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  featuredImage?: string;
-  isFeatured: boolean;
-  tags: string[];
-  readTime: string;
-  authorName: string;
-  authorBio?: string;
-  publishedDate: string;
-  category: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  seoKeywords?: string;
-  sections: Section[];
-}
+import { Blog } from "@/types/blog";
 
 interface ViewBlogModalProps {
   blog: Blog | null;

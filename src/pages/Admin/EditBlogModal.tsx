@@ -14,28 +14,12 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Blog } from "@/types/blog";
 
 interface Section {
   sectionTitle: string;
   sectionContent: string;
   sectionImage?: string | File;
-}
-
-interface Blog {
-  _id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  isFeatured: boolean;
-  tags: string[];
-  readTime: string;
-  authorName: string;
-  authorBio: string;
-  category: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  seoKeywords?: string;
-  sections: Section[];
 }
 
 interface EditBlogModalProps {
