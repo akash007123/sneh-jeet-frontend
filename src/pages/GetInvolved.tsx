@@ -1,15 +1,80 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Heart, Users, Handshake, ArrowRight, Clock, CheckCircle } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { volunteerOpportunities } from "@/data/mockData";
 
 const GetInvolved = () => {
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    mobile: "",
+    interest: "",
+  });
+
+  const submitMembershipMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to submit membership application");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Your membership application has been submitted successfully!",
+      });
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        mobile: "",
+        interest: "",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to submit membership application. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    submitMembershipMutation.mutate(formData);
+  };
+
   return (
     <MainLayout>
       <PageHero
@@ -141,20 +206,34 @@ const GetInvolved = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="bg-card rounded-2xl p-8 border border-border space-y-6"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubmit}
           >
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-foreground mb-2">
                   First Name
                 </label>
-                <Input id="firstName" placeholder="Your first name" />
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  placeholder="Your first name"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               <div>
                 <label htmlFor="lastName" className="block text-sm font-medium text-foreground mb-2">
                   Last Name
                 </label>
-                <Input id="lastName" placeholder="Your last name" />
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Your last name"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
             </div>
 
@@ -162,22 +241,53 @@ const GetInvolved = () => {
               <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Email
               </label>
-              <Input id="email" type="email" placeholder="your@email.com" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="your@email.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="mobile" className="block text-sm font-medium text-foreground mb-2">
+                Mobile Number
+              </label>
+              <Input
+                id="mobile"
+                name="mobile"
+                type="tel"
+                placeholder="Your mobile number"
+                value={formData.mobile}
+                onChange={handleInputChange}
+              />
             </div>
 
             <div>
               <label htmlFor="interest" className="block text-sm font-medium text-foreground mb-2">
                 I'm interested in...
               </label>
-              <Textarea 
-                id="interest" 
+              <Textarea
+                id="interest"
+                name="interest"
                 placeholder="Tell us how you'd like to get involved or what programs interest you"
                 rows={4}
+                value={formData.interest}
+                onChange={handleInputChange}
               />
             </div>
 
-            <Button type="submit" variant="hero" size="lg" className="w-full">
-              Submit Application
+            <Button
+              type="submit"
+              variant="hero"
+              size="lg"
+              className="w-full"
+              disabled={submitMembershipMutation.isPending}
+            >
+              {submitMembershipMutation.isPending ? "Submitting..." : "Submit Application"}
               <ArrowRight className="w-5 h-5 ml-1" />
             </Button>
           </motion.form>

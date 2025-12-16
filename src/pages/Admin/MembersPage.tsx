@@ -1,0 +1,291 @@
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Eye, Edit, Trash2 } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import AdminLayout from "@/layouts/AdminLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
+import ViewMembershipModal from "./ViewMembershipModal";
+import EditMembershipModal from "./EditMembershipModal";
+import DeleteModal from "./DeleteModal";
+
+interface Membership {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile?: string;
+  interest?: string;
+  status: "New" | "Approved" | "Rejected";
+  createdAt: string;
+}
+
+const MembersPage = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { token } = useAuth();
+
+  // Membership states
+  const [viewMembership, setViewMembership] = useState<Membership | null>(null);
+  const [viewMembershipModalOpen, setViewMembershipModalOpen] = useState(false);
+  const [selectedMembership, setSelectedMembership] = useState<Membership | null>(null);
+  const [editMembershipModalOpen, setEditMembershipModalOpen] = useState(false);
+
+  // Delete states
+  const [deleteItem, setDeleteItem] = useState<Membership | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Queries
+  const { data: memberships, isLoading: membershipsLoading } = useQuery({
+    queryKey: ["memberships"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/membership`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch memberships");
+      return response.json();
+    },
+  });
+
+  // Mutations
+  const updateMembershipStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/membership/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["memberships"] });
+      toast({ title: "Success", description: "Status updated successfully" });
+      setSelectedMembership(null);
+      setEditMembershipModalOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update status",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteMembershipMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/membership/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete membership");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["memberships"] });
+      toast({ title: "Success", description: "Membership deleted successfully" });
+      setDeleteItem(null);
+      setDeleteModalOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete membership",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handlers
+  const handleViewMembership = (membership: Membership) => {
+    setViewMembership(membership);
+    setViewMembershipModalOpen(true);
+  };
+
+  const handleEditMembershipStatus = (membership: Membership) => {
+    setSelectedMembership(membership);
+    setEditMembershipModalOpen(true);
+  };
+
+  const handleUpdateMembershipStatus = (status: string) => {
+    if (selectedMembership) {
+      updateMembershipStatusMutation.mutate({ id: selectedMembership._id, status });
+    }
+  };
+
+  const handleDeleteMembership = (membership: Membership) => {
+    setDeleteItem(membership);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDeleteMembership = () => {
+    if (deleteItem) {
+      deleteMembershipMutation.mutate(deleteItem._id);
+    }
+  };
+
+  const getMembershipStatusColor = (status: string) => {
+    switch (status) {
+      case "New":
+        return "bg-blue-100 text-blue-800";
+      case "Approved":
+        return "bg-green-100 text-green-800";
+      case "Rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Members</h1>
+          <p className="text-muted-foreground">
+            Manage membership applications and communications.
+          </p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Membership Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {membershipsLoading ? (
+                <div className="text-center py-8">Loading...</div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Mobile</TableHead>
+                      {/* <TableHead>Interest</TableHead> */}
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {memberships?.map((membership: Membership) => (
+                      <TableRow key={membership._id}>
+                        <TableCell className="font-medium">
+                          {membership.firstName} {membership.lastName}
+                        </TableCell>
+                        <TableCell>{membership.email}</TableCell>
+                        <TableCell>{membership.mobile || "N/A"}</TableCell>
+                        {/* <TableCell>{membership.interest || "N/A"}</TableCell> */}
+                        <TableCell>
+                          <Badge
+                            className={getMembershipStatusColor(
+                              membership.status
+                            )}
+                          >
+                            {membership.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(
+                            membership.createdAt
+                          ).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewMembership(membership)}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                handleEditMembershipStatus(membership)
+                              }
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteMembership(membership)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      <ViewMembershipModal
+        membership={viewMembership}
+        isOpen={viewMembershipModalOpen}
+        onClose={() => setViewMembershipModalOpen(false)}
+      />
+
+      <EditMembershipModal
+        membership={selectedMembership}
+        isOpen={editMembershipModalOpen}
+        onClose={() => setEditMembershipModalOpen(false)}
+        onUpdate={handleUpdateMembershipStatus}
+        isUpdating={updateMembershipStatusMutation.isPending}
+      />
+
+      <DeleteModal
+        type="membership"
+        item={deleteItem}
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDeleteMembership}
+        isDeleting={deleteMembershipMutation.isPending}
+      />
+    </AdminLayout>
+  );
+};
+
+export default MembersPage;

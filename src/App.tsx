@@ -29,6 +29,7 @@ import GalleryPage from "./pages/Admin/GalleryPage";
 import BlogsPage from "./pages/Admin/BlogsPage";
 import MediaPage from "./pages/Admin/MediaPage";
 import IdeasPage from "./pages/Admin/IdeasPage";
+import MembersPage from "./pages/Admin/MembersPage";
 import Login from "./pages/Admin/Login";
 import NotFound from "./pages/NotFound";
 
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/admin/blogs" element={<ProtectedRoute><BlogsPage /></ProtectedRoute>} />
             <Route path="/admin/media" element={<ProtectedRoute><MediaPage /></ProtectedRoute>} />
             <Route path="/admin/ideas" element={<ProtectedRoute><IdeasPage /></ProtectedRoute>} />
+            <Route path="/admin/members" element={<ProtectedRoute><MembersPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -23,6 +23,7 @@ import {
   Film,
   Lightbulb,
   LogOut,
+  UserPlus
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -70,6 +71,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       url: "/admin/ideas",
       icon: Lightbulb,
     },
+    {
+      title: "Members",
+      url: "/admin/members",
+      icon: UserPlus,
+    },
   ];
 
   return (
@@ -77,8 +83,9 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <Sidebar>
         <SidebarHeader className="border-b border-sidebar-border">
           <div className="flex items-center gap-2 px-2 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <LayoutDashboard className="h-4 w-4" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg ">
+              {/* <LayoutDashboard className="h-4 w-4" /> */}
+              <img src="../logo.png" alt="logo" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-semibold">Admin Panel</span>
