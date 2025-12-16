@@ -21,6 +21,7 @@ import Terms from "./pages/Terms";
 import Blog from "./pages/Blog";
 import BlogArticle from "./pages/BlogArticle";
 import MediaHub from "./pages/MediaHub";
+import MediaDetail from "./pages/MediaDetail";
 import Dashboard from "./pages/Admin/Dashboard";
 import ContactsPage from "./pages/Admin/ContactsPage";
 import EventsPage from "./pages/Admin/EventsPage";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogArticle />} />
             <Route path="/media" element={<MediaHub />} />
+            <Route path="/media/:slug" element={<MediaDetail />} />
             <Route path="/admin/login" element={<Login />} />
             <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/admin/contacts" element={<ProtectedRoute><ContactsPage /></ProtectedRoute>} />

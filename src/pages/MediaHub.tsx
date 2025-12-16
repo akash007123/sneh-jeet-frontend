@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Clock, Eye, ThumbsUp, Lightbulb, Film, BookOpen, Sparkles, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ const gradientColors = [
 ];
 
 const MediaHub = () => {
+  const navigate = useNavigate();
   const [activeMediaCategory, setActiveMediaCategory] = useState("all");
   const [activeIdeaCategory, setActiveIdeaCategory] = useState("all");
 
@@ -130,6 +132,7 @@ const MediaHub = () => {
                      viewport={{ once: true }}
                      transition={{ delay: index * 0.1 }}
                      className="group cursor-pointer"
+                     onClick={() => navigate(`/media/${item.slug}`)}
                    >
                      <div className="relative aspect-video rounded-xl overflow-hidden mb-4">
                        {item.thumbnailUrl ? (
@@ -208,6 +211,7 @@ const MediaHub = () => {
                      viewport={{ once: true }}
                      transition={{ delay: index * 0.05 }}
                      className="group cursor-pointer bg-card rounded-xl border border-border overflow-hidden card-hover"
+                     onClick={() => navigate(`/media/${item.slug}`)}
                    >
                      <div className="relative aspect-video">
                        {item.thumbnailUrl ? (
