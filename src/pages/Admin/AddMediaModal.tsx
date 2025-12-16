@@ -32,18 +32,32 @@ const AddMediaModal = ({ isOpen, onClose, onSuccess }: AddMediaModalProps) => {
     featured: false,
     published: false,
     category: "",
-    videoUrl: "",
-    thumbnailUrl: "",
+    videoFile: null as File | null,
+    thumbnailFile: null as File | null,
   });
 
   const createMediaMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      const formDataToSend = new FormData();
+
+      // Append text fields
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'videoFile' && key !== 'thumbnailFile' && value !== null && value !== undefined) {
+          formDataToSend.append(key, value.toString());
+        }
+      });
+
+      // Append files
+      if (data.videoFile) {
+        formDataToSend.append('videoFile', data.videoFile);
+      }
+      if (data.thumbnailFile) {
+        formDataToSend.append('thumbnailFile', data.thumbnailFile);
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formDataToSend,
       });
       if (!response.ok) throw new Error('Failed to create media');
       return response.json();
@@ -73,13 +87,13 @@ const AddMediaModal = ({ isOpen, onClose, onSuccess }: AddMediaModalProps) => {
       featured: false,
       published: false,
       category: "",
-      videoUrl: "",
-      thumbnailUrl: "",
+      videoFile: null,
+      thumbnailFile: null,
     });
     onClose();
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string | boolean | File | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -162,23 +176,23 @@ const AddMediaModal = ({ isOpen, onClose, onSuccess }: AddMediaModalProps) => {
               />
             </div>
             <div>
-              <Label htmlFor="videoUrl">Video URL</Label>
+              <Label htmlFor="videoFile">Video File</Label>
               <Input
-                id="videoUrl"
-                value={formData.videoUrl}
-                onChange={(e) => handleInputChange('videoUrl', e.target.value)}
-                placeholder="URL to video file"
+                id="videoFile"
+                type="file"
+                accept="video/*"
+                onChange={(e) => handleInputChange('videoFile', e.target.files?.[0] || null)}
               />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
+            <Label htmlFor="thumbnailFile">Thumbnail File</Label>
             <Input
-              id="thumbnailUrl"
-              value={formData.thumbnailUrl}
-              onChange={(e) => handleInputChange('thumbnailUrl', e.target.value)}
-              placeholder="URL to thumbnail image"
+              id="thumbnailFile"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleInputChange('thumbnailFile', e.target.files?.[0] || null)}
             />
           </div>
 

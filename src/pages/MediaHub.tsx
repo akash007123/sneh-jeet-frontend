@@ -132,7 +132,15 @@ const MediaHub = () => {
                      className="group cursor-pointer"
                    >
                      <div className="relative aspect-video rounded-xl overflow-hidden mb-4">
-                       <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                       {item.thumbnailUrl ? (
+                         <img
+                           src={`${import.meta.env.VITE_API_BASE_URL}${item.thumbnailUrl}`}
+                           alt={item.title}
+                           className="w-full h-full object-cover"
+                         />
+                       ) : (
+                         <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                       )}
                        <div className="absolute inset-0 bg-foreground/20 group-hover:bg-foreground/30 transition-colors flex items-center justify-center">
                          <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                            <Play className="w-6 h-6 text-primary ml-1" />
@@ -202,7 +210,15 @@ const MediaHub = () => {
                      className="group cursor-pointer bg-card rounded-xl border border-border overflow-hidden card-hover"
                    >
                      <div className="relative aspect-video">
-                       <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                       {item.thumbnailUrl ? (
+                         <img
+                           src={`${import.meta.env.VITE_API_BASE_URL}${item.thumbnailUrl}`}
+                           alt={item.title}
+                           className="w-full h-full object-cover"
+                         />
+                       ) : (
+                         <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                       )}
                        <div className="absolute inset-0 bg-foreground/10 group-hover:bg-foreground/20 transition-colors flex items-center justify-center">
                          <div className="w-12 h-12 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                            <Play className="w-5 h-5 text-primary ml-0.5" />

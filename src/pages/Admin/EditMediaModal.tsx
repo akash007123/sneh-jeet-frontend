@@ -34,8 +34,8 @@ const EditMediaModal = ({ media, isOpen, onClose, onSuccess }: EditMediaModalPro
     featured: false,
     published: false,
     category: "",
-    videoUrl: "",
-    thumbnailUrl: "",
+    videoFile: null as File | null,
+    thumbnailFile: null as File | null,
   });
 
   useEffect(() => {
@@ -49,20 +49,34 @@ const EditMediaModal = ({ media, isOpen, onClose, onSuccess }: EditMediaModalPro
         featured: media.featured,
         published: media.published,
         category: media.category || "",
-        videoUrl: media.videoUrl || "",
-        thumbnailUrl: media.thumbnailUrl || "",
+        videoFile: null, // Files cannot be pre-populated from existing URLs
+        thumbnailFile: null,
       });
     }
   }, [media]);
 
   const updateMediaMutation = useMutation({
     mutationFn: async (data: typeof formData & { id: string }) => {
+      const formDataToSend = new FormData();
+
+      // Append text fields
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'videoFile' && key !== 'thumbnailFile' && key !== 'id' && value !== null && value !== undefined) {
+          formDataToSend.append(key, value.toString());
+        }
+      });
+
+      // Append files (only if new files are selected)
+      if (data.videoFile) {
+        formDataToSend.append('videoFile', data.videoFile);
+      }
+      if (data.thumbnailFile) {
+        formDataToSend.append('thumbnailFile', data.thumbnailFile);
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media/${data.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        body: formDataToSend,
       });
       if (!response.ok) throw new Error('Failed to update media');
       return response.json();
@@ -86,7 +100,7 @@ const EditMediaModal = ({ media, isOpen, onClose, onSuccess }: EditMediaModalPro
     onClose();
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string | boolean | File | null) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -173,24 +187,34 @@ const EditMediaModal = ({ media, isOpen, onClose, onSuccess }: EditMediaModalPro
               />
             </div>
             <div>
-              <Label htmlFor="videoUrl">Video URL</Label>
+              <Label htmlFor="videoFile">Video File</Label>
               <Input
-                id="videoUrl"
-                value={formData.videoUrl}
-                onChange={(e) => handleInputChange('videoUrl', e.target.value)}
-                placeholder="URL to video file"
+                id="videoFile"
+                type="file"
+                accept="video/*"
+                onChange={(e) => handleInputChange('videoFile', e.target.files?.[0] || null)}
               />
+              {media?.videoUrl && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Current video: {media.videoUrl.split('/').pop()}
+                </p>
+              )}
             </div>
           </div>
 
           <div>
-            <Label htmlFor="thumbnailUrl">Thumbnail URL</Label>
+            <Label htmlFor="thumbnailFile">Thumbnail File</Label>
             <Input
-              id="thumbnailUrl"
-              value={formData.thumbnailUrl}
-              onChange={(e) => handleInputChange('thumbnailUrl', e.target.value)}
-              placeholder="URL to thumbnail image"
+              id="thumbnailFile"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleInputChange('thumbnailFile', e.target.files?.[0] || null)}
             />
+            {media?.thumbnailUrl && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Current thumbnail: {media.thumbnailUrl.split('/').pop()}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
