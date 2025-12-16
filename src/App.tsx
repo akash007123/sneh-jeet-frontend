@@ -26,6 +26,8 @@ import ContactsPage from "./pages/Admin/ContactsPage";
 import EventsPage from "./pages/Admin/EventsPage";
 import GalleryPage from "./pages/Admin/GalleryPage";
 import BlogsPage from "./pages/Admin/BlogsPage";
+import MediaPage from "./pages/Admin/MediaPage";
+import IdeasPage from "./pages/Admin/IdeasPage";
 import Login from "./pages/Admin/Login";
 import NotFound from "./pages/NotFound";
 
@@ -61,6 +63,8 @@ const App = () => (
             <Route path="/admin/events" element={<ProtectedRoute><EventsPage /></ProtectedRoute>} />
             <Route path="/admin/gallery" element={<ProtectedRoute><GalleryPage /></ProtectedRoute>} />
             <Route path="/admin/blogs" element={<ProtectedRoute><BlogsPage /></ProtectedRoute>} />
+            <Route path="/admin/media" element={<ProtectedRoute><MediaPage /></ProtectedRoute>} />
+            <Route path="/admin/ideas" element={<ProtectedRoute><IdeasPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

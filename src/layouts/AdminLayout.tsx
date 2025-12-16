@@ -20,6 +20,8 @@ import {
   Calendar,
   Image,
   FileText,
+  Film,
+  Lightbulb,
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,6 +59,16 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       title: "Blogs",
       url: "/admin/blogs",
       icon: FileText,
+    },
+    {
+      title: "Media",
+      url: "/admin/media",
+      icon: Film,
+    },
+    {
+      title: "Ideas",
+      url: "/admin/ideas",
+      icon: Lightbulb,
     },
   ];
 

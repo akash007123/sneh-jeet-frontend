@@ -51,24 +51,47 @@ interface Blog {
   createdAt: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem | Blog;
+interface Media {
+  _id: string;
+  title: string;
+  slug: string;
+  type: string;
+  creator: string;
+  published: boolean;
+  createdAt: string;
+}
+
+interface Idea {
+  _id: string;
+  title: string;
+  slug: string;
+  category: string;
+  author: string;
+  published: boolean;
+  createdAt: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea;
 
 interface DeleteModalProps {
-  type: 'contact' | 'event' | 'gallery' | 'blog';
+  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea';
   item: DeletableItem | null;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   isDeleting: boolean;
+  deleteFunction?: (id: string) => void;
 }
 
-const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting }: DeleteModalProps) => {
+const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, deleteFunction }: DeleteModalProps) => {
   const getTitle = () => {
     switch (type) {
       case 'contact': return 'Delete Contact';
       case 'event': return 'Delete Event';
       case 'gallery': return 'Delete Gallery Item';
       case 'blog': return 'Delete Blog Post';
+      case 'media': return 'Delete Media';
+      case 'idea': return 'Delete Idea';
       default: return 'Delete Item';
     }
   };
@@ -85,6 +108,8 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting }: Del
       case 'event': return (item as Event).title;
       case 'gallery': return (item as GalleryItem).title;
       case 'blog': return (item as Blog).title;
+      case 'media': return (item as Media).title;
+      case 'idea': return (item as Idea).title;
       default: return '';
     }
   };
@@ -105,7 +130,12 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting }: Del
           <Button
             type="button"
             variant="destructive"
-            onClick={onConfirm}
+            onClick={() => {
+              if (deleteFunction && item) {
+                deleteFunction(item._id);
+              }
+              onConfirm();
+            }}
             disabled={isDeleting}
           >
             {isDeleting ? "Deleting..." : "Delete"}

@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Play, Clock, Eye, ThumbsUp, Lightbulb, Film, BookOpen, Sparkles, ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mediaContent, creativeIdeas, mediaCategories, ideaCategories } from "@/data/mockData";
+import { Media } from "@/types/media";
+import { Idea } from "@/types/idea";
 
 const typeIcons: Record<string, React.ReactNode> = {
   "short-film": <Film className="w-4 h-4" />,
@@ -41,15 +44,38 @@ const MediaHub = () => {
   const [activeMediaCategory, setActiveMediaCategory] = useState("all");
   const [activeIdeaCategory, setActiveIdeaCategory] = useState("all");
 
+  // Fetch media from API
+  const { data: mediaData, isLoading: mediaLoading } = useQuery({
+    queryKey: ["media", { published: true }],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media?published=true`);
+      if (!response.ok) throw new Error("Failed to fetch media");
+      return response.json();
+    },
+  });
+
+  // Fetch ideas from API
+  const { data: ideasData, isLoading: ideasLoading } = useQuery({
+    queryKey: ["ideas", { published: true }],
+    queryFn: async () => {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas?published=true`);
+      if (!response.ok) throw new Error("Failed to fetch ideas");
+      return response.json();
+    },
+  });
+
+  const mediaContent = mediaData?.media || [];
+  const creativeIdeas = ideasData?.ideas || [];
+
   const filteredMedia = activeMediaCategory === "all"
     ? mediaContent
-    : mediaContent.filter(item => item.type === activeMediaCategory);
+    : mediaContent.filter((item: Media) => item.type === activeMediaCategory);
 
   const filteredIdeas = activeIdeaCategory === "all"
     ? creativeIdeas
-    : creativeIdeas.filter(idea => idea.category === activeIdeaCategory);
+    : creativeIdeas.filter((idea: Idea) => idea.category === activeIdeaCategory);
 
-  const featuredMedia = mediaContent.filter(m => m.featured);
+  const featuredMedia = mediaContent.filter((m: Media) => m.featured);
 
   const formatViews = (views: number) => {
     if (views >= 1000) {
@@ -96,47 +122,47 @@ const MediaHub = () => {
               />
 
               <div className="grid md:grid-cols-3 gap-6">
-                {featuredMedia.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group cursor-pointer"
-                  >
-                    <div className="relative aspect-video rounded-xl overflow-hidden mb-4">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
-                      <div className="absolute inset-0 bg-foreground/20 group-hover:bg-foreground/30 transition-colors flex items-center justify-center">
-                        <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Play className="w-6 h-6 text-primary ml-1" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-foreground/80 text-background text-xs font-medium">
-                        {item.duration}
-                      </div>
-                    </div>
+                {featuredMedia.map((item: Media, index) => (
+                   <motion.div
+                     key={item._id}
+                     initial={{ opacity: 0, y: 20 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ delay: index * 0.1 }}
+                     className="group cursor-pointer"
+                   >
+                     <div className="relative aspect-video rounded-xl overflow-hidden mb-4">
+                       <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                       <div className="absolute inset-0 bg-foreground/20 group-hover:bg-foreground/30 transition-colors flex items-center justify-center">
+                         <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
+                           <Play className="w-6 h-6 text-primary ml-1" />
+                         </div>
+                       </div>
+                       <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-foreground/80 text-background text-xs font-medium">
+                         {item.duration}
+                       </div>
+                     </div>
 
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeColors[item.type]}`}>
-                        {typeIcons[item.type]}
-                        {item.type === "short-film" ? "Short Film" : item.type === "educational" ? "Educational" : "Content"}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Eye className="w-3 h-3" />
-                        {formatViews(item.views)}
-                      </span>
-                    </div>
+                     <div className="flex items-center gap-2 mb-2">
+                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeColors[item.type]}`}>
+                         {typeIcons[item.type]}
+                         {item.type === "short-film" ? "Short Film" : item.type === "educational" ? "Educational" : "Content"}
+                       </span>
+                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                         <Eye className="w-3 h-3" />
+                         {formatViews(item.views)}
+                       </span>
+                     </div>
 
-                    <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
-                      {item.title}
-                    </h3>
+                     <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-2">
+                       {item.title}
+                     </h3>
 
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {item.description}
-                    </p>
-                  </motion.div>
-                ))}
+                     <p className="text-sm text-muted-foreground line-clamp-2">
+                       {item.description}
+                     </p>
+                   </motion.div>
+                 ))}
               </div>
             </div>
           </section>
@@ -166,48 +192,48 @@ const MediaHub = () => {
           <section className="section-padding bg-background">
             <div className="container-padding mx-auto max-w-7xl">
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {filteredMedia.map((item, index) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group cursor-pointer bg-card rounded-xl border border-border overflow-hidden card-hover"
-                  >
-                    <div className="relative aspect-video">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
-                      <div className="absolute inset-0 bg-foreground/10 group-hover:bg-foreground/20 transition-colors flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Play className="w-5 h-5 text-primary ml-0.5" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-foreground/80 text-background text-xs font-medium">
-                        {item.duration}
-                      </div>
-                    </div>
+                {filteredMedia.map((item: Media, index) => (
+                   <motion.div
+                     key={item._id}
+                     initial={{ opacity: 0, scale: 0.95 }}
+                     whileInView={{ opacity: 1, scale: 1 }}
+                     viewport={{ once: true }}
+                     transition={{ delay: index * 0.05 }}
+                     className="group cursor-pointer bg-card rounded-xl border border-border overflow-hidden card-hover"
+                   >
+                     <div className="relative aspect-video">
+                       <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                       <div className="absolute inset-0 bg-foreground/10 group-hover:bg-foreground/20 transition-colors flex items-center justify-center">
+                         <div className="w-12 h-12 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
+                           <Play className="w-5 h-5 text-primary ml-0.5" />
+                         </div>
+                       </div>
+                       <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-foreground/80 text-background text-xs font-medium">
+                         {item.duration}
+                       </div>
+                     </div>
 
-                    <div className="p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[item.type]}`}>
-                          {typeIcons[item.type]}
-                        </span>
-                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <Eye className="w-3 h-3" />
-                          {formatViews(item.views)}
-                        </span>
-                      </div>
+                     <div className="p-4">
+                       <div className="flex items-center gap-2 mb-2">
+                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[item.type]}`}>
+                           {typeIcons[item.type]}
+                         </span>
+                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                           <Eye className="w-3 h-3" />
+                           {formatViews(item.views)}
+                         </span>
+                       </div>
 
-                      <h4 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
-                        {item.title}
-                      </h4>
+                       <h4 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 mb-1">
+                         {item.title}
+                       </h4>
 
-                      <p className="text-xs text-muted-foreground">
-                        By {item.creator}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
+                       <p className="text-xs text-muted-foreground">
+                         By {item.creator}
+                       </p>
+                     </div>
+                   </motion.div>
+                 ))}
               </div>
             </div>
           </section>
@@ -257,43 +283,43 @@ const MediaHub = () => {
 
               {/* Ideas Grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredIdeas.map((idea, index) => (
-                  <motion.div
-                    key={idea.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-card rounded-xl border border-border p-6 card-hover"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradientColors[index % gradientColors.length]} flex items-center justify-center`}>
-                        <Lightbulb className="w-6 h-6 text-primary-foreground" />
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusColors[idea.status]}`}>
-                        {idea.status === "in-progress" ? "In Progress" : idea.status === "open" ? "Open" : "Planned"}
-                      </span>
-                    </div>
+                {filteredIdeas.map((idea: Idea, index) => (
+                   <motion.div
+                     key={idea._id}
+                     initial={{ opacity: 0, y: 20 }}
+                     whileInView={{ opacity: 1, y: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ delay: index * 0.1 }}
+                     className="bg-card rounded-xl border border-border p-6 card-hover"
+                   >
+                     <div className="flex items-start justify-between mb-4">
+                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradientColors[index % gradientColors.length]} flex items-center justify-center`}>
+                         <Lightbulb className="w-6 h-6 text-primary-foreground" />
+                       </div>
+                       <span className={`px-3 py-1 rounded-full text-xs font-medium border ${statusColors[idea.status]}`}>
+                         {idea.status === "in-progress" ? "In Progress" : idea.status === "open" ? "Open" : "Planned"}
+                       </span>
+                     </div>
 
-                    <h3 className="font-display text-lg font-semibold text-foreground mb-2">
-                      {idea.title}
-                    </h3>
+                     <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                       {idea.title}
+                     </h3>
 
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                      {idea.description}
-                    </p>
+                     <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                       {idea.description}
+                     </p>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <span className="text-sm text-muted-foreground">
-                        By {idea.author}
-                      </span>
-                      <button className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors">
-                        <ThumbsUp className="w-4 h-4" />
-                        {idea.likes}
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
+                     <div className="flex items-center justify-between pt-4 border-t border-border">
+                       <span className="text-sm text-muted-foreground">
+                         By {idea.author}
+                       </span>
+                       <button className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors">
+                         <ThumbsUp className="w-4 h-4" />
+                         {idea.likes}
+                       </button>
+                     </div>
+                   </motion.div>
+                 ))}
               </div>
             </div>
           </section>
