@@ -90,7 +90,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
             <div className="flex flex-col">
               <span className="text-sm font-semibold">Admin Panel</span>
               <span className="text-xs text-muted-foreground">
-                {user?.name}
+                {user?.name} - {user?.role}
               </span>
             </div>
           </div>

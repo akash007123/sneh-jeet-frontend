@@ -37,6 +37,7 @@ const EventsPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { token } = useAuth();
+  const { user } = useAuth();
 
   // Event states
   const [viewEvent, setViewEvent] = useState<Event | null>(null);
@@ -145,10 +146,12 @@ const EventsPage = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Events</CardTitle>
-              <Button onClick={() => setAddEventModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Event
-              </Button>
+              {user && user.role === "Admin" && (
+                <Button onClick={() => setAddEventModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Event
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               {eventsLoading ? (
@@ -171,15 +174,11 @@ const EventsPage = () => {
                         <TableCell className="font-medium">
                           {event.title}
                         </TableCell>
-                        <TableCell>
-                          {formatEventDate(event.date)}
-                        </TableCell>
+                        <TableCell>{formatEventDate(event.date)}</TableCell>
                         <TableCell>{event.time}</TableCell>
                         <TableCell>{event.location}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary">
-                            {event.category}
-                          </Badge>
+                          <Badge variant="secondary">{event.category}</Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
@@ -191,21 +190,25 @@ const EventsPage = () => {
                               <Eye className="w-4 h-4" />
                             </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditEvent(event)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
+                            {user && user.role === "Admin" && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditEvent(event)}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteEvent(event)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteEvent(event)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

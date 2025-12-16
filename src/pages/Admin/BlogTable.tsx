@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Blog } from "@/types/blog";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface BlogTableProps {
   onView: (blog: Blog) => void;
@@ -25,30 +26,40 @@ interface BlogTableProps {
 const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: blogs, isLoading } = useQuery({
-    queryKey: ['blogs'],
+    queryKey: ["blogs"],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`);
-      if (!response.ok) throw new Error('Failed to fetch blogs');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/blog`
+      );
+      if (!response.ok) throw new Error("Failed to fetch blogs");
       return response.json();
     },
   });
 
   const deleteBlogMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete blog');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete blog");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
       toast({ title: "Success", description: "Blog deleted successfully" });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete blog", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete blog",
+        variant: "destructive",
+      });
     },
   });
 
@@ -69,10 +80,12 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Blog Posts</CardTitle>
-        <Button onClick={onAdd}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Blog Post
-        </Button>
+        {user && user.role === "Admin" && (
+          <Button onClick={onAdd}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Blog Post
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <Table>
@@ -116,21 +129,25 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
                       <Eye className="w-4 h-4" />
                     </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(blog)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
+                    {user && user.role === "Admin" && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onEdit(blog)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onDelete(blog)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onDelete(blog)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

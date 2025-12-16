@@ -79,7 +79,7 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }: AddEventModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Event</DialogTitle>
         </DialogHeader>

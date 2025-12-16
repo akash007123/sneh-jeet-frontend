@@ -34,6 +34,7 @@ const GalleryPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { token } = useAuth();
+  const { user } = useAuth();
 
   // Gallery states
   const [viewGalleryItem, setViewGalleryItem] = useState<GalleryItem | null>(
@@ -139,10 +140,12 @@ const GalleryPage = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Gallery</CardTitle>
-              <Button onClick={() => setAddGalleryModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Gallery Item
-              </Button>
+              {user && user.role === "Admin" && (
+                <Button onClick={() => setAddGalleryModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Gallery Item
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               {galleryLoading ? (
@@ -165,10 +168,7 @@ const GalleryPage = () => {
                           {item.title}
                         </TableCell>
                         <TableCell>
-                          <Badge
-                            variant="secondary"
-                            className="capitalize"
-                          >
+                          <Badge variant="secondary" className="capitalize">
                             {item.category}
                           </Badge>
                         </TableCell>
@@ -199,24 +199,25 @@ const GalleryPage = () => {
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
+                            {user && user.role === "Admin" && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditGalleryItem(item)}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditGalleryItem(item)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleDeleteGalleryItem(item)
-                              }
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteGalleryItem(item)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

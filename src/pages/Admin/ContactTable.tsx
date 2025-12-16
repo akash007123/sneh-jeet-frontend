@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "./EditStatusModal";
 import DeleteModal from "./DeleteModal";
@@ -35,6 +36,7 @@ interface Contact {
 const ContactTable = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [viewContact, setViewContact] = useState<Contact | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
@@ -193,21 +195,25 @@ const ContactTable = () => {
                               <Eye className="w-4 h-4" />
                             </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleStatusChange(contact)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
+                            {user && user.role === 'Admin' && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleStatusChange(contact)}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDelete(contact)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDelete(contact)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>

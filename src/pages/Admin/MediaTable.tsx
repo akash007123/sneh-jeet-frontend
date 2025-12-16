@@ -3,6 +3,7 @@ import { Eye, Edit, Trash2, Plus, Star } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Table,
   TableBody,
@@ -25,30 +26,40 @@ interface MediaTableProps {
 const MediaTable = ({ onView, onEdit, onAdd, onDelete }: MediaTableProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: media, isLoading } = useQuery({
-    queryKey: ['media'],
+    queryKey: ["media"],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media`);
-      if (!response.ok) throw new Error('Failed to fetch media');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/media`
+      );
+      if (!response.ok) throw new Error("Failed to fetch media");
       return response.json();
     },
   });
 
   const deleteMediaMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete media');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/media/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete media");
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: ["media"] });
       toast({ title: "Success", description: "Media deleted successfully" });
     },
     onError: () => {
-      toast({ title: "Error", description: "Failed to delete media", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to delete media",
+        variant: "destructive",
+      });
     },
   });
 
@@ -73,10 +84,12 @@ const MediaTable = ({ onView, onEdit, onAdd, onDelete }: MediaTableProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Media Content</CardTitle>
-        <Button onClick={onAdd}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Media
-        </Button>
+        {user && user.role === "Admin" && (
+          <Button onClick={onAdd}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Media
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <Table>
@@ -123,22 +136,25 @@ const MediaTable = ({ onView, onEdit, onAdd, onDelete }: MediaTableProps) => {
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
+                    {user && user.role === "Admin" && (
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onEdit(item)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(item)}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onDelete(item)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onDelete(item)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

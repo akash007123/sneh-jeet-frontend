@@ -34,7 +34,7 @@ interface Contact {
 const ContactsPage = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   // Contact states
   const [viewContact, setViewContact] = useState<Contact | null>(null);
@@ -235,23 +235,27 @@ const ContactsPage = () => {
                               <Eye className="w-4 h-4" />
                             </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleEditContactStatus(contact)
-                              }
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
+                            {user && user.role === 'Admin' && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleEditContactStatus(contact)
+                                  }
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
 
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteContact(contact)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteContact(contact)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
