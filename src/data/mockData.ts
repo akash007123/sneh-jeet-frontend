@@ -1060,6 +1060,7 @@ export const mediaCategories = [
   { id: "short-film", label: "Short Films" },
   { id: "educational", label: "Educational" },
   { id: "content", label: "Featured Content" },
+  { id: "event", label: "Events" },
 ];
 
 export const ideaCategories = [

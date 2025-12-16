@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Play, Clock, Eye, ThumbsUp, Lightbulb, Film, BookOpen, Sparkles, ArrowRight } from "lucide-react";
+import { Play, Clock, Eye, ThumbsUp, Lightbulb, Film, BookOpen, Sparkles, ArrowRight, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { mediaContent, creativeIdeas, mediaCategories, ideaCategories } from "@/data/mockData";
+import { mediaContent, creativeIdeas } from "@/data/mockData";
 import { Media } from "@/types/media";
 import { Idea } from "@/types/idea";
 
@@ -16,12 +16,24 @@ const typeIcons: Record<string, React.ReactNode> = {
   "short-film": <Film className="w-4 h-4" />,
   "educational": <BookOpen className="w-4 h-4" />,
   "content": <Sparkles className="w-4 h-4" />,
+  "event": <Calendar className="w-4 h-4" />,
 };
 
 const typeColors: Record<string, string> = {
   "short-film": "bg-warm text-warm-foreground",
   "educational": "bg-safe text-safe-foreground",
   "content": "bg-hope text-hope-foreground",
+  "event": "bg-purple-500 text-white",
+};
+
+const getTypeDisplay = (type: string) => {
+  const displayNames: Record<string, string> = {
+    "short-film": "Short Film",
+    "educational": "Educational",
+    "content": "Content",
+    "event": "Event",
+  };
+  return displayNames[type] || type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
 const statusColors: Record<string, string> = {
@@ -69,9 +81,26 @@ const MediaHub = () => {
   const mediaContent = mediaData?.media || [];
   const creativeIdeas = ideasData?.ideas || [];
 
+  // Generate dynamic categories from real data
+  const mediaCategories = [
+    { id: "all", label: "All Content" },
+    ...Array.from(new Set((mediaContent.flatMap(item => [item.type, item.category].filter(Boolean)) as string[]))).map(cat => ({
+      id: cat,
+      label: getTypeDisplay(cat) || cat.charAt(0).toUpperCase() + cat.slice(1)
+    }))
+  ];
+
+  const ideaCategories = [
+    { id: "all", label: "All Ideas" },
+    ...Array.from(new Set((creativeIdeas.map(idea => idea.category).filter(Boolean) as string[]))).map(cat => ({
+      id: cat,
+      label: cat.charAt(0).toUpperCase() + cat.slice(1)
+    }))
+  ];
+
   const filteredMedia = activeMediaCategory === "all"
     ? mediaContent
-    : mediaContent.filter((item: Media) => item.type === activeMediaCategory);
+    : mediaContent.filter((item: Media) => item.type === activeMediaCategory || item.category === activeMediaCategory);
 
   const filteredIdeas = activeIdeaCategory === "all"
     ? creativeIdeas
@@ -155,10 +184,15 @@ const MediaHub = () => {
                      </div>
 
                      <div className="flex items-center gap-2 mb-2">
-                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeColors[item.type]}`}>
-                         {typeIcons[item.type]}
-                         {item.type === "short-film" ? "Short Film" : item.type === "educational" ? "Educational" : "Content"}
+                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${typeColors[item.type] || 'bg-gray-500 text-white'}`}>
+                         {typeIcons[item.type] || <Film className="w-4 h-4" />}
+                         {getTypeDisplay(item.type)}
                        </span>
+                       {item.category && (
+                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-500 text-white">
+                           {item.category}
+                         </span>
+                       )}
                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
                          <Eye className="w-3 h-3" />
                          {formatViews(item.views)}
@@ -235,9 +269,15 @@ const MediaHub = () => {
 
                      <div className="p-4">
                        <div className="flex items-center gap-2 mb-2">
-                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[item.type]}`}>
-                           {typeIcons[item.type]}
+                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[item.type] || 'bg-gray-500 text-white'}`}>
+                           {typeIcons[item.type] || <Film className="w-4 h-4" />}
+                           {getTypeDisplay(item.type)}
                          </span>
+                         {item.category && (
+                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500 text-white">
+                             {item.category}
+                           </span>
+                         )}
                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
                            <Eye className="w-3 h-3" />
                            {formatViews(item.views)}

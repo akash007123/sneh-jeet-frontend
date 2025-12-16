@@ -126,7 +126,7 @@ const AddMediaModal = ({ isOpen, onClose, onSuccess }: AddMediaModalProps) => {
                 id="type"
                 value={formData.type}
                 onChange={(e) => handleInputChange('type', e.target.value)}
-                placeholder="e.g., short-film, educational, content"
+                placeholder="e.g., short-film, educational, content, event"
                 required
               />
             </div>
