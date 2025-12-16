@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState, useRef } from "react";
 import {
   ArrowLeft,
   Calendar,
@@ -14,17 +14,39 @@ import {
   Copy,
   Tag,
   BookOpen,
+  MessageCircle,
+  Send,
+  Mail,
 } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 const BlogArticle = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [readingProgress, setReadingProgress] = useState(0);
+
+  // Comment form state
+  const [commentForm, setCommentForm] = useState({
+    name: '',
+    email: '',
+    profileImage: null as File | null,
+    comment: '',
+  });
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  // Comments state
+  const [comments, setComments] = useState([]);
+  const [commentCount, setCommentCount] = useState(0);
+  const [showAllComments, setShowAllComments] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch current blog post
   const { data: articleData, isLoading: articleLoading } = useQuery({
@@ -49,6 +71,30 @@ const BlogArticle = () => {
 
   const article = articleData;
   const blogPosts = blogsData?.blogs || [];
+
+  // Fetch comments for this blog
+  const { data: commentsData } = useQuery({
+    queryKey: ['comments', article?._id],
+    queryFn: async () => {
+      if (!article?._id) return { comments: [], total: 0 };
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/blog/${article._id}`);
+      if (!response.ok) throw new Error('Failed to fetch comments');
+      return response.json();
+    },
+    enabled: !!article?._id,
+  });
+
+  // Fetch comment count
+  const { data: countData } = useQuery({
+    queryKey: ['comment-count', article?._id],
+    queryFn: async () => {
+      if (!article?._id) return { count: 0 };
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/blog/${article._id}/count`);
+      if (!response.ok) throw new Error('Failed to fetch comment count');
+      return response.json();
+    },
+    enabled: !!article?._id,
+  });
 
   // Update SEO meta tags
   useEffect(() => {
@@ -117,6 +163,16 @@ const BlogArticle = () => {
     return () => window.removeEventListener('scroll', updateProgress);
   }, []);
 
+  // Update comments state when data is fetched
+  useEffect(() => {
+    if (commentsData) {
+      setComments(commentsData.comments || []);
+    }
+    if (countData) {
+      setCommentCount(countData.count || 0);
+    }
+  }, [commentsData, countData]);
+
   if (articleLoading) {
     return (
       <MainLayout>
@@ -160,6 +216,98 @@ const BlogArticle = () => {
       title: "Link copied!",
       description: "Article link has been copied to your clipboard.",
     });
+  };
+
+  // Handle comment form input changes
+  const handleCommentFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type, files } = e.target as HTMLInputElement;
+    if (type === 'file' && files) {
+      setCommentForm(prev => ({
+        ...prev,
+        [name]: files[0] || null,
+      }));
+    } else {
+      setCommentForm(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  // Submit comment
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!commentForm.name || !commentForm.email || !commentForm.comment) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!article?._id) {
+      toast({
+        title: "Error",
+        description: "Unable to submit comment. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmittingComment(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('blogId', article._id);
+      formData.append('name', commentForm.name);
+      formData.append('email', commentForm.email);
+      formData.append('comment', commentForm.comment);
+      if (commentForm.profileImage) {
+        formData.append('profileImage', commentForm.profileImage);
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit comment');
+      }
+
+      // Reset form
+      setCommentForm({
+        name: '',
+        email: '',
+        profileImage: null,
+        comment: '',
+      });
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      // Refresh comments and count
+      queryClient.invalidateQueries({ queryKey: ['comments', article._id] });
+      queryClient.invalidateQueries({ queryKey: ['comment-count', article._id] });
+
+      toast({
+        title: "Comment Submitted!",
+        description: "Thank you for your comment!",
+      });
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your comment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   const shareUrl = encodeURIComponent(window.location.href);
@@ -490,6 +638,206 @@ const BlogArticle = () => {
           </div>
         </div>
       </article>
+
+      {/* Comments Section */}
+      <section className="py-16 md:py-20 bg-muted/20">
+        <div className="container-padding mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-12"
+          >
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4 flex items-center gap-3">
+              <MessageCircle className="w-8 h-8 text-primary" />
+              Comments ({commentCount})
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Join the conversation and share your thoughts
+            </p>
+          </motion.div>
+
+          {/* Comment Form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-card rounded-2xl border border-border/50 p-8 mb-12 shadow-soft"
+          >
+            <h3 className="text-xl font-display font-bold text-foreground mb-6">
+              Leave a Comment
+            </h3>
+            <form onSubmit={handleSubmitComment} className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Name *
+                  </Label>
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={commentForm.name}
+                    onChange={handleCommentFormChange}
+                    placeholder="Your name"
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Email *
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={commentForm.email}
+                    onChange={handleCommentFormChange}
+                    placeholder="your.email@example.com"
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="profileImage" className="text-sm font-medium text-foreground">
+                  Profile Picture (Optional)
+                </Label>
+                <Input
+                  ref={fileInputRef}
+                  id="profileImage"
+                  name="profileImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCommentFormChange}
+                  className="rounded-xl"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Upload a profile picture (max 2MB, JPG, PNG, GIF, WebP)
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="comment" className="text-sm font-medium text-foreground">
+                  Comment *
+                </Label>
+                <Textarea
+                  id="comment"
+                  name="comment"
+                  value={commentForm.comment}
+                  onChange={handleCommentFormChange}
+                  placeholder="Share your thoughts about this article..."
+                  required
+                  rows={5}
+                  className="rounded-xl resize-none"
+                />
+              </div>
+              <Button
+                type="submit"
+                disabled={isSubmittingComment}
+                className="w-full md:w-auto px-8 py-3 rounded-xl"
+                variant="hero"
+              >
+                {isSubmittingComment ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Post Comment
+                  </>
+                )}
+              </Button>
+            </form>
+          </motion.div>
+
+          {/* Comments List */}
+          {comments.length > 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              {comments.slice(0, showAllComments ? comments.length : 3).map((comment, index) => (
+                <motion.div
+                  key={comment._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-card rounded-2xl border border-border/50 p-6 shadow-soft hover:shadow-medium transition-shadow duration-300"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                      {comment.profileImage ? (
+                        <img
+                          src={`${import.meta.env.VITE_API_BASE_URL}${comment.profileImage}`}
+                          alt={`${comment.name}'s profile`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                          <User className="w-6 h-6 text-primary" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h4 className="font-semibold text-foreground">{comment.name}</h4>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-foreground leading-relaxed whitespace-pre-wrap max-h-[200px] overflow-auto">
+                        {comment.comment}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+
+              {comments.length > 3 && (
+                <div className="text-center pt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAllComments(!showAllComments)}
+                    className="rounded-xl"
+                  >
+                    {showAllComments
+                      ? `Show Less`
+                      : `Show ${comments.length - 3} More Comments`
+                    }
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center py-12"
+            >
+              <MessageCircle className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-display font-semibold text-foreground mb-2">
+                No comments yet
+              </h3>
+              <p className="text-muted-foreground">
+                Be the first to share your thoughts on this article!
+              </p>
+            </motion.div>
+          )}
+        </div>
+      </section>
 
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
