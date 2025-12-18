@@ -122,59 +122,62 @@ const Stories = () => {
 
             <div className="grid md:grid-cols-2 gap-8">
               {featuredStories.map((story, index) => (
-                <motion.article
+                <motion.div
                   key={story._id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card rounded-2xl border border-border overflow-hidden card-hover"
                 >
-                  {/* Image */}
-                  {story.image ? (
-                    <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
-                      alt={story.title}
-                      className="aspect-video object-cover"
-                    />
-                  ) : (
-                    <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
-                  )}
+                  <Link to={`/stories/${story._id}`} className="block">
+                    <article className="bg-card rounded-2xl border border-border overflow-hidden card-hover">
+                      {/* Image */}
+                      {story.image ? (
+                        <img
+                          src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                          alt={story.title}
+                          className="aspect-video object-cover"
+                        />
+                      ) : (
+                        <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
+                      )}
 
-                  <div className="p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${categoryColors[story.category] || "bg-muted text-muted-foreground"}`}>
-                        {story.type || story.category}
-                      </span>
-                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        {story.readTime}
-                      </span>
-                    </div>
+                      <div className="p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${categoryColors[story.category] || "bg-muted text-muted-foreground"}`}>
+                            {story.type || story.category}
+                          </span>
+                          <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Clock className="w-4 h-4" />
+                            {story.readTime}
+                          </span>
+                        </div>
 
-                    <h3 className="font-display text-xl font-semibold text-foreground mb-3">
-                      {story.title}
-                    </h3>
+                        <h3 className="font-display text-xl font-semibold text-foreground mb-3">
+                          {story.title}
+                        </h3>
 
-                    <p className="text-muted-foreground mb-4">
-                      {story.excerpt}
-                    </p>
+                        <p className="text-muted-foreground mb-4">
+                          {story.excerpt}
+                        </p>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <User className="w-4 h-4" />
-                        {story.author}
-                        <span>•</span>
-                        {formatDate(story.publishedDate)}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <User className="w-4 h-4" />
+                            {story.author}
+                            <span>•</span>
+                            {formatDate(story.publishedDate)}
+                          </div>
+
+                          <Button variant="ghost" size="sm">
+                            Read More
+                            <ArrowRight className="w-4 h-4 ml-1" />
+                          </Button>
+                        </div>
                       </div>
-
-                      <Button variant="ghost" size="sm">
-                        Read More
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
-                </motion.article>
+                    </article>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -195,48 +198,51 @@ const Stories = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {otherStories.map((story, index) => (
-                <motion.article
+                <motion.div
                   key={story._id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-card rounded-xl p-5 border border-border card-hover"
                 >
-                  <div className="mb-2 rounded">
-                  {story.image ? (
-                    <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
-                      alt={story.title}
-                      className="aspect-video object-cover rounded-sm"
-                    />
-                  ) : (
-                    <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
-                  )}
-                  </div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColors[story.category] || "bg-muted text-muted-foreground"}`}>
-                      {story.type || story.category}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {story.readTime}
-                    </span>
-                  </div>
+                  <Link to={`/stories/${story._id}`} className="block">
+                    <article className="bg-card rounded-xl p-5 border border-border card-hover">
+                      <div className="mb-2 rounded">
+                      {story.image ? (
+                        <img
+                          src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                          alt={story.title}
+                          className="aspect-video object-cover rounded-sm"
+                        />
+                      ) : (
+                        <div className="aspect-video bg-gradient-to-br from-warm via-safe to-hope" />
+                      )}
+                      </div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${categoryColors[story.category] || "bg-muted text-muted-foreground"}`}>
+                          {story.type || story.category}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {story.readTime}
+                        </span>
+                      </div>
 
-                  <h3 className="font-display text-lg font-semibold text-foreground mb-2">
-                    {story.title}
-                  </h3>
+                      <h3 className="font-display text-lg font-semibold text-foreground mb-2">
+                        {story.title}
+                      </h3>
 
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {story.excerpt}
-                  </p>
+                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                        {story.excerpt}
+                      </p>
 
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>{story.author}</span>
-                    <span>•</span>
-                    <span>{formatDate(story.publishedDate)}</span>
-                  </div>
-                </motion.article>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{story.author}</span>
+                        <span>•</span>
+                        <span>{formatDate(story.publishedDate)}</span>
+                      </div>
+                    </article>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           )}

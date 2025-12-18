@@ -14,6 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   LayoutDashboard,
   MessageSquare,
@@ -25,7 +26,9 @@ import {
   LogOut,
   UserPlus,
   BookOpen,
-  Mail
+  Mail,
+  Users,
+  User
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -49,6 +52,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       title: "Dashboard",
       url: "/admin",
       icon: LayoutDashboard,
+    },
+    {
+      title: "Profile",
+      url: "/admin/profile",
+      icon: User,
     },
     {
       title: "Contacts",
@@ -95,6 +103,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       url: "/admin/members",
       icon: UserPlus,
     },
+    {
+      title: "Users",
+      url: "/admin/users",
+      icon: Users,
+    },
   ];
 
   if (!user) {
@@ -106,10 +119,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <Sidebar>
         <SidebarHeader className="border-b border-sidebar-border">
           <div className="flex items-center gap-2 px-2 py-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg ">
-              {/* <LayoutDashboard className="h-4 w-4" /> */}
-              <img src="../logo.png" alt="logo" />
-            </div>
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : undefined} alt="Profile" />
+              <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
             <div className="flex flex-col">
               <span className="text-sm font-semibold">Admin Panel</span>
               <span className="text-xs text-muted-foreground">

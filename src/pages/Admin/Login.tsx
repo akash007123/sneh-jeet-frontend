@@ -25,6 +25,7 @@ const PRIDE_COLORS = [
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({ name: '', email: '', password: '', role: '' });
+  const [profilePic, setProfilePic] = useState<File | null>(null);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [activeColorIndex, setActiveColorIndex] = useState(0);
@@ -74,7 +75,7 @@ const Login = () => {
     e.preventDefault();
     setIsSignupLoading(true);
     try {
-      await signup(signupData.name, signupData.email, signupData.password, signupData.role);
+      await signup(signupData.name, signupData.email, signupData.password, signupData.role, profilePic || undefined);
       toast({
         title: 'Signup successful',
         description: 'Account created successfully! 🎉',
@@ -364,7 +365,38 @@ const Login = () => {
                         </SelectContent>
                       </Select>
                     </motion.div>
-                    
+
+                    {/* Profile Picture Upload */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="relative group"
+                    >
+                      <Label htmlFor="signup-profilePic" className="text-gray-700 dark:text-gray-300 font-medium mb-2 block">
+                        <div className="flex items-center gap-2">
+                          <User className="w-5 h-5" />
+                          Profile Picture (Optional)
+                        </div>
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="signup-profilePic"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setProfilePic(e.target.files?.[0] || null)}
+                          className="pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border-2 border-gray-200 dark:border-gray-700 rounded-xl transition-all duration-300 focus:border-blue-500 focus:scale-[1.02] focus:shadow-lg group-hover:border-blue-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-500 transition-colors duration-200 group-hover:text-teal-500" />
+                        <div className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-teal-500 group-hover:w-full transition-all duration-300" />
+                      </div>
+                      {profilePic && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                          Selected: {profilePic.name}
+                        </p>
+                      )}
+                    </motion.div>
+
                     <motion.div
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

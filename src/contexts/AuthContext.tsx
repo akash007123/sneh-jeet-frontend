@@ -6,6 +6,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  profilePic?: string;
 }
 
 interface AuthContextType {
@@ -13,7 +14,8 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string, role: string) => Promise<void>;
+  signup: (name: string, email: string, password: string, role: string, profilePic?: File) => Promise<void>;
+  updateProfile: (name: string, email: string, password?: string, profilePic?: File) => Promise<void>;
   logout: () => void;
 }
 
@@ -61,18 +63,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (name: string, email: string, password: string, role: string) => {
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signup`, { name, email, password, role });
-      const { user: userData, token: newToken } = response.data;
-      setUser(userData);
-      setToken(newToken);
-      localStorage.setItem('token', newToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-    } catch (error) {
-      throw error;
+  const signup = async (name: string, email: string, password: string, role: string, profilePic?: File) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('role', role);
+    if (profilePic) {
+      formData.append('profilePic', profilePic);
     }
+
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signup`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    const { user: userData, token: newToken } = response.data;
+    setUser(userData);
+    setToken(newToken);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+  };
+
+  const updateProfile = async (name: string, email: string, password?: string, profilePic?: File) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    if (password) {
+      formData.append('password', password);
+    }
+    if (profilePic) {
+      formData.append('profilePic', profilePic);
+    }
+
+    const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/users/${user?.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    const updatedUser = response.data;
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
   const logout = () => {
@@ -89,6 +121,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     login,
     signup,
+    updateProfile,
     logout,
   };
 

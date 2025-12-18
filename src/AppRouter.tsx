@@ -8,6 +8,7 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import GetInvolved from "./pages/GetInvolved";
 import Stories from "./pages/Stories";
+import StoryDetail from "./pages/StoryDetail";
 import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 import Donate from "./pages/Donate";
@@ -27,6 +28,8 @@ import StoriesPage from "./pages/Admin/StoriesPage";
 import MediaPage from "./pages/Admin/MediaPage";
 import IdeasPage from "./pages/Admin/IdeasPage";
 import MembersPage from "./pages/Admin/MembersPage";
+import UsersPage from "./pages/Admin/UsersPage";
+import Profile from "./pages/Admin/Profile";
 import Login from "./pages/Admin/Login";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +43,7 @@ const AppRouter = () => (
     <Route path="/events/:slug" element={<EventDetail />} />
     <Route path="/get-involved" element={<GetInvolved />} />
     <Route path="/stories" element={<Stories />} />
+    <Route path="/stories/:id" element={<StoryDetail />} />
     <Route path="/gallery" element={<Gallery />} />
     <Route path="/contact" element={<Contact />} />
     <Route path="/donate" element={<Donate />} />
@@ -50,6 +54,14 @@ const AppRouter = () => (
     <Route path="/media" element={<MediaHub />} />
     <Route path="/media/:slug" element={<MediaDetail />} />
     <Route path="/admin/login" element={<Login />} />
+    <Route
+      path="/admin/profile"
+      element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      }
+    />
     <Route path="/admin" element={<Dashboard />} />
     <Route path="/admin/contacts" element={<ContactsPage />} />
     <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
@@ -66,6 +78,15 @@ const AppRouter = () => (
       element={
         <ProtectedRoute roles={["Admin", "HR"]}>
           <MembersPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/admin/users"
+      element={
+        <ProtectedRoute roles={["Admin"]}>
+          <UsersPage />
         </ProtectedRoute>
       }
     />
