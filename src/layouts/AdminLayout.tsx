@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { ReactNode, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -35,6 +35,13 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/admin/login', { replace: true });
+    }
+  }, [user, navigate]);
 
   const menuItems = [
     {
@@ -84,6 +91,10 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
     },
   ];
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -127,7 +138,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={logout}>
+            <Button variant="outline" size="sm" onClick={() => { logout(); navigate('/admin/login'); }}>
               <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>

@@ -29,9 +29,16 @@ const Login = () => {
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [activeColorIndex, setActiveColorIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-  const { login, signup } = useAuth();
+  const { login, signup, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/admin', { replace: true });
+    }
+  }, [user, navigate]);
 
   // Animated background color cycling
   useEffect(() => {
@@ -196,9 +203,8 @@ const Login = () => {
               
               {/* Login Form */}
               <AnimatePresence mode="wait">
-                <TabsContent value="login">
+                <TabsContent key="login" value="login">
                   <motion.form
-                    key="login"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
@@ -270,9 +276,8 @@ const Login = () => {
                 </TabsContent>
                 
                 {/* Signup Form */}
-                <TabsContent value="signup">
+                <TabsContent key="signup" value="signup">
                   <motion.form
-                    key="signup"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
