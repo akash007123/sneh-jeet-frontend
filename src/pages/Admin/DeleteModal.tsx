@@ -80,10 +80,17 @@ interface Story {
   publishedDate: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story;
+interface Subscription {
+  _id: string;
+  email: string;
+  status: "active" | "unsubscribed";
+  subscribedAt: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story | Subscription;
 
 interface DeleteModalProps {
-  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story';
+  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story' | 'subscription';
   item: DeletableItem | null;
   isOpen: boolean;
   onClose: () => void;
@@ -102,6 +109,7 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, delet
       case 'media': return 'Delete Media';
       case 'idea': return 'Delete Idea';
       case 'story': return 'Delete Story';
+      case 'subscription': return 'Delete Subscription';
       default: return 'Delete Item';
     }
   };
@@ -121,6 +129,7 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, delet
       case 'media': return (item as Media).title;
       case 'idea': return (item as Idea).title;
       case 'story': return (item as Story).title;
+      case 'subscription': return (item as Subscription).email;
       default: return '';
     }
   };

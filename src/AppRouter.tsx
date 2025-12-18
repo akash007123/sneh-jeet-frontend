@@ -19,6 +19,7 @@ import MediaHub from "./pages/MediaHub";
 import MediaDetail from "./pages/MediaDetail";
 import Dashboard from "./pages/Admin/Dashboard";
 import ContactsPage from "./pages/Admin/ContactsPage";
+import SubscriptionsPage from "./pages/Admin/SubscriptionsPage";
 import EventsPage from "./pages/Admin/EventsPage";
 import GalleryPage from "./pages/Admin/GalleryPage";
 import BlogsPage from "./pages/Admin/BlogsPage";
@@ -51,6 +52,7 @@ const AppRouter = () => (
     <Route path="/admin/login" element={<Login />} />
     <Route path="/admin" element={<Dashboard />} />
     <Route path="/admin/contacts" element={<ContactsPage />} />
+    <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
     <Route path="/admin/events" element={<EventsPage />} />
     <Route path="/admin/gallery" element={<GalleryPage />} />
     <Route path="/admin/blogs" element={<BlogsPage />} />

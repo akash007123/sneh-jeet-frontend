@@ -24,7 +24,8 @@ import {
   Lightbulb,
   LogOut,
   UserPlus,
-  BookOpen
+  BookOpen,
+  Mail
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -53,6 +54,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       title: "Contacts",
       url: "/admin/contacts",
       icon: MessageSquare,
+    },
+    {
+      title: "Subscriptions",
+      url: "/admin/subscriptions",
+      icon: Mail,
     },
     {
       title: "Events",
