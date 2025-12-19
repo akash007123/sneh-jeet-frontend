@@ -33,6 +33,7 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { Media } from "@/types/media";
 import { cn } from "@/lib/utils";
+import LGBTLoading from "@/components/ui/LGBTLoading";
 
 const typeIcons: Record<string, React.ReactNode> = {
   "short-film": <Film className="w-4 h-4" />,
@@ -210,7 +211,11 @@ const MediaDetail = () => {
     return (
       <MainLayout>
         <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">Loading media...</div>
+          <LGBTLoading
+            message="Loading media..."
+            size="lg"
+            variant="rainbow"
+          />
         </div>
       </MainLayout>
     );

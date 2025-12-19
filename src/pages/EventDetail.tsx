@@ -17,7 +17,8 @@ import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import {formatDate} from "../pages/utils/formatDate"
+import {formatDate} from "../pages/utils/formatDate";
+import LGBTLoading from "@/components/ui/LGBTLoading";
 
 const categoryColors: Record<string, string> = {
   celebration: "bg-pride-pink/10 text-pride-pink",
@@ -45,7 +46,11 @@ const EventDetail = () => {
     return (
       <MainLayout>
         <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center">Loading event...</div>
+          <LGBTLoading
+            message="Loading event..."
+            size="lg"
+            variant="hearts"
+          />
         </div>
       </MainLayout>
     );

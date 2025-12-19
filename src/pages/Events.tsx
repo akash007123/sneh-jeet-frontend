@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
+import LGBTLoading from "@/components/ui/LGBTLoading";
 
 const categories = [
   { id: "all", label: "All Events" },
@@ -103,7 +104,13 @@ const Events = () => {
           </h2>
 
           {isLoading ? (
-            <div className="text-center py-12">Loading events...</div>
+            <div className="text-center py-12">
+              <LGBTLoading
+                message="Loading events..."
+                size="lg"
+                variant="stars"
+              />
+            </div>
           ) : upcomingEvents.length === 0 ? (
             <p className="text-muted-foreground text-center py-12">
               No upcoming events in this category. Check back soon!

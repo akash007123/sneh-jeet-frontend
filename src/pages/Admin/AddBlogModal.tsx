@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Section {
   sectionTitle: string;
@@ -31,6 +32,7 @@ interface AddBlogModalProps {
 const AddBlogModal = ({ isOpen, onClose, onSuccess }: AddBlogModalProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { token } = useAuth();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -52,8 +54,12 @@ const AddBlogModal = ({ isOpen, onClose, onSuccess }: AddBlogModalProps) => {
 
   const createBlogMutation = useMutation({
     mutationFn: async (data: FormData) => {
+      if (!token) throw new Error('Not authenticated');
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: data,
       });
       if (!response.ok) throw new Error('Failed to create blog');
