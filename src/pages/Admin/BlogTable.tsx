@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Blog } from "@/types/blog";
 import { useAuth } from "@/contexts/AuthContext";
+import {formatDate} from "../utils/formatDate";
 
 interface BlogTableProps {
   onView: (blog: Blog) => void;
@@ -62,15 +63,6 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
       });
     },
   });
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   if (isLoading) {
     return <div className="text-center py-8">Loading blogs...</div>;

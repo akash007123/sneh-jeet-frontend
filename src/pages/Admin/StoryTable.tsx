@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import {formatDate} from '../utils/formatDate';
 
 interface Story {
   _id: string;
@@ -76,14 +77,6 @@ const StoryTable = ({ onView, onEdit, onAdd, onDelete }: StoryTableProps) => {
     },
   });
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   if (isLoading) {
     return <div className="text-center py-8">Loading stories...</div>;

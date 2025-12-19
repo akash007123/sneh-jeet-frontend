@@ -21,6 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "./EditStatusModal";
 import DeleteModal from "./DeleteModal";
+import {formatDate} from "../utils/formatDate";
 
 interface Contact {
   _id: string;
@@ -183,7 +184,7 @@ const ContactTable = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(contact.createdAt).toLocaleDateString()}
+                          {formatDate(contact.createdAt)}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">

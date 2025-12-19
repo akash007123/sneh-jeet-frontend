@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import DeleteModal from "./DeleteModal";
+import {formatDate} from "../utils/formatDate";
 
 interface Subscription {
   _id: string;
@@ -186,9 +187,9 @@ const SubscriptionsPage = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(
+                          {formatDate(
                             subscription.subscribedAt
-                          ).toLocaleDateString()}
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">

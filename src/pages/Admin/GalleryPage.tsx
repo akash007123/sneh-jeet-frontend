@@ -20,6 +20,7 @@ import ViewGalleryModal from "./ViewGalleryModal";
 import EditGalleryModal from "./EditGalleryModal";
 import AddGalleryModal from "./AddGalleryModal";
 import DeleteModal from "./DeleteModal";
+import {formatDate} from "../utils/formatDate";
 
 interface GalleryItem {
   _id: string;
@@ -188,7 +189,7 @@ const GalleryPage = () => {
                           )}
                         </TableCell>
                         <TableCell>
-                          {new Date(item.createdAt).toLocaleDateString()}
+                          {formatDate(item.createdAt)}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">

@@ -17,6 +17,7 @@ import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import {formatDate} from "../pages/utils/formatDate"
 
 const categoryColors: Record<string, string> = {
   celebration: "bg-pride-pink/10 text-pride-pink",
@@ -79,15 +80,6 @@ const EventDetail = () => {
   const shareUrl = encodeURIComponent(window.location.href);
   const shareTitle = encodeURIComponent(event.title);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
 
   const isUpcoming = new Date(event.date) >= new Date();
 
