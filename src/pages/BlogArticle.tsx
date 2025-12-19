@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   ArrowLeft,
   Calendar,
@@ -17,6 +18,10 @@ import {
   MessageCircle,
   Send,
   Mail,
+  Edit,
+  Trash2,
+  Check,
+  X,
 } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -26,11 +31,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
+interface Comment {
+  _id: string;
+  name: string;
+  email: string;
+  comment: string;
+  profileImage?: string;
+  createdAt: string;
+}
+
 const BlogArticle = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user, token } = useAuth();
   const [readingProgress, setReadingProgress] = useState(0);
 
   // Comment form state
@@ -43,10 +58,21 @@ const BlogArticle = () => {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   // Comments state
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
   const [showAllComments, setShowAllComments] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Edit comment state
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    comment: '',
+    profileImage: null as File | null,
+  });
+  const [isUpdatingComment, setIsUpdatingComment] = useState(false);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch current blog post
   const { data: articleData, isLoading: articleLoading } = useQuery({
@@ -307,6 +333,141 @@ const BlogArticle = () => {
       });
     } finally {
       setIsSubmittingComment(false);
+    }
+  };
+
+  // Handle edit comment form input changes
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type, files } = e.target as HTMLInputElement;
+    if (type === 'file' && files) {
+      setEditForm(prev => ({
+        ...prev,
+        [name]: files[0] || null,
+      }));
+    } else {
+      setEditForm(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  // Start editing a comment
+  const startEditingComment = (comment: Comment) => {
+    setEditingComment(comment._id);
+    setEditForm({
+      name: comment.name,
+      email: comment.email,
+      comment: comment.comment,
+      profileImage: null,
+    });
+  };
+
+  // Cancel editing
+  const cancelEditing = () => {
+    setEditingComment(null);
+    setEditForm({
+      name: '',
+      email: '',
+      comment: '',
+      profileImage: null,
+    });
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = '';
+    }
+  };
+
+  // Update comment
+  const handleUpdateComment = async (e: React.FormEvent, commentId: string) => {
+    e.preventDefault();
+
+    if (!editForm.name || !editForm.email || !editForm.comment) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUpdatingComment(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('name', editForm.name);
+      formData.append('email', editForm.email);
+      formData.append('comment', editForm.comment);
+      if (editForm.profileImage) {
+        formData.append('profileImage', editForm.profileImage);
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/${commentId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update comment');
+      }
+
+      // Reset edit form
+      cancelEditing();
+
+      // Refresh comments
+      queryClient.invalidateQueries({ queryKey: ['comments', article._id] });
+
+      toast({
+        title: "Comment Updated!",
+        description: "The comment has been successfully updated.",
+      });
+    } catch (error) {
+      console.error('Error updating comment:', error);
+      toast({
+        title: "Update Failed",
+        description: "There was an error updating the comment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingComment(false);
+    }
+  };
+
+  // Delete comment
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm('Are you sure you want to delete this comment?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete comment');
+      }
+
+      // Refresh comments and count
+      queryClient.invalidateQueries({ queryKey: ['comments', article._id] });
+      queryClient.invalidateQueries({ queryKey: ['comment-count', article._id] });
+
+      toast({
+        title: "Comment Deleted",
+        description: "The comment has been successfully deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      toast({
+        title: "Delete Failed",
+        description: "There was an error deleting the comment. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -731,36 +892,151 @@ const BlogArticle = () => {
                   transition={{ delay: index * 0.1 }}
                   className="bg-card rounded-2xl border border-border/50 p-6 shadow-soft hover:shadow-medium transition-shadow duration-300"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                      {comment.profileImage ? (
-                        <img
-                          src={`${import.meta.env.VITE_API_BASE_URL}${comment.profileImage}`}
-                          alt={`${comment.name}'s profile`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                          <User className="w-6 h-6 text-primary" />
+                  {editingComment === comment._id ? (
+                    // Edit Form
+                    <form onSubmit={(e) => handleUpdateComment(e, comment._id)} className="space-y-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                          {editForm.profileImage ? (
+                            <img
+                              src={URL.createObjectURL(editForm.profileImage)}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : comment.profileImage ? (
+                            <img
+                              src={`${import.meta.env.VITE_API_BASE_URL}${comment.profileImage}`}
+                              alt={`${comment.name}'s profile`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                              <User className="w-6 h-6 text-primary" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h4 className="font-semibold text-foreground">{comment.name}</h4>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(comment.createdAt).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
+                        <div className="flex-1 space-y-3">
+                          <div className="grid md:grid-cols-2 gap-3">
+                            <Input
+                              name="name"
+                              value={editForm.name}
+                              onChange={handleEditFormChange}
+                              placeholder="Name"
+                              required
+                              className="rounded-xl"
+                            />
+                            <Input
+                              name="email"
+                              type="email"
+                              value={editForm.email}
+                              onChange={handleEditFormChange}
+                              placeholder="Email"
+                              required
+                              className="rounded-xl"
+                            />
+                          </div>
+                          <Input
+                            ref={editFileInputRef}
+                            name="profileImage"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleEditFormChange}
+                            className="rounded-xl"
+                          />
+                          <Textarea
+                            name="comment"
+                            value={editForm.comment}
+                            onChange={handleEditFormChange}
+                            placeholder="Comment"
+                            required
+                            rows={3}
+                            className="rounded-xl resize-none"
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              type="submit"
+                              size="sm"
+                              disabled={isUpdatingComment}
+                              className="rounded-xl"
+                            >
+                              {isUpdatingComment ? (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              ) : (
+                                <>
+                                  <Check className="w-4 h-4 mr-1" />
+                                  Save
+                                </>
+                              )}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={cancelEditing}
+                              className="rounded-xl"
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-foreground leading-relaxed whitespace-pre-wrap max-h-[200px] overflow-auto">
-                        {comment.comment}
-                      </p>
+                    </form>
+                  ) : (
+                    // Display Comment
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                        {comment.profileImage ? (
+                          <img
+                            src={`${import.meta.env.VITE_API_BASE_URL}${comment.profileImage}`}
+                            alt={`${comment.name}'s profile`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                            <User className="w-6 h-6 text-primary" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <h4 className="font-semibold text-foreground">{comment.name}</h4>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                          {user && user.role === 'Admin' && (
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => startEditingComment(comment)}
+                                className="h-8 w-8 p-0 hover:bg-primary/10 text-blue-500"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteComment(comment._id)}
+                                className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive text-red-500"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-foreground leading-relaxed whitespace-pre-wrap max-h-[200px] overflow-auto">
+                          {comment.comment}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               ))}
 

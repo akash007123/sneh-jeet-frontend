@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "@/layouts/AdminLayout";
 import BlogTable from "./BlogTable";
 import ViewBlogModal from "./ViewBlogModal";
@@ -11,6 +12,7 @@ import DeleteModal from "./DeleteModal";
 import { Blog } from "@/types/blog";
 
 const BlogsPage = () => {
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const { token } = useAuth();
 
@@ -42,6 +44,36 @@ const BlogsPage = () => {
     },
   });
 
+  // Mutations
+  const deleteBlogMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete blog");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      toast({ title: "Success", description: "Blog deleted successfully" });
+      setDeleteItem(null);
+      setDeleteModalOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete blog",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Handlers
   const handleViewBlog = (blog: Blog) => {
     setViewBlog(blog);
@@ -56,6 +88,12 @@ const BlogsPage = () => {
   const handleDeleteBlog = (blog: Blog) => {
     setDeleteItem(blog);
     setDeleteModalOpen(true);
+  };
+
+  const confirmDeleteBlog = () => {
+    if (deleteItem) {
+      deleteBlogMutation.mutate(deleteItem._id);
+    }
   };
 
   return (
@@ -106,12 +144,8 @@ const BlogsPage = () => {
         item={deleteItem}
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
-        onConfirm={() => {
-          // The delete logic is handled in BlogTable component
-          setDeleteItem(null);
-          setDeleteModalOpen(false);
-        }}
-        isDeleting={false}
+        onConfirm={confirmDeleteBlog}
+        isDeleting={deleteBlogMutation.isPending}
       />
     </AdminLayout>
   );

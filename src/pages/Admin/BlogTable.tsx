@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, Edit, Trash2, Plus, Star } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
 import { Blog } from "@/types/blog";
 import { useAuth } from "@/contexts/AuthContext";
 import {formatDate} from "../utils/formatDate";
@@ -25,8 +24,6 @@ interface BlogTableProps {
 }
 
 const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { user } = useAuth();
 
   const { data: blogs, isLoading } = useQuery({
@@ -40,29 +37,6 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
     },
   });
 
-  const deleteBlogMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete blog");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blogs"] });
-      toast({ title: "Success", description: "Blog deleted successfully" });
-    },
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to delete blog",
-        variant: "destructive",
-      });
-    },
-  });
 
   if (isLoading) {
     return <div className="text-center py-8">Loading blogs...</div>;
