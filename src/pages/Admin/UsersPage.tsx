@@ -82,6 +82,8 @@ const UsersPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       toast({ title: "Success", description: "User deleted successfully" });
+      setDeleteModalOpen(false);
+      setDeleteItem(null);
     },
     onError: () => {
       toast({
