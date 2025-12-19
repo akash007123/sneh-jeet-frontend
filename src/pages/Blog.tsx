@@ -173,9 +173,9 @@ const Blog = () => {
                                 {post.title}
                               </h3>
 
-                              <p className="text-muted-foreground mb-4 line-clamp-3 flex-grow">
-                                {post.excerpt}
-                              </p>
+                              <div className="text-muted-foreground mb-4 line-clamp-3 flex-grow prose max-w-none">
+                                <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+                              </div>
 
                               <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border/50">
                                 <div className="flex items-center gap-2">
@@ -250,9 +250,9 @@ const Blog = () => {
                                 {post.title}
                               </h3>
 
-                              <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
-                                {post.excerpt}
-                              </p>
+                              <div className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow prose max-w-none">
+                                <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+                              </div>
 
                               <div className="flex items-center justify-between text-sm text-muted-foreground">
                                 <span className="flex items-center gap-2">

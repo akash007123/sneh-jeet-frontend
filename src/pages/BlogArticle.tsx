@@ -361,9 +361,9 @@ const BlogArticle = () => {
               {article.title}
             </h1>
 
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow">
-              {article.excerpt}
-            </p>
+            <div className="text-xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow prose prose-invert max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: article.excerpt }} />
+            </div>
 
             <div className="flex flex-wrap items-center justify-center gap-6 text-white/80">
               <div className="flex items-center gap-3">
@@ -447,29 +447,7 @@ const BlogArticle = () => {
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
             >
               {/* Main content */}
-              {article.content.split("\n\n").map((paragraph, index) => {
-                if (paragraph.startsWith("## ")) {
-                  return (
-                    <h2 key={index}>{paragraph.replace("## ", "")}</h2>
-                  );
-                }
-                if (paragraph.startsWith("### ")) {
-                  return (
-                    <h3 key={index}>{paragraph.replace("### ", "")}</h3>
-                  );
-                }
-                if (paragraph.startsWith("- ")) {
-                  const items = paragraph.split("\n").filter((item) => item.startsWith("- "));
-                  return (
-                    <ul key={index}>
-                      {items.map((item, i) => (
-                        <li key={i}>{item.replace("- ", "")}</li>
-                      ))}
-                    </ul>
-                  );
-                }
-                return <p key={index}>{paragraph}</p>;
-              })}
+              <div dangerouslySetInnerHTML={{ __html: article.content }} />
 
               {/* Dynamic sections */}
               {article.sections && article.sections.map((section, sectionIndex) => (
@@ -509,26 +487,7 @@ const BlogArticle = () => {
                     prose-strong:text-foreground
                     prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                     prose-blockquote:border-l-primary prose-blockquote:text-muted-foreground">
-                    {section.sectionContent.split("\n\n").map((paragraph, index) => {
-                      if (paragraph.startsWith("### ")) {
-                        return (
-                          <h3 key={index} className="text-xl font-display font-semibold text-foreground mt-8 mb-4">
-                            {paragraph.replace("### ", "")}
-                          </h3>
-                        );
-                      }
-                      if (paragraph.startsWith("- ")) {
-                        const items = paragraph.split("\n").filter((item) => item.startsWith("- "));
-                        return (
-                          <ul key={index} className="list-disc list-inside space-y-2">
-                            {items.map((item, i) => (
-                              <li key={i} className="text-muted-foreground">{item.replace("- ", "")}</li>
-                            ))}
-                          </ul>
-                        );
-                      }
-                      return <p key={index} className="text-muted-foreground leading-relaxed">{paragraph}</p>;
-                    })}
+                    <div dangerouslySetInnerHTML={{ __html: section.sectionContent }} />
                   </div>
                 </motion.div>
               ))}
@@ -889,9 +848,9 @@ const BlogArticle = () => {
                         <h3 className="text-lg font-display font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2 leading-tight">
                           {post.title}
                         </h3>
-                        <p className="text-muted-foreground text-sm line-clamp-3 mb-4">
-                          {post.excerpt}
-                        </p>
+                        <div className="text-muted-foreground text-sm line-clamp-3 mb-4 prose max-w-none">
+                          <div dangerouslySetInnerHTML={{ __html: post.excerpt }} />
+                        </div>
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />

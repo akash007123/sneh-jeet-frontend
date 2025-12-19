@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import CKEditorComponent from "@/components/ui/CKEditorComponent";
 
 interface GalleryItem {
   _id: string;
@@ -131,12 +132,10 @@ const EditGalleryModal = ({ galleryItem, isOpen, onClose, onSuccess }: EditGalle
 
           <div>
             <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
+            <CKEditorComponent
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(value) => handleInputChange('description', value)}
               placeholder="Enter description (optional)"
-              rows={3}
             />
           </div>
 

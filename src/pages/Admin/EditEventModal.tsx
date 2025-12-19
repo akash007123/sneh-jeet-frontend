@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import CKEditorComponent from "@/components/ui/CKEditorComponent";
 
 interface Event {
   _id: string;
@@ -157,13 +158,10 @@ const EditEventModal = ({ event, isOpen, onClose, onSuccess }: EditEventModalPro
           </div>
           <div>
             <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
-              name="description"
+            <CKEditorComponent
               value={formData.description}
-              onChange={handleChange}
-              rows={3}
-              required
+              onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+              placeholder="Enter event description..."
             />
           </div>
           <div>

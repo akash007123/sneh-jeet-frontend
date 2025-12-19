@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Blog } from "@/types/blog";
+import CKEditorComponent from "@/components/ui/CKEditorComponent";
 
 interface Section {
   sectionTitle: string;
@@ -211,24 +212,19 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
 
               <div>
                 <Label htmlFor="excerpt">Excerpt *</Label>
-                <Textarea
-                  id="excerpt"
+                <CKEditorComponent
                   value={formData.excerpt}
-                  onChange={(e) => handleInputChange('excerpt', e.target.value)}
+                  onChange={(value) => handleInputChange('excerpt', value)}
                   placeholder="Brief summary of the blog post"
-                  required
                 />
               </div>
 
               <div>
                 <Label htmlFor="content">Content *</Label>
-                <Textarea
-                  id="content"
+                <CKEditorComponent
                   value={formData.content}
-                  onChange={(e) => handleInputChange('content', e.target.value)}
+                  onChange={(value) => handleInputChange('content', value)}
                   placeholder="Main content of the blog post"
-                  rows={6}
-                  required
                 />
               </div>
 
@@ -382,11 +378,10 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
                     </div>
                     <div>
                       <Label>Section Content</Label>
-                      <Textarea
+                      <CKEditorComponent
                         value={section.sectionContent}
-                        onChange={(e) => updateSection(index, 'sectionContent', e.target.value)}
+                        onChange={(value) => updateSection(index, 'sectionContent', value)}
                         placeholder="Section content"
-                        rows={4}
                       />
                     </div>
                     <div>

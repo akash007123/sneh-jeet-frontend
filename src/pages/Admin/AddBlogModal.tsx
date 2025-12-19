@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CKEditorComponent from "@/components/ui/CKEditorComponent";
 
 interface Section {
   sectionTitle: string;
@@ -177,24 +178,19 @@ const AddBlogModal = ({ isOpen, onClose, onSuccess }: AddBlogModalProps) => {
 
               <div>
                 <Label htmlFor="excerpt">Excerpt *</Label>
-                <Textarea
-                  id="excerpt"
+                <CKEditorComponent
                   value={formData.excerpt}
-                  onChange={(e) => handleInputChange('excerpt', e.target.value)}
+                  onChange={(value) => handleInputChange('excerpt', value)}
                   placeholder="Brief summary of the blog post"
-                  required
                 />
               </div>
 
               <div>
                 <Label htmlFor="content">Content *</Label>
-                <Textarea
-                  id="content"
+                <CKEditorComponent
                   value={formData.content}
-                  onChange={(e) => handleInputChange('content', e.target.value)}
+                  onChange={(value) => handleInputChange('content', value)}
                   placeholder="Main content of the blog post"
-                  rows={6}
-                  required
                 />
               </div>
 
@@ -304,11 +300,10 @@ const AddBlogModal = ({ isOpen, onClose, onSuccess }: AddBlogModalProps) => {
                     </div>
                     <div>
                       <Label>Section Content</Label>
-                      <Textarea
+                      <CKEditorComponent
                         value={section.sectionContent}
-                        onChange={(e) => updateSection(index, 'sectionContent', e.target.value)}
+                        onChange={(value) => updateSection(index, 'sectionContent', value)}
                         placeholder="Section content"
-                        rows={4}
                       />
                     </div>
                     <div>

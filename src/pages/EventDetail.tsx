@@ -172,7 +172,7 @@ const EventDetail = () => {
                   />
                 </div>
               )}
-              <p className="text-lg leading-relaxed">{event.description}</p>
+              <div className="text-lg leading-relaxed prose max-w-none" dangerouslySetInnerHTML={{ __html: event.description }} />
             </motion.div>
 
             {/* Sidebar */}
