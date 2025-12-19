@@ -19,6 +19,9 @@ import { useToast } from "@/hooks/use-toast";
 import ViewMembershipModal from "./ViewMembershipModal";
 import EditMembershipModal from "./EditMembershipModal";
 import DeleteModal from "./DeleteModal";
+import jsPDF from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+import { saveAs } from 'file-saver';
 
 interface Membership {
   _id: string;
@@ -165,6 +168,48 @@ const MembersPage = () => {
     }
   };
 
+  // Export functions
+  const exportToCSV = () => {
+    if (!memberships || memberships.length === 0) return;
+
+    const headers = ['Name', 'Email', 'Mobile', 'Status', 'Date'];
+    const csvData = memberships.map((membership: Membership) => [
+      `${membership.firstName} ${membership.lastName}`,
+      membership.email,
+      membership.mobile || 'N/A',
+      membership.status,
+      new Date(membership.createdAt).toLocaleDateString()
+    ]);
+
+    const csvContent = [headers, ...csvData].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'memberships.csv');
+  };
+
+  const exportToPDF = () => {
+    if (!memberships || memberships.length === 0) return;
+
+    const doc = new jsPDF();
+    doc.text('Memberships Report', 14, 20);
+
+    const tableColumn = ['Name', 'Email', 'Mobile', 'Status', 'Date'];
+    const tableRows = memberships.map((membership: Membership) => [
+      `${membership.firstName} ${membership.lastName}`,
+      membership.email,
+      membership.mobile || 'N/A',
+      membership.status,
+      new Date(membership.createdAt).toLocaleDateString()
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+
+    doc.save('memberships.pdf');
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -182,7 +227,17 @@ const MembersPage = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Membership Applications</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Membership Applications</CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={exportToCSV}>
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={exportToPDF}>
+                    Export PDF
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {membershipsLoading ? (

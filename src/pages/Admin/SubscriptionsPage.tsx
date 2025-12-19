@@ -18,6 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import DeleteModal from "./DeleteModal";
 import {formatDate} from "../utils/formatDate";
+import jsPDF from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+import { saveAs } from 'file-saver';
 
 interface Subscription {
   _id: string;
@@ -139,6 +142,44 @@ const SubscriptionsPage = () => {
     }
   };
 
+  // Export functions
+  const exportToCSV = () => {
+    if (!subscriptions || subscriptions.length === 0) return;
+
+    const headers = ['Email', 'Status', 'Subscribed At'];
+    const csvData = subscriptions.map((subscription: Subscription) => [
+      subscription.email,
+      subscription.status,
+      formatDate(subscription.subscribedAt)
+    ]);
+
+    const csvContent = [headers, ...csvData].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'subscriptions.csv');
+  };
+
+  const exportToPDF = () => {
+    if (!subscriptions || subscriptions.length === 0) return;
+
+    const doc = new jsPDF();
+    doc.text('Subscriptions Report', 14, 20);
+
+    const tableColumn = ['Email', 'Status', 'Subscribed At'];
+    const tableRows = subscriptions.map((subscription: Subscription) => [
+      subscription.email,
+      subscription.status,
+      formatDate(subscription.subscribedAt)
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+
+    doc.save('subscriptions.pdf');
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -156,7 +197,17 @@ const SubscriptionsPage = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Email Subscriptions</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Email Subscriptions</CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={exportToCSV}>
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={exportToPDF}>
+                    Export PDF
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {subscriptionsLoading ? (

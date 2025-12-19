@@ -19,6 +19,9 @@ import { useToast } from "@/hooks/use-toast";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "./EditStatusModal";
 import DeleteModal from "./DeleteModal";
+import jsPDF from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+import { saveAs } from 'file-saver';
 
 interface Contact {
   _id: string;
@@ -167,6 +170,50 @@ const ContactsPage = () => {
     }
   };
 
+  // Export functions
+  const exportToCSV = () => {
+    if (!contacts || contacts.length === 0) return;
+
+    const headers = ['Name', 'Email', 'Phone', 'Subject', 'Status', 'Date'];
+    const csvData = contacts.map((contact: Contact) => [
+      contact.name,
+      contact.email,
+      contact.phone || 'N/A',
+      contact.subject,
+      contact.status,
+      new Date(contact.createdAt).toLocaleDateString()
+    ]);
+
+    const csvContent = [headers, ...csvData].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, 'contacts.csv');
+  };
+
+  const exportToPDF = () => {
+    if (!contacts || contacts.length === 0) return;
+
+    const doc = new jsPDF();
+    doc.text('Contacts Report', 14, 20);
+
+    const tableColumn = ['Name', 'Email', 'Phone', 'Subject', 'Status', 'Date'];
+    const tableRows = contacts.map((contact: Contact) => [
+      contact.name,
+      contact.email,
+      contact.phone || 'N/A',
+      contact.subject,
+      contact.status,
+      new Date(contact.createdAt).toLocaleDateString()
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+
+    doc.save('contacts.pdf');
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -184,7 +231,17 @@ const ContactsPage = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Contact Submissions</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Contact Submissions</CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={exportToCSV}>
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={exportToPDF}>
+                    Export PDF
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {contactsLoading ? (

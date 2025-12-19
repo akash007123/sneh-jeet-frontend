@@ -350,7 +350,8 @@ const MediaHub = () => {
                      whileInView={{ opacity: 1, y: 0 }}
                      viewport={{ once: true }}
                      transition={{ delay: index * 0.1 }}
-                     className="bg-card rounded-xl border border-border p-6 card-hover"
+                     className="bg-card rounded-xl border border-border p-6 card-hover cursor-pointer"
+                     onClick={() => navigate(`/ideas/${idea.slug}`)}
                    >
                      <div className="flex items-start justify-between mb-4">
                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradientColors[index % gradientColors.length]} flex items-center justify-center`}>

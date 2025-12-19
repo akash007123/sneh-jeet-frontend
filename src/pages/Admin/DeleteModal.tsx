@@ -96,10 +96,21 @@ interface User {
   createdAt: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story | Subscription | User;
+interface Membership {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile?: string;
+  interest?: string;
+  status: "New" | "Approved" | "Rejected";
+  createdAt: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story | Subscription | User | Membership;
 
 interface DeleteModalProps {
-  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story' | 'subscription' | 'user';
+  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story' | 'subscription' | 'user' | 'membership';
   item: DeletableItem | null;
   isOpen: boolean;
   onClose: () => void;
