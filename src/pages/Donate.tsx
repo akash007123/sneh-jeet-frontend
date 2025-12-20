@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-const donationAmounts = [25, 50, 100, 250, 500];
+const donationAmounts = [1075, 2150, 4350, 10750, 21500];
 
 const impactItems = [
-  { amount: "$25", impact: "Provides crisis support for one person" },
-  { amount: "$50", impact: "Funds a mental health counseling session" },
-  { amount: "$100", impact: "Supports a youth mentorship program for a month" },
-  { amount: "$250", impact: "Covers legal consultation for name change" },
-  { amount: "$500", impact: "Sponsors a community event" },
+  { amount: "₹1075", impact: "Provides crisis support for one person" },
+  { amount: "₹2150", impact: "Funds a mental health counseling session" },
+  { amount: "₹4350", impact: "Supports a youth mentorship program for a month" },
+  { amount: "₹10750", impact: "Covers legal consultation for name change" },
+  { amount: "₹21500", impact: "Sponsors a community event" },
 ];
 
 const Donate = () => {
@@ -94,11 +94,11 @@ const Donate = () => {
                           : "bg-muted text-foreground hover:bg-muted/80"
                       )}
                     >
-                      ${amount}
+                      ₹{amount}
                     </button>
                   ))}
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
                     <Input
                       type="number"
                       placeholder="Other"
@@ -114,7 +114,7 @@ const Donate = () => {
 
                 {donationType === "monthly" && displayAmount > 0 && (
                   <p className="text-sm text-muted-foreground mb-6">
-                    You'll be charged ${displayAmount} monthly. Cancel anytime.
+                    You'll be charged ₹{displayAmount} monthly. Cancel anytime.
                   </p>
                 )}
 
@@ -155,7 +155,7 @@ const Donate = () => {
 
                 <Button variant="hero" size="xl" className="w-full">
                   <Heart className="w-5 h-5 mr-2" />
-                  Donate {displayAmount > 0 ? `$${displayAmount}` : ""}
+                  Donate {displayAmount > 0 ? `₹${displayAmount}` : ""}
                   {donationType === "monthly" ? " Monthly" : ""}
                 </Button>
 

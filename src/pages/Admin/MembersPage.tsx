@@ -22,6 +22,7 @@ import DeleteModal from "./DeleteModal";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
+import {formatDate} from "../utils/formatDate"
 
 interface Membership {
   _id: string;
@@ -274,9 +275,9 @@ const MembersPage = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(
+                          {formatDate(
                             membership.createdAt
-                          ).toLocaleDateString()}
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">

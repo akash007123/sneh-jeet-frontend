@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Heart, ChevronDown, UserPlus, BookOpen, Image, Mail, Megaphone, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import MemberFormModal from "./MemberFormModal";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -166,9 +167,10 @@ const Navbar = () => {
             <Button asChild variant="outline" size="sm">
               <Link to="/contact">Contact</Link>
             </Button>
-            <Button asChild variant="hero" size="sm">
+            <MemberFormModal />
+            {/* <Button asChild variant="hero" size="sm">
               <Link to="/donate">Donate</Link>
-            </Button>
+            </Button> */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -210,9 +212,12 @@ const Navbar = () => {
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/contact">Contact Us</Link>
                 </Button>
-                <Button asChild variant="hero" className="w-full">
+                <div className="w-full">
+                  <MemberFormModal />
+                </div>
+                {/* <Button asChild variant="hero" className="w-full">
                   <Link to="/donate">Donate Now</Link>
-                </Button>
+                </Button> */}
               </div>
             </div>
           </motion.div>
