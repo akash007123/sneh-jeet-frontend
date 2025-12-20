@@ -197,7 +197,7 @@ const IdeaDetail = () => {
                 prose-strong:text-foreground
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
               >
-                <p className="text-lg leading-relaxed">{idea.description}</p>
+                <div className="text-lg leading-relaxed" dangerouslySetInnerHTML={{ __html: idea.description }} />
               </div>
 
               {/* Engagement Section */}

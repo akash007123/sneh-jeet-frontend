@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import CKEditorComponent from "@/components/ui/CKEditorComponent";
 
 interface AddIdeaModalProps {
   isOpen: boolean;
@@ -115,12 +115,10 @@ const AddIdeaModal = ({ isOpen, onClose, onSuccess }: AddIdeaModalProps) => {
 
           <div>
             <Label htmlFor="description">Description *</Label>
-            <Textarea
-              id="description"
+            <CKEditorComponent
               value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+              onChange={(value) => handleInputChange('description', value)}
               placeholder="Brief description of the idea"
-              required
             />
           </div>
 
