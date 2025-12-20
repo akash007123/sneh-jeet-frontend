@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import LGBTLoading from "@/components/ui/LGBTLoading";
@@ -14,7 +14,6 @@ interface GalleryItem {
   createdAt: string;
 }
 
-// Generate gradient colors for placeholders
 const gradientColors = [
   "from-pride-red to-pride-orange",
   "from-pride-orange to-pride-yellow",
@@ -27,13 +26,13 @@ const gradientColors = [
   "from-hope to-primary/30",
 ];
 
-const Gallery = () => {
+export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
-  const [categories, setCategories] = useState<{ id: string; label: string }[]>([
-    { id: "all", label: "All" }
-  ]);
+  const [categories, setCategories] = useState<{ id: string; label: string }[]>(
+    [{ id: "all", label: "All" }]
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,36 +40,35 @@ const Gallery = () => {
     const fetchGalleryData = async () => {
       try {
         setLoading(true);
-        const [itemsResponse, categoriesResponse] = await Promise.all([
+        const [itemsRes, catsRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery/categories`)
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery/categories`),
         ]);
-
-        if (!itemsResponse.ok || !categoriesResponse.ok) {
-          throw new Error('Failed to fetch gallery data');
-        }
-
-        const items = await itemsResponse.json();
-        const categoryList = await categoriesResponse.json();
-
+        if (!itemsRes.ok || !catsRes.ok)
+          throw new Error("Failed to fetch gallery");
+        const items = await itemsRes.json();
+        const cats = await catsRes.json();
         setGalleryItems(items);
         setCategories([
           { id: "all", label: "All" },
-          ...categoryList.map((cat: string) => ({ id: cat, label: cat.charAt(0).toUpperCase() + cat.slice(1) }))
+          ...cats.map((c: string) => ({
+            id: c,
+            label: c.charAt(0).toUpperCase() + c.slice(1),
+          })),
         ]);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Unknown error");
       } finally {
         setLoading(false);
       }
     };
-
     fetchGalleryData();
   }, []);
 
-  const filteredImages = activeCategory === "all"
-    ? galleryItems
-    : galleryItems.filter(img => img.category === activeCategory);
+  const filteredImages =
+    activeCategory === "all"
+      ? galleryItems
+      : galleryItems.filter((i) => i.category === activeCategory);
 
   return (
     <MainLayout>
@@ -84,17 +82,17 @@ const Gallery = () => {
       <section className="py-8 bg-muted/30 sticky top-16 md:top-20 z-40">
         <div className="container-padding mx-auto max-w-7xl">
           <div className="flex items-center justify-center gap-3">
-            {categories.map((category) => (
+            {categories.map((cat) => (
               <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === category.id
+                  activeCategory === cat.id
                     ? "bg-primary text-primary-foreground"
                     : "bg-card text-muted-foreground hover:text-foreground border border-border"
                 }`}
               >
-                {category.label}
+                {cat.label}
               </button>
             ))}
           </div>
@@ -116,34 +114,38 @@ const Gallery = () => {
             </div>
           ) : (
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-              {filteredImages.map((image, index) => (
+              {filteredImages.map((img, idx) => (
                 <motion.div
-                  key={image._id}
+                  key={img._id}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: idx * 0.05 }}
                   className="break-inside-avoid"
                 >
                   <button
-                    onClick={() => setSelectedImage(image._id)}
+                    onClick={() => setSelectedImage(img._id)}
                     className="w-full group relative overflow-hidden rounded-xl"
                   >
-                    {image.imageUrl ? (
+                    {img.imageUrl ? (
                       <img
-                        src={`${import.meta.env.VITE_API_BASE_URL}${image.imageUrl}`}
-                        alt={image.title}
+                        src={`${import.meta.env.VITE_API_BASE_URL}${
+                          img.imageUrl
+                        }`}
+                        alt={img.title}
                         className="w-full object-contain"
                       />
                     ) : (
                       <div
-                        className={`bg-gradient-to-br ${gradientColors[index % gradientColors.length]} aspect-[4/3]`}
+                        className={`bg-gradient-to-br ${
+                          gradientColors[idx % gradientColors.length]
+                        } aspect-[4/3]`}
                       />
                     )}
                     <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors flex items-end">
                       <div className="p-4 translate-y-full group-hover:translate-y-0 transition-transform">
                         <p className="text-primary-foreground font-medium text-sm">
-                          {image.title}
+                          {img.title}
                         </p>
                       </div>
                     </div>
@@ -155,7 +157,7 @@ const Gallery = () => {
         </div>
       </section>
 
-      {/* Lightbox Modal */}
+      {/* Light-box Modal */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div
@@ -178,29 +180,90 @@ const Gallery = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="max-w-4xl w-full"
+              className="max-w-4xl w-full relative"
             >
               {(() => {
-                const selectedItem = galleryItems.find(img => img._id === selectedImage);
-                return selectedItem?.imageUrl ? (
-                  <img
-                    src={`${import.meta.env.VITE_API_BASE_URL}${selectedItem.imageUrl}`}
-                    alt={selectedItem.title}
-                    className="w-full rounded-2xl aspect-video object-cover"
-                  />
-                ) : (
-                  <div className={`bg-gradient-to-br ${gradientColors[0]} rounded-2xl aspect-video`} />
+                const currentIndex = filteredImages.findIndex(
+                  (i) => i._id === selectedImage
+                );
+                const item = galleryItems.find((i) => i._id === selectedImage);
+                return (
+                  <>
+                    {/* Previous */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (currentIndex > 0)
+                          setSelectedImage(
+                            filteredImages[currentIndex - 1]._id
+                          );
+                      }}
+                      disabled={currentIndex <= 0}
+                      aria-label="Previous image"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 z-20
+                                 w-10 h-10 rounded-full
+                                 bg-black/40 backdrop-blur
+                                 flex items-center justify-center
+                                 text-white shadow-lg
+                                 hover:bg-black/60 transition
+                                 disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+
+                    {/* Next */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (currentIndex < filteredImages.length - 1)
+                          setSelectedImage(
+                            filteredImages[currentIndex + 1]._id
+                          );
+                      }}
+                      disabled={currentIndex >= filteredImages.length - 1}
+                      aria-label="Next image"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 z-20
+                                 w-10 h-10 rounded-full
+                                 bg-black/40 backdrop-blur
+                                 flex items-center justify-center
+                                 text-white shadow-lg
+                                 hover:bg-black/60 transition
+                                 disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+
+                    {/* Image */}
+                    {item?.imageUrl ? (
+                      <img
+                        src={`${import.meta.env.VITE_API_BASE_URL}${
+                          item.imageUrl
+                        }`}
+                        alt={item.title}
+                        className="w-full rounded-2xl aspect-video object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`bg-gradient-to-br ${gradientColors[0]} rounded-2xl aspect-video`}
+                      />
+                    )}
+
+                    {/* Caption */}
+                    <p className="text-background text-center mt-4">
+                      {item?.title}
+                    </p>
+                    {/* <p className="text-background text-center mt-4 ">
+                      <p
+                        dangerouslySetInnerHTML={{ __html: item?.description }}
+                      />
+                    </p> */}
+                  </>
                 );
               })()}
-              <p className="text-background text-center mt-4 font-medium">
-                {galleryItems.find(img => img._id === selectedImage)?.title}
-              </p>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
     </MainLayout>
   );
-};
-
-export default Gallery;
+}
