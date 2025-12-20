@@ -1,239 +1,272 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, Shield, CheckCircle, CreditCard } from "lucide-react";
+import type { RepeatType, AnimationGeneratorType } from "framer-motion";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-
-const donationAmounts = [1075, 2150, 4350, 10750, 21500];
-
-const impactItems = [
-  { amount: "₹1075", impact: "Provides crisis support for one person" },
-  { amount: "₹2150", impact: "Funds a mental health counseling session" },
-  { amount: "₹4350", impact: "Supports a youth mentorship program for a month" },
-  { amount: "₹10750", impact: "Covers legal consultation for name change" },
-  { amount: "₹21500", impact: "Sponsors a community event" },
-];
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Heart, Mail, Clock, CheckCircle, ChevronRight } from "lucide-react";
 
 const Donate = () => {
-  const [donationType, setDonationType] = useState<"one-time" | "monthly">("one-time");
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(50);
-  const [customAmount, setCustomAmount] = useState("");
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
 
-  const handleAmountSelect = (amount: number) => {
-    setSelectedAmount(amount);
-    setCustomAmount("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setProgress(65);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const futureFeatures = [
+    {
+      title: "Secure Payment Gateway",
+      description: "Multiple payment methods including cards, UPI, and crypto",
+      icon: "🔒",
+      color: "from-blue-500/10 to-blue-600/10",
+      delay: 0.1
+    },
+    {
+      title: "Recurring Donations",
+      description: "Set up monthly contributions to support ongoing projects",
+      icon: "🔄",
+      color: "from-green-500/10 to-green-600/10",
+      delay: 0.2
+    },
+    {
+      title: "Transparent Tracking",
+      description: "See exactly how your donation makes an impact",
+      icon: "📊",
+      color: "from-purple-500/10 to-purple-600/10",
+      delay: 0.3
+    }
+  ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
   };
 
-  const handleCustomAmount = (value: string) => {
-    setCustomAmount(value);
-    setSelectedAmount(null);
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring" as AnimationGeneratorType,
+        stiffness: 100
+      }
+    }
   };
 
-  const displayAmount = selectedAmount || (customAmount ? parseInt(customAmount) : 0);
+  const pulseVariants = {
+    initial: { scale: 1 },
+    animate: {
+      scale: [1, 1.05, 1],
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        repeatType: "reverse" as RepeatType
+      }
+    }
+  };
 
   return (
     <MainLayout>
       <PageHero
-        badge="Support Us"
-        title="Make a Difference Today"
-        subtitle="Your generous donation helps us provide vital services to the LGBTQIA+ community."
+        badge={
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2"
+          >
+            <Heart className="w-4 h-4 fill-current" />
+            Support Us
+          </motion.div>
+        }
+        title="Donations Coming Soon"
+        subtitle="We're building a secure donation system to better serve our community"
       />
 
-      <section className="section-padding bg-background">
-        <div className="container-padding mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Donation Form */}
+      <section className="section-padding bg-gradient-to-b from-background to-background/80">
+        <div className="container-padding mx-auto max-w-6xl">
+          {/* Main Card with Progress */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6 }}
+            className="relative overflow-hidden"
+          >
+            {/* Background decoration */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="bg-card rounded-2xl p-8 border border-border">
-                {/* Donation Type Toggle */}
-                <div className="flex bg-muted rounded-xl p-1 mb-8">
-                  <button
-                    onClick={() => setDonationType("one-time")}
-                    className={cn(
-                      "flex-1 py-3 rounded-lg font-medium transition-colors",
-                      donationType === "one-time"
-                        ? "bg-card text-foreground shadow-soft"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    One-Time
-                  </button>
-                  <button
-                    onClick={() => setDonationType("monthly")}
-                    className={cn(
-                      "flex-1 py-3 rounded-lg font-medium transition-colors",
-                      donationType === "monthly"
-                        ? "bg-card text-foreground shadow-soft"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    Monthly
-                  </button>
-                </div>
-
-                {/* Amount Selection */}
-                <h3 className="font-display text-lg font-semibold text-foreground mb-4">
-                  Select Amount
-                </h3>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {donationAmounts.map((amount) => (
-                    <button
-                      key={amount}
-                      onClick={() => handleAmountSelect(amount)}
-                      className={cn(
-                        "py-4 rounded-xl font-semibold transition-all",
-                        selectedAmount === amount
-                          ? "bg-primary text-primary-foreground shadow-glow"
-                          : "bg-muted text-foreground hover:bg-muted/80"
-                      )}
-                    >
-                      ₹{amount}
-                    </button>
-                  ))}
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
-                    <Input
-                      type="number"
-                      placeholder="Other"
-                      value={customAmount}
-                      onChange={(e) => handleCustomAmount(e.target.value)}
-                      className={cn(
-                        "pl-8 h-full",
-                        customAmount && "border-primary"
-                      )}
-                    />
-                  </div>
-                </div>
-
-                {donationType === "monthly" && displayAmount > 0 && (
-                  <p className="text-sm text-muted-foreground mb-6">
-                    You'll be charged ₹{displayAmount} monthly. Cancel anytime.
-                  </p>
-                )}
-
-                {/* Form Fields */}
-                <div className="space-y-4 mb-8">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        First Name
-                      </label>
-                      <Input placeholder="First name" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        Last Name
-                      </label>
-                      <Input placeholder="Last name" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Email
-                    </label>
-                    <Input type="email" placeholder="your@email.com" />
-                  </div>
-                </div>
-
-                {/* Payment (Mock UI) */}
-                <div className="border border-border rounded-xl p-6 mb-6 bg-muted/30">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CreditCard className="w-5 h-5 text-muted-foreground" />
-                    <span className="font-medium text-foreground">Payment Details</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Payment processing is not enabled in this demo. In production, this would integrate with a payment provider.
-                  </p>
-                </div>
-
-                <Button variant="hero" size="xl" className="w-full">
-                  <Heart className="w-5 h-5 mr-2" />
-                  Donate {displayAmount > 0 ? `₹${displayAmount}` : ""}
-                  {donationType === "monthly" ? " Monthly" : ""}
-                </Button>
-
-                <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
-                  <Shield className="w-4 h-4" />
-                  Secure donation powered by industry-standard encryption
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Impact & Trust */}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-full blur-3xl"
+            />
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              {/* Impact */}
-              <div>
-                <h2 className="font-display text-2xl font-bold text-foreground mb-6">
-                  Your Impact
+              animate={{ rotate: -360 }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute -bottom-24 -left-24 w-48 h-48 bg-gradient-to-r from-secondary/5 to-primary/5 rounded-full blur-3xl"
+            />
+
+            <div className="relative bg-card/80 backdrop-blur-sm rounded-3xl border border-border/50 shadow-2xl p-8 md:p-12">
+              <div className="text-center mb-10">
+                <motion.div
+                  variants={pulseVariants}
+                  initial="initial"
+                  animate="animate"
+                  className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl mb-6 border border-primary/20"
+                >
+                  <Clock className="w-10 h-10 text-primary" />
+                </motion.div>
+                
+                <h2 className="text-4xl font-bold text-foreground mb-4">
+                  Donation System in Progress
                 </h2>
-                <div className="space-y-4">
-                  {impactItems.map((item, index) => (
-                    <motion.div
-                      key={item.amount}
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-start gap-4 p-4 bg-muted/30 rounded-xl"
-                    >
-                      <div className="w-16 font-display font-bold text-primary">
-                        {item.amount}
-                      </div>
-                      <p className="text-muted-foreground">{item.impact}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Trust */}
-              <div className="bg-safe rounded-2xl p-6">
-                <h3 className="font-display text-lg font-semibold text-foreground mb-4">
-                  Transparency & Trust
-                </h3>
-                <ul className="space-y-3">
-                  {[
-                    "501(c)(3) nonprofit organization",
-                    "85% of donations go directly to programs",
-                    "Annual reports available to donors",
-                    "Independent financial audits",
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-muted-foreground">
-                      <CheckCircle className="w-5 h-5 text-accent shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Other Ways */}
-              <div className="bg-card rounded-2xl p-6 border border-border">
-                <h3 className="font-display text-lg font-semibold text-foreground mb-4">
-                  Other Ways to Give
-                </h3>
-                <ul className="space-y-2 text-muted-foreground text-sm">
-                  <li>• Workplace giving programs</li>
-                  <li>• Donor-advised funds</li>
-                  <li>• Stock donations</li>
-                  <li>• Legacy/planned giving</li>
-                </ul>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Contact us at donations@prideconnect.org for more options.
+                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                  We're currently developing a secure and transparent donation platform. 
+                  Implementation is planned for the near future.
                 </p>
               </div>
-            </motion.div>
-          </div>
+
+              {/* Progress Bar */}
+              <div className="max-w-2xl mx-auto mb-10">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-sm font-medium text-foreground">Development Progress</span>
+                  <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-sm font-bold text-primary"
+                  >
+                    {progress}%
+                  </motion.span>
+                </div>
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 1.5, delay: 0.5 }}
+                    className="h-full bg-gradient-to-r from-primary to-primary/80 rounded-full"
+                  />
+                </div>
+              </div>
+
+              {/* Contact Card */}
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-2xl p-6 mb-10"
+              >
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Mail className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-foreground">Need immediate assistance?</h3>
+                      <p className="text-muted-foreground">Contact us for partnership or sponsorship inquiries</p>
+                    </div>
+                  </div>
+                  <motion.a
+                    whileHover={{ x: 5 }}
+                    href="mailto:akashraikwar763@gmail.com"
+                    className="group inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    <Link to="/contact">
+                    Contact Now
+                    </Link>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </motion.a>
+                </div>
+              </motion.div>
+
+              {/* Future Features */}
+              <div className="mb-10">
+                <h3 className="text-2xl font-bold text-center text-foreground mb-8">
+                  Future Features
+                </h3>
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                >
+                  {futureFeatures.map((feature, index) => (
+                    <motion.div
+                      key={index}
+                      variants={itemVariants}
+                      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                      onMouseEnter={() => setHoveredCard(index)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                      className={`relative bg-gradient-to-br ${feature.color} border border-border/50 rounded-2xl p-6 cursor-pointer transition-all duration-300 ${
+                        hoveredCard === index ? "shadow-lg" : "shadow-md"
+                      }`}
+                    >
+                      <motion.div
+                        animate={{
+                          scale: hoveredCard === index ? 1.1 : 1,
+                          rotate: hoveredCard === index ? 5 : 0
+                        }}
+                        className="w-14 h-14 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-2xl mb-4 border border-white/20"
+                      >
+                        {feature.icon}
+                      </motion.div>
+                      <h4 className="text-xl font-semibold text-foreground mb-2">
+                        {feature.title}
+                      </h4>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                      
+                      {/* Hover indicator */}
+                      {hoveredCard === index && (
+                        <motion.div
+                          layoutId="hoverBackground"
+                          className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl -z-10"
+                          transition={{ type: "spring", bounce: 0.2 }}
+                        />
+                      )}
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+
+              {/* CTA Section */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                className="text-center"
+              >
+                <div className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-full px-6 py-3 mb-6">
+                  <CheckCircle className="w-5 h-5 text-primary" />
+                  <span className="text-foreground font-medium">
+                    Subscribe to get notified when donations open
+                  </span>
+                </div>
+                <p className="text-muted-foreground">
+                  We appreciate your interest in supporting our mission. Stay tuned for updates!
+                </p>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Floating Elements */}
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="fixed bottom-10 right-10 w-8 h-8 bg-primary/20 rounded-full hidden lg:block"
+          />
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
+            className="fixed top-1/4 left-10 w-6 h-6 bg-secondary/20 rounded-full hidden lg:block"
+          />
         </div>
       </section>
     </MainLayout>
