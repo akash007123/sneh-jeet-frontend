@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Play, Clock, Eye, ThumbsUp, Lightbulb, Film, BookOpen, Sparkles, ArrowRight, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -317,10 +317,10 @@ const MediaHub = () => {
                   <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
                     Share your ideas for community projects, initiatives, and improvements. Vote on ideas you love and help bring them to life.
                   </p>
-                  <Button variant="pride">
+                  {/* <Button variant="pride">
                     Submit Your Idea
                     <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
+                  </Button> */}
                 </motion.div>
               </div>
 
@@ -402,14 +402,16 @@ const MediaHub = () => {
               We're always looking for new voices and perspectives. Submit your short film, educational content, or creative idea.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to='/contact'>              
               <Button variant="pride" size="lg">
                 <Film className="w-5 h-5 mr-2" />
-                Submit Content
+                Contact us and share your Ideas and Video Content.
               </Button>
-              <Button variant="outline" size="lg">
+              </Link>
+              {/* <Button variant="outline" size="lg">
                 <Lightbulb className="w-5 h-5 mr-2" />
                 Share an Idea
-              </Button>
+              </Button> */}
             </div>
           </motion.div>
         </div>
