@@ -19,8 +19,8 @@ import { useToast } from "@/hooks/use-toast";
 import ViewGalleryModal from "./ViewGalleryModal";
 import EditGalleryModal from "./EditGalleryModal";
 import AddGalleryModal from "./AddGalleryModal";
-import DeleteModal from "./DeleteModal";
-import {formatDate} from "../utils/formatDate";
+import DeleteModal from "../Shared//DeleteModal";
+import {formatDate} from "../../utils/formatDate";
 
 interface GalleryItem {
   _id: string;

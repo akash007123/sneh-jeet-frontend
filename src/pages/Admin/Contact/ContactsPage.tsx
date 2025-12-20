@@ -17,8 +17,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ViewContactModal from "./ViewContactModal";
-import EditStatusModal from "./EditStatusModal";
-import DeleteModal from "./DeleteModal";
+import EditStatusModal from "../Shared/EditStatusModal";
+import DeleteModal from "../Shared/DeleteModal";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';

@@ -8,7 +8,7 @@ import StoryTable from "./StoryTable";
 import ViewStoryModal from "./ViewStoryModal";
 import EditStoryModal from "./EditStoryModal";
 import AddStoryModal from "./AddStoryModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 
 interface Story {
   _id: string;

@@ -133,15 +133,11 @@ const Gallery = () => {
                       <img
                         src={`${import.meta.env.VITE_API_BASE_URL}${image.imageUrl}`}
                         alt={image.title}
-                        className={`w-full object-cover aspect-[4/3] ${
-                          index % 3 === 0 ? "sm:aspect-[3/4]" : index % 3 === 1 ? "aspect-square" : "aspect-[4/3]"
-                        }`}
+                        className="w-full object-contain"
                       />
                     ) : (
                       <div
-                        className={`bg-gradient-to-br ${gradientColors[index % gradientColors.length]} aspect-[4/3] ${
-                          index % 3 === 0 ? "sm:aspect-[3/4]" : index % 3 === 1 ? "aspect-square" : "aspect-[4/3]"
-                        }`}
+                        className={`bg-gradient-to-br ${gradientColors[index % gradientColors.length]} aspect-[4/3]`}
                       />
                     )}
                     <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors flex items-end">

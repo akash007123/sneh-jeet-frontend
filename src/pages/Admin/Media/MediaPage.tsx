@@ -7,7 +7,7 @@ import MediaTable from "./MediaTable";
 import ViewMediaModal from "./ViewMediaModal";
 import EditMediaModal from "./EditMediaModal";
 import AddMediaModal from "./AddMediaModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 import { useToast } from "@/hooks/use-toast";
 import { Media } from "@/types/media";
 

@@ -19,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import ViewEventModal from "./ViewEventModal";
 import EditEventModal from "./EditEventModal";
 import AddEventModal from "./AddEventModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 
 interface Event {
   _id: string;

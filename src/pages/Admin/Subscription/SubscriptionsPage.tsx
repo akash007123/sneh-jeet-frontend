@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import DeleteModal from "./DeleteModal";
-import {formatDate} from "../utils/formatDate";
+import DeleteModal from "../Shared/DeleteModal";
+import {formatDate} from "../../utils/formatDate";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';

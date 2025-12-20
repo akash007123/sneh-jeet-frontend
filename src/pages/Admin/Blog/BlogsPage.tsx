@@ -8,7 +8,7 @@ import BlogTable from "./BlogTable";
 import ViewBlogModal from "./ViewBlogModal";
 import EditBlogModal from "./EditBlogModal";
 import AddBlogModal from "./AddBlogModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 import { Blog } from "@/types/blog";
 
 const BlogsPage = () => {

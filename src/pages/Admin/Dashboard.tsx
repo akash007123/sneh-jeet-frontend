@@ -7,6 +7,10 @@ import {
   Calendar,
   Image,
   FileText,
+  BookOpen,
+  Film,
+  Lightbulb,
+  UserPlus,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -82,6 +86,86 @@ const Dashboard = () => {
     },
   });
 
+  const { data: stories, isLoading: storiesLoading } = useQuery({
+    queryKey: ["stories"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/story`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch stories");
+      return response.json();
+    },
+  });
+
+  const { data: media, isLoading: mediaLoading } = useQuery({
+    queryKey: ["media"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/media`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch media");
+      return response.json();
+    },
+  });
+
+  const { data: ideas, isLoading: ideasLoading } = useQuery({
+    queryKey: ["ideas"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/ideas`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch ideas");
+      return response.json();
+    },
+  });
+
+  const { data: members, isLoading: membersLoading } = useQuery({
+    queryKey: ["memberships"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/membership`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch memberships");
+      return response.json();
+    },
+  });
+
+  const { data: users, isLoading: usersLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Failed to fetch users");
+      return response.json();
+    },
+  });
+
 
   const stats = {
     totalContacts: contacts?.length || 0,
@@ -94,6 +178,11 @@ const Dashboard = () => {
     totalGallery: gallery?.length || 0,
     totalBlogs: blogs?.blogs?.length || 0,
     featuredBlogs: blogs?.blogs?.filter((b) => b.isFeatured).length || 0,
+    totalStories: stories?.stories?.length || 0,
+    totalMedia: media?.media?.length || 0,
+    totalIdeas: ideas?.ideas?.length || 0,
+    totalMembers: members?.length || 0,
+    totalUsers: users?.length || 0,
   };
 
   return (
@@ -243,6 +332,103 @@ const Dashboard = () => {
                 <p className="text-xs text-muted-foreground">
                   {stats.featuredBlogs} featured
                 </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Stories
+                </CardTitle>
+                <BookOpen className="h-4 w-4 text-indigo-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalStories}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Media
+                </CardTitle>
+                <Film className="h-4 w-4 text-red-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalMedia}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Ideas
+                </CardTitle>
+                <Lightbulb className="h-4 w-4 text-cyan-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalIdeas}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Members
+                </CardTitle>
+                <UserPlus className="h-4 w-4 text-emerald-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalMembers}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            whileHover={{ scale: 1.02, y: -5 }}
+          >
+            <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border-violet-200 hover:shadow-lg transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Users
+                </CardTitle>
+                <Users className="h-4 w-4 text-violet-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalUsers}</div>
               </CardContent>
             </Card>
           </motion.div>

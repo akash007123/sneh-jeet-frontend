@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import AddUserModal from "./AddUserModal";
 import EditUserModal from "./EditUserModal";
 import ViewUserModal from "./ViewUserModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 
 interface User {
   _id: string;

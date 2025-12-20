@@ -7,7 +7,7 @@ import IdeasTable from "./IdeasTable";
 import ViewIdeaModal from "./ViewIdeaModal";
 import EditIdeaModal from "./EditIdeaModal";
 import AddIdeaModal from "./AddIdeaModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 import { useToast } from "@/hooks/use-toast";
 import { Idea } from "@/types/idea";
 

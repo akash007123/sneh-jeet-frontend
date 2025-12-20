@@ -18,11 +18,11 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import ViewMembershipModal from "./ViewMembershipModal";
 import EditMembershipModal from "./EditMembershipModal";
-import DeleteModal from "./DeleteModal";
+import DeleteModal from "../Shared/DeleteModal";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
-import {formatDate} from "../utils/formatDate"
+import {formatDate} from "../../utils/formatDate"
 
 interface Membership {
   _id: string;

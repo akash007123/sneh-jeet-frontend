@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, Edit, Trash2, Plus, Star } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,44 +12,84 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Blog } from "@/types/blog";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import {formatDate} from "../utils/formatDate";
+import {formatDate} from '../../utils/formatDate';
 
-interface BlogTableProps {
-  onView: (blog: Blog) => void;
-  onEdit: (blog: Blog) => void;
-  onAdd: () => void;
-  onDelete: (blog: Blog) => void;
+interface Story {
+  _id: string;
+  title: string;
+  excerpt: string;
+  content?: string;
+  image?: string;
+  isFeatured: boolean;
+  readTime: string;
+  author: string;
+  publishedDate: string;
+  category: string;
+  type?: string;
 }
 
-const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
+interface StoryTableProps {
+  onView: (story: Story) => void;
+  onEdit: (story: Story) => void;
+  onAdd: () => void;
+  onDelete: (story: Story) => void;
+}
+
+const StoryTable = ({ onView, onEdit, onAdd, onDelete }: StoryTableProps) => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
 
-  const { data: blogs, isLoading } = useQuery({
-    queryKey: ["blogs"],
+  const { data: stories, isLoading } = useQuery({
+    queryKey: ["stories"],
     queryFn: async () => {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog`
+        `${import.meta.env.VITE_API_BASE_URL}/api/story`
       );
-      if (!response.ok) throw new Error("Failed to fetch blogs");
+      if (!response.ok) throw new Error("Failed to fetch stories");
       return response.json();
+    },
+  });
+
+  const deleteStoryMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/story/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("Failed to delete story");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stories"] });
+      toast({ title: "Success", description: "Story deleted successfully" });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete story",
+        variant: "destructive",
+      });
     },
   });
 
 
   if (isLoading) {
-    return <div className="text-center py-8">Loading blogs...</div>;
+    return <div className="text-center py-8">Loading stories...</div>;
   }
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Blog Posts</CardTitle>
+        <CardTitle>Stories</CardTitle>
         {user && user.role === "Admin" && (
           <Button onClick={onAdd}>
             <Plus className="w-4 h-4 mr-2" />
-            Add Blog Post
+            Add Story
           </Button>
         )}
       </CardHeader>
@@ -66,31 +106,31 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {blogs?.blogs?.map((blog: Blog) => (
-              <TableRow key={blog._id}>
+            {stories?.stories?.map((story: Story) => (
+              <TableRow key={story._id}>
                 <TableCell className="font-medium max-w-xs">
-                  <div className="truncate" title={blog.title}>
-                    {blog.title}
+                  <div className="truncate" title={story.title}>
+                    {story.title}
                   </div>
                 </TableCell>
-                <TableCell>{blog.authorName}</TableCell>
+                <TableCell>{story.author}</TableCell>
                 <TableCell>
                   <Badge variant="secondary" className="capitalize">
-                    {blog.category.replace("-", " ")}
+                    {story.type || story.category}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  {blog.isFeatured && (
+                  {story.isFeatured && (
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                   )}
                 </TableCell>
-                <TableCell>{formatDate(blog.publishedDate)}</TableCell>
+                <TableCell>{formatDate(story.publishedDate)}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onView(blog)}
+                      onClick={() => onView(story)}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
@@ -100,7 +140,7 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => onEdit(blog)}
+                          onClick={() => onEdit(story)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -108,7 +148,7 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => onDelete(blog)}
+                          onClick={() => onDelete(story)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -120,9 +160,9 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
             ))}
           </TableBody>
         </Table>
-        {blogs?.blogs?.length === 0 && (
+        {stories?.stories?.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            No blog posts found. Create your first blog post!
+            No stories found. Create your first story!
           </div>
         )}
       </CardContent>
@@ -130,4 +170,4 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
   );
 };
 
-export default BlogTable;
+export default StoryTable;
