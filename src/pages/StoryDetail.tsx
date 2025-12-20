@@ -203,29 +203,9 @@ const StoryDetail = () => {
                 prose-strong:text-foreground
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
             >
-              {story.content ? story.content.split("\n\n").map((paragraph: string, index: number) => {
-                if (paragraph.startsWith("## ")) {
-                  return (
-                    <h2 key={index}>{paragraph.replace("## ", "")}</h2>
-                  );
-                }
-                if (paragraph.startsWith("### ")) {
-                  return (
-                    <h3 key={index}>{paragraph.replace("### ", "")}</h3>
-                  );
-                }
-                if (paragraph.startsWith("- ")) {
-                  const items = paragraph.split("\n").filter((item) => item.startsWith("- "));
-                  return (
-                    <ul key={index}>
-                      {items.map((item, i) => (
-                        <li key={i}>{item.replace("- ", "")}</li>
-                      ))}
-                    </ul>
-                  );
-                }
-                return <p key={index}>{paragraph}</p>;
-              }) : (
+              {story.content ? (
+                <div dangerouslySetInnerHTML={{ __html: story.content }} />
+              ) : (
                 <p className="text-muted-foreground">No content available for this story.</p>
               )}
             </motion.div>

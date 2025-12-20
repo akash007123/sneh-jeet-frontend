@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import CKEditorComponent from "@/components/ui/CKEditorComponent";
 
 interface AddStoryModalProps {
   isOpen: boolean;
@@ -143,12 +144,10 @@ const AddStoryModal = ({ isOpen, onClose, onSuccess }: AddStoryModalProps) => {
 
               <div>
                 <Label htmlFor="content">Content</Label>
-                <Textarea
-                  id="content"
+                <CKEditorComponent
                   value={formData.content}
-                  onChange={(e) => handleInputChange('content', e.target.value)}
+                  onChange={(value) => handleInputChange('content', value)}
                   placeholder="Full story content (optional)"
-                  rows={6}
                 />
               </div>
 
