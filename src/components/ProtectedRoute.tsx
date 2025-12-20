@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import LGBTLoading from '@/components/ui/LGBTLoading';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -11,7 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LGBTLoading message="Authenticating..." size="md" variant="rainbow" />;
   }
 
   if (!user) {

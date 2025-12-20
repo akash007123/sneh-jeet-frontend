@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2 } from "lucide-react";
+import { X } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
+import LGBTLoading from "@/components/ui/LGBTLoading";
 
 interface GalleryItem {
   _id: string;
@@ -104,9 +105,11 @@ const Gallery = () => {
       <section className="section-padding bg-background">
         <div className="container-padding mx-auto max-w-7xl">
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
+            <LGBTLoading
+              message="Loading gallery..."
+              size="lg"
+              variant="hearts"
+            />
           ) : error ? (
             <div className="text-center py-12">
               <p className="text-destructive">{error}</p>

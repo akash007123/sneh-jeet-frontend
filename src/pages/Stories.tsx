@@ -5,6 +5,7 @@ import { Clock, User, Tag, ArrowRight } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
+import LGBTLoading from "@/components/ui/LGBTLoading";
 
 interface Story {
   _id: string;
@@ -191,7 +192,11 @@ const Stories = () => {
             All Stories
           </h2>
 
-          {otherStories.length === 0 && featuredStories.length === 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <LGBTLoading message="Loading stories..." size="lg" variant="pride" />
+            </div>
+          ) : otherStories.length === 0 && featuredStories.length === 0 ? (
             <p className="text-muted-foreground text-center py-12">
               No stories found in this category.
             </p>
