@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import AdminTablePagination from "@/components/ui/admin-table-pagination";
 import AddUserModal from "./AddUserModal";
@@ -30,6 +31,7 @@ interface User {
   role: string;
   profilePic?: string;
   createdAt: string;
+  isActive: boolean;
 }
 
 const UsersPage = () => {
@@ -70,6 +72,35 @@ const UsersPage = () => {
   });
 
   // Mutations
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/users/${id}/status`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isActive }),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update user status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({ title: "Success", description: "User status updated successfully" });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update user status",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteUserMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(
@@ -117,6 +148,10 @@ const UsersPage = () => {
   const handleDeleteUser = (user: User) => {
     setDeleteItem(user);
     setDeleteModalOpen(true);
+  };
+
+  const handleToggleStatus = (user: User, isActive: boolean) => {
+    toggleStatusMutation.mutate({ id: user._id, isActive });
   };
 
   const confirmDeleteUser = () => {
@@ -186,6 +221,7 @@ const UsersPage = () => {
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead>Joined</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -212,6 +248,21 @@ const UsersPage = () => {
                             <Badge className={getRoleColor(user.role)}>
                               {user.role}
                             </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={user.isActive ? "active" : "inactive"}
+                              onValueChange={(value) => handleToggleStatus(user, value === "active")}
+                              disabled={toggleStatusMutation.isPending}
+                            >
+                              <SelectTrigger className="w-24">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="active">Active</SelectItem>
+                                <SelectItem value="inactive">Inactive</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                           <TableCell>
                             {new Date(user.createdAt).toLocaleDateString()}

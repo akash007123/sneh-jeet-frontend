@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 
 interface User {
@@ -23,6 +24,7 @@ interface User {
   role: string;
   profilePic?: string;
   createdAt: string;
+  isActive: boolean;
 }
 
 interface EditUserModalProps {
@@ -37,6 +39,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSuccess }: EditUserModalProps)
     name: "",
     email: "",
     role: "",
+    isActive: true,
   });
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const { toast } = useToast();
@@ -48,6 +51,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSuccess }: EditUserModalProps)
         name: user.name,
         email: user.email,
         role: user.role,
+        isActive: user.isActive,
       });
       setProfilePic(null);
     }
@@ -100,6 +104,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSuccess }: EditUserModalProps)
     submitData.append("name", formData.name);
     submitData.append("email", formData.email);
     submitData.append("role", formData.role);
+    submitData.append("isActive", formData.isActive.toString());
     if (profilePic) {
       submitData.append("profilePic", profilePic);
     }
@@ -112,6 +117,7 @@ const EditUserModal = ({ user, isOpen, onClose, onSuccess }: EditUserModalProps)
       name: "",
       email: "",
       role: "",
+      isActive: true,
     });
     setProfilePic(null);
     onClose();
@@ -178,6 +184,15 @@ const EditUserModal = ({ user, isOpen, onClose, onSuccess }: EditUserModalProps)
                 <SelectItem value="User">User</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isActive"
+              checked={formData.isActive}
+              onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+            />
+            <Label htmlFor="isActive">Active Status</Label>
           </div>
 
           <div className="space-y-2">
