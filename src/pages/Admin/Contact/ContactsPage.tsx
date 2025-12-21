@@ -17,15 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import AdminTablePagination from "@/components/ui/admin-table-pagination";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "../Shared/EditStatusModal";
 import DeleteModal from "../Shared/DeleteModal";
@@ -232,38 +224,6 @@ const ContactsPage = () => {
     doc.save('contacts.pdf');
   };
 
-  const renderPagination = () => {
-    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-    return (
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-            />
-          </PaginationItem>
-          {pages.map(page => (
-            <PaginationItem key={page}>
-              <PaginationLink
-                isActive={page === currentPage}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    );
-  };
 
   return (
     <AdminLayout>
@@ -284,29 +244,13 @@ const ContactsPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Contact Submissions</CardTitle>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm">Items per page:</label>
-                    <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
-                      <SelectTrigger className="w-20">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="5">5</SelectItem>
-                        <SelectItem value="10">10</SelectItem>
-                        <SelectItem value="25">25</SelectItem>
-                        <SelectItem value="30">30</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={exportToCSV}>
-                      Export CSV
-                    </Button>
-                    <Button variant="outline" onClick={exportToPDF}>
-                      Export PDF
-                    </Button>
-                  </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={exportToCSV}>
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={exportToPDF}>
+                    Export PDF
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -389,11 +333,13 @@ const ContactsPage = () => {
                       ))}
                     </TableBody>
                   </Table>
-                  {totalPages > 1 && (
-                    <div className="flex justify-center mt-4">
-                      {renderPagination()}
-                    </div>
-                  )}
+                  <AdminTablePagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={setCurrentPage}
+                    onItemsPerPageChange={(value) => { setItemsPerPage(value); setCurrentPage(1); }}
+                  />
                 </>
               )}
             </CardContent>
