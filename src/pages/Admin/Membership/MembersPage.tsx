@@ -17,6 +17,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import ViewMembershipModal from "./ViewMembershipModal";
 import EditMembershipModal from "./EditMembershipModal";
 import DeleteModal from "../Shared/DeleteModal";
@@ -97,6 +106,10 @@ const MembersPage = () => {
   // Add member states
   const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   // Queries
   const { data: memberships, isLoading: membershipsLoading } = useQuery({
     queryKey: ["memberships"],
@@ -174,6 +187,10 @@ const MembersPage = () => {
       });
     },
   });
+
+  // Pagination calculations
+  const paginatedMemberships = memberships?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((memberships?.length || 0) / itemsPerPage);
 
   // Handlers
   const handleViewMembership = (membership: Membership) => {
@@ -264,6 +281,39 @@ const MembersPage = () => {
     doc.save('memberships.pdf');
   };
 
+  const renderPagination = () => {
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    return (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+          {pages.map(page => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                isActive={page === currentPage}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -283,16 +333,32 @@ const MembersPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Membership Applications</CardTitle>
-                <div className="flex gap-2">
-                  <Button onClick={() => setAddMemberModalOpen(true)}>
-                    Add Member
-                  </Button>
-                  <Button variant="outline" onClick={exportToCSV}>
-                    Export CSV
-                  </Button>
-                  <Button variant="outline" onClick={exportToPDF}>
-                    Export PDF
-                  </Button>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm">Items per page:</label>
+                    <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={() => setAddMemberModalOpen(true)}>
+                      Add Member
+                    </Button>
+                    <Button variant="outline" onClick={exportToCSV}>
+                      Export CSV
+                    </Button>
+                    <Button variant="outline" onClick={exportToPDF}>
+                      Export PDF
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -300,86 +366,93 @@ const MembersPage = () => {
               {membershipsLoading ? (
                 <div className="text-center py-8">Loading...</div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Image</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Mobile</TableHead>
-                      <TableHead>Position</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {memberships?.map((membership: Membership) => (
-                      <TableRow key={membership._id}>
-                        <TableCell>
-                          <Avatar className="w-10 h-10">
-                            <AvatarImage
-                              src={membership.image ? `${import.meta.env.VITE_API_BASE_URL}${membership.image}` : undefined}
-                              alt={`${membership.firstName} ${membership.lastName}`}
-                            />
-                            <AvatarFallback>
-                              {membership.firstName[0]}{membership.lastName[0]}
-                            </AvatarFallback>
-                          </Avatar>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {membership.firstName} {membership.lastName}
-                        </TableCell>
-                        <TableCell>{membership.email}</TableCell>
-                        <TableCell>{membership.mobile || "N/A"}</TableCell>
-                        <TableCell>{membership.position || "N/A"}</TableCell>
-                        <TableCell>
-                          <Badge
-                            className={getMembershipStatusColor(
-                              membership.status
-                            )}
-                          >
-                            {membership.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {formatDate(
-                            membership.createdAt
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewMembership(membership)}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() =>
-                                handleEditMembershipStatus(membership)
-                              }
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteMembership(membership)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Image</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Mobile</TableHead>
+                        <TableHead>Position</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedMemberships?.map((membership: Membership) => (
+                        <TableRow key={membership._id}>
+                          <TableCell>
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage
+                                src={membership.image ? `${import.meta.env.VITE_API_BASE_URL}${membership.image}` : undefined}
+                                alt={`${membership.firstName} ${membership.lastName}`}
+                              />
+                              <AvatarFallback>
+                                {membership.firstName[0]}{membership.lastName[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {membership.firstName} {membership.lastName}
+                          </TableCell>
+                          <TableCell>{membership.email}</TableCell>
+                          <TableCell>{membership.mobile || "N/A"}</TableCell>
+                          <TableCell>{membership.position || "N/A"}</TableCell>
+                          <TableCell>
+                            <Badge
+                              className={getMembershipStatusColor(
+                                membership.status
+                              )}
+                            >
+                              {membership.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(
+                              membership.createdAt
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewMembership(membership)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() =>
+                                  handleEditMembershipStatus(membership)
+                                }
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteMembership(membership)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {totalPages > 1 && (
+                    <div className="flex justify-center mt-4">
+                      {renderPagination()}
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>

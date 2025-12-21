@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "../../utils/formatDate";
 import {
   Table,
   TableBody,
@@ -16,6 +17,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "../Shared/EditStatusModal";
 import DeleteModal from "../Shared/DeleteModal";
@@ -48,6 +58,10 @@ const ContactsPage = () => {
   // Delete states
   const [deleteItem, setDeleteItem] = useState<Contact | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Queries
   const { data: contacts, isLoading: contactsLoading } = useQuery({
@@ -126,6 +140,10 @@ const ContactsPage = () => {
       });
     },
   });
+
+  // Pagination calculations
+  const paginatedContacts = contacts?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((contacts?.length || 0) / itemsPerPage);
 
   // Handlers
   const handleViewContact = (contact: Contact) => {
@@ -214,6 +232,39 @@ const ContactsPage = () => {
     doc.save('contacts.pdf');
   };
 
+  const renderPagination = () => {
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    return (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+          {pages.map(page => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                isActive={page === currentPage}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -233,13 +284,29 @@ const ContactsPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Contact Submissions</CardTitle>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={exportToCSV}>
-                    Export CSV
-                  </Button>
-                  <Button variant="outline" onClick={exportToPDF}>
-                    Export PDF
-                  </Button>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm">Items per page:</label>
+                    <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={exportToCSV}>
+                      Export CSV
+                    </Button>
+                    <Button variant="outline" onClick={exportToPDF}>
+                      Export PDF
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -247,80 +314,87 @@ const ContactsPage = () => {
               {contactsLoading ? (
                 <div className="text-center py-8">Loading...</div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>#</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      {/* <TableHead>Subject</TableHead> */}
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {contacts?.map((contact: Contact, index: number) => (
-                      <TableRow key={contact._id}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell className="font-medium">
-                          {contact.name}
-                        </TableCell>
-                        <TableCell>{contact.email}</TableCell>
-                        <TableCell>{contact.phone || "N/A"}</TableCell>
-                        {/* <TableCell>{contact.subject}</TableCell> */}
-                        <TableCell>
-                          <Badge
-                            className={getContactStatusColor(
-                              contact.status
-                            )}
-                          >
-                            {contact.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(
-                            contact.createdAt
-                          ).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewContact(contact)}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-
-                            {user && user.role === 'Admin' && (
-                              <>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleEditContactStatus(contact)
-                                  }
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleDeleteContact(contact)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        </TableCell>
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>#</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        {/* <TableHead>Subject</TableHead> */}
+                        <TableHead>Status</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedContacts?.map((contact: Contact, index: number) => (
+                        <TableRow key={contact._id}>
+                          <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                          <TableCell className="font-medium">
+                            {contact.name}
+                          </TableCell>
+                          <TableCell>{contact.email}</TableCell>
+                          <TableCell>{contact.phone || "N/A"}</TableCell>
+                          {/* <TableCell>{contact.subject}</TableCell> */}
+                          <TableCell>
+                            <Badge
+                              className={getContactStatusColor(
+                                contact.status
+                              )}
+                            >
+                              {contact.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(
+                              contact.createdAt
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewContact(contact)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+
+                              {user && user.role === 'Admin' && (
+                                <>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                      handleEditContactStatus(contact)
+                                    }
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleDeleteContact(contact)}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {totalPages > 1 && (
+                    <div className="flex justify-center mt-4">
+                      {renderPagination()}
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>

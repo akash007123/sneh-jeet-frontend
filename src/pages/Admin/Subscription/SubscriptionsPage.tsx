@@ -16,6 +16,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import DeleteModal from "../Shared/DeleteModal";
 import {formatDate} from "../../utils/formatDate";
 import jsPDF from 'jspdf';
@@ -37,6 +46,10 @@ const SubscriptionsPage = () => {
   // Delete states
   const [deleteItem, setDeleteItem] = useState<Subscription | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Queries
   const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
@@ -114,6 +127,10 @@ const SubscriptionsPage = () => {
     },
   });
 
+  // Pagination calculations
+  const paginatedSubscriptions = subscriptions?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((subscriptions?.length || 0) / itemsPerPage);
+
   // Handlers
   const handleToggleStatus = (subscription: Subscription) => {
     const newStatus = subscription.status === "active" ? "unsubscribed" : "active";
@@ -180,6 +197,39 @@ const SubscriptionsPage = () => {
     doc.save('subscriptions.pdf');
   };
 
+  const renderPagination = () => {
+    const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+    return (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+          {pages.map(page => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                isActive={page === currentPage}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -199,13 +249,29 @@ const SubscriptionsPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Email Subscriptions</CardTitle>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={exportToCSV}>
-                    Export CSV
-                  </Button>
-                  <Button variant="outline" onClick={exportToPDF}>
-                    Export PDF
-                  </Button>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm">Items per page:</label>
+                    <Select value={itemsPerPage.toString()} onValueChange={(value) => { setItemsPerPage(Number(value)); setCurrentPage(1); }}>
+                      <SelectTrigger className="w-20">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="30">30</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={exportToCSV}>
+                      Export CSV
+                    </Button>
+                    <Button variant="outline" onClick={exportToPDF}>
+                      Export PDF
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -213,61 +279,68 @@ const SubscriptionsPage = () => {
               {subscriptionsLoading ? (
                 <div className="text-center py-8">Loading...</div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Subscribed At</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {subscriptions?.map((subscription: Subscription) => (
-                      <TableRow key={subscription._id}>
-                        <TableCell className="font-medium">
-                          {subscription.email}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={getSubscriptionStatusColor(
-                              subscription.status
-                            )}
-                          >
-                            {subscription.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {formatDate(
-                            subscription.subscribedAt
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleToggleStatus(subscription)}
-                              disabled={updateSubscriptionStatusMutation.isPending}
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Subscribed At</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedSubscriptions?.map((subscription: Subscription) => (
+                        <TableRow key={subscription._id}>
+                          <TableCell className="font-medium">
+                            {subscription.email}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              className={getSubscriptionStatusColor(
+                                subscription.status
+                              )}
                             >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-
-                            {user && user.role === 'Admin' && (
+                              {subscription.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(
+                              subscription.subscribedAt
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleDeleteSubscription(subscription)}
+                                onClick={() => handleToggleStatus(subscription)}
+                                disabled={updateSubscriptionStatusMutation.isPending}
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Edit className="w-4 h-4" />
                               </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+
+                              {user && user.role === 'Admin' && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteSubscription(subscription)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  {totalPages > 1 && (
+                    <div className="flex justify-center mt-4">
+                      {renderPagination()}
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
