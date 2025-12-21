@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 interface Membership {
@@ -21,7 +22,8 @@ interface Membership {
   email: string;
   mobile?: string;
   interest?: string;
-  status: 'New' | 'Approved' | 'Rejected';
+  position?: string;
+  status: 'New' | 'Pending' | 'Talk' | 'Approved';
   createdAt: string;
 }
 
@@ -29,21 +31,23 @@ interface EditMembershipModalProps {
   membership: Membership | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (status: string) => void;
+  onUpdate: (status: string, position: string) => void;
   isUpdating: boolean;
 }
 
 const EditMembershipModal = ({ membership, isOpen, onClose, onUpdate, isUpdating }: EditMembershipModalProps) => {
   const [status, setStatus] = useState<string>("");
+  const [position, setPosition] = useState<string>("");
 
   useEffect(() => {
     if (membership) {
       setStatus(membership.status);
+      setPosition(membership.position || "");
     }
   }, [membership]);
 
   const handleUpdate = () => {
-    onUpdate(status);
+    onUpdate(status, position);
   };
 
   return (
@@ -58,6 +62,14 @@ const EditMembershipModal = ({ membership, isOpen, onClose, onUpdate, isUpdating
             <p>{membership?.firstName} {membership?.lastName} - {membership?.email}</p>
           </div>
           <div>
+            <label className="block text-sm font-medium mb-2">Position</label>
+            <Input
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              placeholder="Enter position (e.g., Volunteer, Coordinator)"
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium mb-2">Status</label>
             <Select value={status} onValueChange={setStatus}>
               <SelectTrigger>
@@ -65,8 +77,9 @@ const EditMembershipModal = ({ membership, isOpen, onClose, onUpdate, isUpdating
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="New">New</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Talk">Talk</SelectItem>
                 <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>

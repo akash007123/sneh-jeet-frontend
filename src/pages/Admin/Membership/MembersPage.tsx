@@ -32,8 +32,9 @@ interface Membership {
   email: string;
   mobile?: string;
   interest?: string;
+  position?: string;
   image?: string;
-  status: "New" | "Approved" | "Rejected";
+  status: "New" | "Pending" | "Talk" | "Approved";
   createdAt: string;
 }
 
@@ -71,7 +72,7 @@ const MembersPage = () => {
 
   // Mutations
   const updateMembershipStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status, position }: { id: string; status: string; position: string }) => {
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/membership/${id}`,
         {
@@ -80,10 +81,10 @@ const MembersPage = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ status }),
+          body: JSON.stringify({ status, position }),
         }
       );
-      if (!response.ok) throw new Error("Failed to update status");
+      if (!response.ok) throw new Error("Failed to update membership");
       return response.json();
     },
     onSuccess: () => {
@@ -141,9 +142,9 @@ const MembersPage = () => {
     setEditMembershipModalOpen(true);
   };
 
-  const handleUpdateMembershipStatus = (status: string) => {
+  const handleUpdateMembershipStatus = (status: string, position: string) => {
     if (selectedMembership) {
-      updateMembershipStatusMutation.mutate({ id: selectedMembership._id, status });
+      updateMembershipStatusMutation.mutate({ id: selectedMembership._id, status, position });
     }
   };
 
@@ -162,10 +163,12 @@ const MembersPage = () => {
     switch (status) {
       case "New":
         return "bg-blue-100 text-blue-800";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "Talk":
+        return "bg-purple-100 text-purple-800";
       case "Approved":
         return "bg-green-100 text-green-800";
-      case "Rejected":
-        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -175,11 +178,12 @@ const MembersPage = () => {
   const exportToCSV = () => {
     if (!memberships || memberships.length === 0) return;
 
-    const headers = ['Name', 'Email', 'Mobile', 'Has Image', 'Status', 'Date'];
+    const headers = ['Name', 'Email', 'Mobile', 'Position', 'Has Image', 'Status', 'Date'];
     const csvData = memberships.map((membership: Membership) => [
       `${membership.firstName} ${membership.lastName}`,
       membership.email,
       membership.mobile || 'N/A',
+      membership.position || 'N/A',
       membership.image ? 'Yes' : 'No',
       membership.status,
       new Date(membership.createdAt).toLocaleDateString()
@@ -196,11 +200,12 @@ const MembersPage = () => {
     const doc = new jsPDF();
     doc.text('Memberships Report', 14, 20);
 
-    const tableColumn = ['Name', 'Email', 'Mobile', 'Has Image', 'Status', 'Date'];
+    const tableColumn = ['Name', 'Email', 'Mobile', 'Position', 'Has Image', 'Status', 'Date'];
     const tableRows = memberships.map((membership: Membership) => [
       `${membership.firstName} ${membership.lastName}`,
       membership.email,
       membership.mobile || 'N/A',
+      membership.position || 'N/A',
       membership.image ? 'Yes' : 'No',
       membership.status,
       new Date(membership.createdAt).toLocaleDateString()
@@ -255,7 +260,7 @@ const MembersPage = () => {
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Mobile</TableHead>
-                      {/* <TableHead>Interest</TableHead> */}
+                      <TableHead>Position</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
@@ -280,7 +285,7 @@ const MembersPage = () => {
                         </TableCell>
                         <TableCell>{membership.email}</TableCell>
                         <TableCell>{membership.mobile || "N/A"}</TableCell>
-                        {/* <TableCell>{membership.interest || "N/A"}</TableCell> */}
+                        <TableCell>{membership.position || "N/A"}</TableCell>
                         <TableCell>
                           <Badge
                             className={getMembershipStatusColor(

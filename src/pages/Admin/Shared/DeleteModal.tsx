@@ -103,7 +103,7 @@ interface Membership {
   email: string;
   mobile?: string;
   interest?: string;
-  status: "New" | "Approved" | "Rejected";
+  status: "New" | "Pending" | "Talk" | "Approved";
   createdAt: string;
 }
 

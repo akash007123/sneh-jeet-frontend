@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Heart, Users, Handshake, ArrowRight, Clock, CheckCircle } from "lucide-react";
+import { Heart, Users, Handshake, ArrowRight, Clock, CheckCircle, Mail, Phone } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
@@ -10,7 +10,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import LGBTLoading from "@/components/ui/LGBTLoading";
 import { volunteerOpportunities } from "@/data/mockData";
+
+interface Member {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  mobile?: string;
+  interest?: string;
+  position?: string;
+  image?: string;
+  status: string;
+  createdAt: string;
+}
 
 const GetInvolved = () => {
   const { toast } = useToast();
@@ -23,6 +37,27 @@ const GetInvolved = () => {
     interest: "",
     image: null as File | null,
   });
+
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(true);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`);
+        const data = await response.json();
+        const approvedMembers = data.filter((member: Member) => member.status === "Approved");
+        const sortedMembers = approvedMembers.sort((a: Member, b: Member) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setMembers(sortedMembers.slice(0, 3));
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      } finally {
+        setLoadingMembers(false);
+      }
+    };
+
+    fetchMembers();
+  }, []);
 
   const submitMembershipMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -158,7 +193,7 @@ const GetInvolved = () => {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section>      
 
       {/* Volunteer Opportunities */}
       <section id="volunteer" className="section-padding bg-muted/30">
@@ -203,6 +238,81 @@ const GetInvolved = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Latest Members */}
+      <section className="section-padding bg-muted/30">
+        <div className="container-padding mx-auto max-w-7xl">
+          <SectionHeading
+            badge="Community"
+            title="Latest Members"
+            subtitle="Meet our newest approved members joining the fight for equality."
+          />
+
+          {loadingMembers ? (
+            <div className="py-16 text-center">
+              <LGBTLoading message="Loading members..." size="lg" variant="pride" />
+            </div>
+          ) : members.length === 0 ? (
+            <div className="py-16 text-center">
+              <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="font-display text-xl font-semibold">No Members Yet</h3>
+              <p className="text-muted-foreground mt-2">Check back soon for our latest members.</p>
+            </div>
+          ) : (
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {members.map((member, index) => (
+                <motion.div
+                  key={member._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                  whileHover={{ y: -6, scale: 1.02 }}
+                >
+                  <div className="relative bg-card rounded-2xl border border-border pt-16 pb-6 px-6 text-center shadow-sm hover:shadow-lg transition-all duration-300 mt-[50px]">
+                    <div className="absolute -top-12 left-1/2 -translate-x-1/2">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-purple-600 p-[3px]">
+                        <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
+                          {member.image ? (
+                            <img
+                              src={`${import.meta.env.VITE_API_BASE_URL}${member.image}`}
+                              alt={`${member.firstName} ${member.lastName}`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xl font-bold text-primary">
+                              {member.firstName.charAt(0)}{member.lastName.charAt(0)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <h3 className="mt-4 font-display text-lg font-semibold text-foreground">
+                      {member.firstName} {member.lastName}
+                    </h3>
+                    {member.position && (
+                      <p className="text-sm font-medium text-primary mt-1">{member.position}</p>
+                    )}
+                    <div className="my-4 h-px bg-border" />
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex items-center justify-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        <span className="truncate max-w-[200px]">{member.email}</span>
+                      </div>
+                      {member.mobile && (
+                        <div className="flex items-center justify-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          <span>{member.mobile}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

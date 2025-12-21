@@ -14,8 +14,9 @@ interface Membership {
   email: string;
   mobile?: string;
   interest?: string;
+  position?: string;
   image?: string;
-  status: 'New' | 'Approved' | 'Rejected';
+  status: 'New' | 'Pending' | 'Talk' | 'Approved';
   createdAt: string;
 }
 
@@ -29,8 +30,9 @@ const ViewMembershipModal = ({ membership, isOpen, onClose }: ViewMembershipModa
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'New': return 'bg-blue-100 text-blue-800';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800';
+      case 'Talk': return 'bg-purple-100 text-purple-800';
       case 'Approved': return 'bg-green-100 text-green-800';
-      case 'Rejected': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -73,6 +75,10 @@ const ViewMembershipModal = ({ membership, isOpen, onClose }: ViewMembershipModa
             <div>
               <label className="font-semibold">Interest:</label>
               <p className="whitespace-pre-wrap">{membership.interest || 'N/A'}</p>
+            </div>
+            <div>
+              <label className="font-semibold">Position:</label>
+              <p>{membership.position || 'N/A'}</p>
             </div>
             <div>
               <label className="font-semibold">Status:</label>
