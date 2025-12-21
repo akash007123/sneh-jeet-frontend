@@ -18,6 +18,7 @@ const navLinks = [
   { name: "Stories", path: "/stories" },
   { name: "Gallery", path: "/gallery" },
   { name: "Contact", path: "/contact" },
+  { name: "Members", path: "/members" },
 ];
 
 // Map readable link names to contextual icons

@@ -22,23 +22,47 @@ const MemberFormModal = () => {
     email: '',
     mobile: '',
     interest: '',
+    image: null as File | null,
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value, files } = e.target as HTMLInputElement;
+    if (id === 'image' && files) {
+      setFormData({ ...formData, image: files[0] });
+    } else {
+      setFormData({ ...formData, [id]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Validate required fields
+      if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim()) {
+        toast({
+          title: 'Error',
+          description: 'Please fill in all required fields.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+        return;
+      }
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('firstName', formData.firstName.trim());
+      formDataToSend.append('lastName', formData.lastName.trim());
+      formDataToSend.append('email', formData.email.trim());
+      formDataToSend.append('mobile', formData.mobile.trim());
+      formDataToSend.append('interest', formData.interest.trim());
+      if (formData.image) {
+        formDataToSend.append('image', formData.image);
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend,
       });
       if (response.ok) {
         toast({
@@ -51,6 +75,7 @@ const MemberFormModal = () => {
           email: '',
           mobile: '',
           interest: '',
+          image: null,
         });
         setOpen(false);
       } else {
@@ -77,14 +102,14 @@ const MemberFormModal = () => {
           Become Member
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[425px] max-h-[80vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Join Sneh Jeet NGO</DialogTitle>
           <DialogDescription>
             Fill out the form below to apply for membership. We'll review your application and get back to you soon.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-foreground mb-2">
@@ -150,6 +175,21 @@ const MemberFormModal = () => {
               value={formData.interest}
               onChange={handleChange}
             />
+          </div>
+
+          <div>
+            <label htmlFor="image" className="block text-sm font-medium text-foreground mb-2">
+              Profile Image (Optional)
+            </label>
+            <Input
+              id="image"
+              type="file"
+              accept="image/*"
+              onChange={handleChange}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Upload a profile image (max 5MB, JPG/PNG/GIF only)
+            </p>
           </div>
 
           <p className="text-sm text-muted-foreground">

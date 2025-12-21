@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { Phone, Heart, Scale, Stethoscope, ExternalLink, Download, ChevronDown } from "lucide-react";
+import { Phone, Heart, Scale, Stethoscope, ExternalLink, Download, ChevronDown, Users } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { resources, faqs } from "@/data/mockData";
+import MemberFormModal from "@/components/MemberFormModal";
 
 const Resources = () => {
   return (
@@ -209,6 +210,31 @@ const Resources = () => {
               </motion.div>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      {/* Become a Member */}
+      <section className="py-12 bg-primary/5 border-y border-primary/10">
+        <div className="container-padding mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-foreground mb-2">
+                Join Our Community
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Become a member of Sneh Jeet NGO and help us create a more inclusive and supportive environment for the LGBTQ+ community. Your involvement makes a difference.
+              </p>
+            </div>
+            <MemberFormModal />
+          </motion.div>
         </div>
       </section>
     </MainLayout>

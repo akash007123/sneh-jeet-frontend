@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Membership {
   _id: string;
@@ -13,6 +14,7 @@ interface Membership {
   email: string;
   mobile?: string;
   interest?: string;
+  image?: string;
   status: 'New' | 'Approved' | 'Rejected';
   createdAt: string;
 }
@@ -41,6 +43,21 @@ const ViewMembershipModal = ({ membership, isOpen, onClose }: ViewMembershipModa
         </DialogHeader>
         {membership && (
           <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="w-16 h-16">
+                <AvatarImage
+                  src={membership.image ? `${import.meta.env.VITE_API_BASE_URL}${membership.image}` : undefined}
+                  alt={`${membership.firstName} ${membership.lastName}`}
+                />
+                <AvatarFallback className="text-lg">
+                  {membership.firstName[0]}{membership.lastName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h3 className="text-lg font-semibold">{membership.firstName} {membership.lastName}</h3>
+                <p className="text-sm text-muted-foreground">Profile Image {membership.image ? 'Uploaded' : 'Not Provided'}</p>
+              </div>
+            </div>
             <div>
               <label className="font-semibold">Name:</label>
               <p>{membership.firstName} {membership.lastName}</p>

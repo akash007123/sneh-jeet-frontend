@@ -22,9 +22,25 @@ const PartnersSection = () => {
               transition={{ duration: 0.3, delay: index * 0.05 }}
               className="bg-card rounded-xl p-6 flex flex-col items-center justify-center border border-border hover:border-primary/30 transition-colors"
             >
-              <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center text-xl font-bold text-muted-foreground mb-3">
+              <motion.div
+                className="w-14 h-14 rounded-full 
+    bg-gradient-to-r from-red-500 via-yellow-400 to-purple-600
+    flex items-center justify-center 
+    text-xl font-bold text-white mb-3"
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                style={{
+                  backgroundSize: "300% 300%",
+                }}
+              >
                 {partner.logo}
-              </div>
+              </motion.div>
               <span className="text-sm text-center text-muted-foreground">
                 {partner.name}
               </span>

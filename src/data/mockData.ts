@@ -55,7 +55,7 @@ export const programs = [
 export const testimonials = [
   {
     id: 1,
-    name: "Alex Rivera",
+    name: "Jitendra Thakur",
     role: "Community Member",
     quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
     avatar: "AR",

@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import ViewMembershipModal from "./ViewMembershipModal";
 import EditMembershipModal from "./EditMembershipModal";
@@ -31,6 +32,7 @@ interface Membership {
   email: string;
   mobile?: string;
   interest?: string;
+  image?: string;
   status: "New" | "Approved" | "Rejected";
   createdAt: string;
 }
@@ -173,11 +175,12 @@ const MembersPage = () => {
   const exportToCSV = () => {
     if (!memberships || memberships.length === 0) return;
 
-    const headers = ['Name', 'Email', 'Mobile', 'Status', 'Date'];
+    const headers = ['Name', 'Email', 'Mobile', 'Has Image', 'Status', 'Date'];
     const csvData = memberships.map((membership: Membership) => [
       `${membership.firstName} ${membership.lastName}`,
       membership.email,
       membership.mobile || 'N/A',
+      membership.image ? 'Yes' : 'No',
       membership.status,
       new Date(membership.createdAt).toLocaleDateString()
     ]);
@@ -193,11 +196,12 @@ const MembersPage = () => {
     const doc = new jsPDF();
     doc.text('Memberships Report', 14, 20);
 
-    const tableColumn = ['Name', 'Email', 'Mobile', 'Status', 'Date'];
+    const tableColumn = ['Name', 'Email', 'Mobile', 'Has Image', 'Status', 'Date'];
     const tableRows = memberships.map((membership: Membership) => [
       `${membership.firstName} ${membership.lastName}`,
       membership.email,
       membership.mobile || 'N/A',
+      membership.image ? 'Yes' : 'No',
       membership.status,
       new Date(membership.createdAt).toLocaleDateString()
     ]);
@@ -247,6 +251,7 @@ const MembersPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Image</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Mobile</TableHead>
@@ -259,6 +264,17 @@ const MembersPage = () => {
                   <TableBody>
                     {memberships?.map((membership: Membership) => (
                       <TableRow key={membership._id}>
+                        <TableCell>
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage
+                              src={membership.image ? `${import.meta.env.VITE_API_BASE_URL}${membership.image}` : undefined}
+                              alt={`${membership.firstName} ${membership.lastName}`}
+                            />
+                            <AvatarFallback>
+                              {membership.firstName[0]}{membership.lastName[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                        </TableCell>
                         <TableCell className="font-medium">
                           {membership.firstName} {membership.lastName}
                         </TableCell>

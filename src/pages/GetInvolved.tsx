@@ -21,16 +21,24 @@ const GetInvolved = () => {
     email: "",
     mobile: "",
     interest: "",
+    image: null as File | null,
   });
 
   const submitMembershipMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      const formDataToSend = new FormData();
+      formDataToSend.append('firstName', data.firstName);
+      formDataToSend.append('lastName', data.lastName);
+      formDataToSend.append('email', data.email);
+      formDataToSend.append('mobile', data.mobile);
+      formDataToSend.append('interest', data.interest);
+      if (data.image) {
+        formDataToSend.append('image', data.image);
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formDataToSend,
       });
       if (!response.ok) throw new Error("Failed to submit membership application");
       return response.json();
@@ -46,6 +54,7 @@ const GetInvolved = () => {
         email: "",
         mobile: "",
         interest: "",
+        image: null,
       });
     },
     onError: () => {
@@ -58,8 +67,13 @@ const GetInvolved = () => {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const target = e.target as HTMLInputElement;
+    const { name, value, files } = target;
+    if (name === 'image' && files) {
+      setFormData(prev => ({ ...prev, image: files[0] }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -278,6 +292,22 @@ const GetInvolved = () => {
                 value={formData.interest}
                 onChange={handleInputChange}
               />
+            </div>
+
+            <div>
+              <label htmlFor="image" className="block text-sm font-medium text-foreground mb-2">
+                Profile Image (Optional)
+              </label>
+              <Input
+                id="image"
+                name="image"
+                type="file"
+                accept="image/*"
+                onChange={handleInputChange}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Upload a profile image (max 5MB, JPG/PNG/GIF only)
+              </p>
             </div>
 
             <Button
