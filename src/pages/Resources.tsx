@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Phone, Heart, Scale, Stethoscope, ExternalLink, Download, ChevronDown, Users } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
@@ -11,6 +12,21 @@ import MemberFormModal from "@/components/MemberFormModal";
 const Resources = () => {
   return (
     <MainLayout>
+      <Helmet>
+        <title>Resources & Support - Sneh Jeet NGO</title>
+        <meta name="description" content="Access the help you need. All services are confidential and judgment-free." />
+        <meta name="keywords" content="resources, support, mental health, legal, healthcare, LGBTQIA+, confidential" />
+        <link rel="canonical" href="/resources" />
+        <meta property="og:title" content="Resources & Support - Sneh Jeet NGO" />
+        <meta property="og:description" content="Access the help you need. All services are confidential and judgment-free." />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content="/resources" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Resources & Support - Sneh Jeet NGO" />
+        <meta name="twitter:description" content="Access the help you need. All services are confidential and judgment-free." />
+        <meta name="twitter:image" content="/logo.png" />
+      </Helmet>
       <PageHero
         badge="Get Help"
         title="Resources & Support"

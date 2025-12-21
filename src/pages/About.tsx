@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Target, Eye, Heart, Users, Shield, Sparkles } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
@@ -31,6 +32,21 @@ const values = [
 const About = () => {
   return (
     <MainLayout>
+      <Helmet>
+        <title>About Us - Sneh Jeet NGO</title>
+        <meta name="description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community. Learn about our values, team, and 15 years of impact." />
+        <meta name="keywords" content="LGBTQIA+, NGO, support, advocacy, community, compassion, safety, empowerment" />
+        <link rel="canonical" href="/about" />
+        <meta property="og:title" content="About Us - Sneh Jeet NGO" />
+        <meta property="og:description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community. Learn about our values, team, and 15 years of impact." />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content="/about" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About Us - Sneh Jeet NGO" />
+        <meta name="twitter:description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community. Learn about our values, team, and 15 years of impact." />
+        <meta name="twitter:image" content="/logo.png" />
+      </Helmet>
       <PageHero
         badge="About Us"
         title="Our Story & Mission"

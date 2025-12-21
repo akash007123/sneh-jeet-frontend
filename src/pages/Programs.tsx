@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Heart, Scale, Stethoscope, Users, Sparkles, GraduationCap, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -87,6 +88,21 @@ const detailedPrograms = [
 const Programs = () => {
   return (
     <MainLayout>
+      <Helmet>
+        <title>Programs - Sneh Jeet NGO</title>
+        <meta name="description" content="Explore our comprehensive programs for LGBTQIA+ support, including mental health services, legal aid, healthcare navigation, community events, youth programs, and education initiatives." />
+        <meta name="keywords" content="programs, LGBTQIA+, mental health, legal aid, healthcare, community events, youth support, education" />
+        <link rel="canonical" href="/programs" />
+        <meta property="og:title" content="Programs - Sneh Jeet NGO" />
+        <meta property="og:description" content="Explore our comprehensive programs for LGBTQIA+ support, including mental health services, legal aid, healthcare navigation, community events, youth programs, and education initiatives." />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content="/programs" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Programs - Sneh Jeet NGO" />
+        <meta name="twitter:description" content="Explore our comprehensive programs for LGBTQIA+ support, including mental health services, legal aid, healthcare navigation, community events, youth programs, and education initiatives." />
+        <meta name="twitter:image" content="/logo.png" />
+      </Helmet>
       <PageHero
         badge="Our Programs"
         title="Comprehensive Support Services"

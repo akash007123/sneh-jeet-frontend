@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Clock, Filter, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -68,6 +69,21 @@ const Events = () => {
 
   return (
     <MainLayout>
+      <Helmet>
+        <title>Events - Sneh Jeet NGO</title>
+        <meta name="description" content="Join us for workshops, celebrations, support groups, and social events. Everyone is welcome in our inclusive community." />
+        <meta name="keywords" content="events, LGBTQIA+, workshops, celebrations, support groups, social events, community" />
+        <link rel="canonical" href="/events" />
+        <meta property="og:title" content="Events - Sneh Jeet NGO" />
+        <meta property="og:description" content="Join us for workshops, celebrations, support groups, and social events. Everyone is welcome in our inclusive community." />
+        <meta property="og:image" content="/logo.png" />
+        <meta property="og:url" content="/events" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Events - Sneh Jeet NGO" />
+        <meta name="twitter:description" content="Join us for workshops, celebrations, support groups, and social events. Everyone is welcome in our inclusive community." />
+        <meta name="twitter:image" content="/logo.png" />
+      </Helmet>
       <PageHero
         badge="Events"
         title="Community Events"

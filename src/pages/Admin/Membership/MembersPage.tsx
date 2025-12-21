@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import ViewMembershipModal from "./ViewMembershipModal";
 import EditMembershipModal from "./EditMembershipModal";
 import DeleteModal from "../Shared/DeleteModal";
+import AdminAddMember from "./AdminAddMember";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
@@ -31,6 +32,46 @@ interface Membership {
   lastName: string;
   email: string;
   mobile?: string;
+  alternateMobile?: string;
+  address?: {
+    houseFlatNo?: string;
+    streetArea?: string;
+    city?: string;
+    district?: string;
+    state?: string;
+    country?: string;
+    pinZipCode?: string;
+  };
+  currentAddress?: {
+    sameAsPermanent?: boolean;
+    houseFlatNo?: string;
+    streetArea?: string;
+    city?: string;
+    district?: string;
+    state?: string;
+    country?: string;
+    pinZipCode?: string;
+  };
+  idProofType?: string;
+  idProofFile?: string;
+  education?: string;
+  job?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  age?: number;
+  nationality?: string;
+  maritalStatus?: string;
+  bloodGroup?: string;
+  languagesKnown?: string[];
+  previousNgoExperience?: {
+    hasExperience?: boolean;
+    details?: string;
+  };
+  socialMediaProfiles?: {
+    linkedIn?: string;
+    facebook?: string;
+    instagram?: string;
+  };
   interest?: string;
   position?: string;
   image?: string;
@@ -52,6 +93,9 @@ const MembersPage = () => {
   // Delete states
   const [deleteItem, setDeleteItem] = useState<Membership | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  // Add member states
+  const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
 
   // Queries
   const { data: memberships, isLoading: membershipsLoading } = useQuery({
@@ -186,7 +230,7 @@ const MembersPage = () => {
       membership.position || 'N/A',
       membership.image ? 'Yes' : 'No',
       membership.status,
-      new Date(membership.createdAt).toLocaleDateString()
+      formatDate(membership.createdAt)
     ]);
 
     const csvContent = [headers, ...csvData].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
@@ -208,7 +252,7 @@ const MembersPage = () => {
       membership.position || 'N/A',
       membership.image ? 'Yes' : 'No',
       membership.status,
-      new Date(membership.createdAt).toLocaleDateString()
+      formatDate(membership.createdAt)
     ]);
 
     autoTable(doc, {
@@ -240,6 +284,9 @@ const MembersPage = () => {
               <div className="flex justify-between items-center">
                 <CardTitle>Membership Applications</CardTitle>
                 <div className="flex gap-2">
+                  <Button onClick={() => setAddMemberModalOpen(true)}>
+                    Add Member
+                  </Button>
                   <Button variant="outline" onClick={exportToCSV}>
                     Export CSV
                   </Button>
@@ -360,6 +407,11 @@ const MembersPage = () => {
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDeleteMembership}
         isDeleting={deleteMembershipMutation.isPending}
+      />
+
+      <AdminAddMember
+        isOpen={addMemberModalOpen}
+        onClose={() => setAddMemberModalOpen(false)}
       />
     </AdminLayout>
   );

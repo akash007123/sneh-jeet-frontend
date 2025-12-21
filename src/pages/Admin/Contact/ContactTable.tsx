@@ -19,9 +19,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ViewContactModal from "./ViewContactModal";
-import EditStatusModal from "./EditStatusModal";
-import DeleteModal from "./DeleteModal";
-import {formatDate} from "../utils/formatDate";
+import EditStatusModal from "../Shared/EditStatusModal";
+import DeleteModal from "../Shared/DeleteModal";
+import {formatDate} from "../../utils/formatDate";
 
 interface Contact {
   _id: string;
@@ -162,6 +162,7 @@ const ContactTable = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                       <TableHead>#</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Phone</TableHead>
@@ -172,8 +173,9 @@ const ContactTable = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {contacts?.map((contact: Contact) => (
+                    {contacts?.map((contact: Contact, index: number) => (
                       <TableRow key={contact._id}>
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell className="font-medium">{contact.name}</TableCell>
                         <TableCell>{contact.email}</TableCell>
                         <TableCell>{contact.phone || 'N/A'}</TableCell>

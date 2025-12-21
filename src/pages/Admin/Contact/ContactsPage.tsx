@@ -250,24 +250,26 @@ const ContactsPage = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>#</TableHead>
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Phone</TableHead>
-                      <TableHead>Subject</TableHead>
+                      {/* <TableHead>Subject</TableHead> */}
                       <TableHead>Status</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {contacts?.map((contact: Contact) => (
+                    {contacts?.map((contact: Contact, index: number) => (
                       <TableRow key={contact._id}>
+                        <TableCell>{index + 1}</TableCell>
                         <TableCell className="font-medium">
                           {contact.name}
                         </TableCell>
                         <TableCell>{contact.email}</TableCell>
                         <TableCell>{contact.phone || "N/A"}</TableCell>
-                        <TableCell>{contact.subject}</TableCell>
+                        {/* <TableCell>{contact.subject}</TableCell> */}
                         <TableCell>
                           <Badge
                             className={getContactStatusColor(
