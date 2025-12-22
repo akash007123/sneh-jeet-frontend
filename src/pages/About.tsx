@@ -95,6 +95,154 @@ const About = () => {
         </div>
       </section>
 
+      {/* Long-term Vision for LGBT */}
+      <section className="section-padding bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5">
+        <div className="container-padding mx-auto max-w-7xl">
+          <SectionHeading
+            badge="Our Long-term Vision"
+            title="Building a Future of Equality"
+            subtitle="Ambitious goals for LGBTQIA+ rights and inclusion in the coming decade"
+          />
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-card rounded-2xl p-6 border border-border"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Target className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                Legal Equality Nationwide
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Achieve comprehensive legal protections for LGBTQIA+ individuals across all states,
+                including marriage equality, anti-discrimination laws, and gender-affirming care access.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-card rounded-2xl p-6 border border-border"
+            >
+              <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-secondary" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                Zero Violence & Discrimination
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Create environments where LGBTQIA+ individuals can live free from violence,
+                harassment, and discrimination in schools, workplaces, and communities.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-card rounded-2xl p-6 border border-border"
+            >
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
+                <Heart className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                Mental Health Revolution
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Transform mental health support for LGBTQIA+ communities through culturally
+                competent care, reduced stigma, and accessible affirming services.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-card rounded-2xl p-6 border border-border"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                Inclusive Education System
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Implement comprehensive LGBTQIA+ education in schools, teacher training programs,
+                and curriculum development to foster understanding from an early age.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="bg-card rounded-2xl p-6 border border-border"
+            >
+              <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 text-secondary" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                Economic Empowerment
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Close the economic gap for LGBTQIA+ individuals through workplace equality,
+                entrepreneurship support, and financial inclusion initiatives.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="bg-card rounded-2xl p-6 border border-border"
+            >
+              <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
+                <Eye className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
+                Global LGBTQIA+ Leadership
+              </h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Position LGBTQIA+ voices at the forefront of social justice movements,
+                policy development, and international human rights advocacy.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Vision Statement */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6 }}
+            className="mt-12 bg-card rounded-3xl p-8 md:p-12 border border-border text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-6">
+              <Eye className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
+              Our 2035 Vision
+            </h3>
+            <p className="text-muted-foreground text-lg leading-relaxed max-w-4xl mx-auto">
+              By 2035, we envision a world where LGBTQIA+ individuals are not just tolerated, but truly celebrated.
+              Where coming out is met with joy rather than fear, where love is love in every sense, and where
+              identity is never a barrier to opportunity, safety, or happiness. A world where our community
+              thrives in every aspect of life—personally, professionally, and socially.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Values */}
       <section className="section-padding bg-muted/30">
         <div className="container-padding mx-auto max-w-7xl">

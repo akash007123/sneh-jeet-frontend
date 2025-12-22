@@ -20,6 +20,14 @@ import MediaHub from "./pages/MediaHub";
 import MediaDetail from "./pages/MediaDetail";
 import IdeaDetail from "./pages/IdeaDetail";
 import Members from "./pages/Members";
+import Partners from "./pages/Partners";
+import Health from "./pages/Health";
+import Ally from "./pages/Ally";
+import Education from "./pages/Education";
+import Impact from "./pages/Impact";
+import Rights from "./pages/Rights";
+import Volunteer from "./pages/Volunteer";
+import Careers from "./pages/Careers";
 import Dashboard from "./pages/Admin/Dashboard";
 import ContactsPage from "./pages/Admin/Contact/ContactsPage";
 import SubscriptionsPage from "./pages/Admin/Subscription/SubscriptionsPage";
@@ -57,6 +65,14 @@ const AppRouter = () => (
     <Route path="/media/:slug" element={<MediaDetail />} />
     <Route path="/ideas/:slug" element={<IdeaDetail />} />
     <Route path="/members" element={<Members />} />
+    <Route path="/partners" element={<Partners />} />
+    <Route path="/health" element={<Health />} />
+    <Route path="/ally" element={<Ally />} />
+    <Route path="/education" element={<Education />} />
+    <Route path="/impact" element={<Impact />} />
+    <Route path="/rights" element={<Rights />} />
+    <Route path="/volunteer" element={<Volunteer />} />
+    <Route path="/careers" element={<Careers />} />
     <Route path="/admin/login" element={<Login />} />
     <Route
       path="/admin/profile"

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Heart, ChevronDown, UserPlus, BookOpen, Image, Mail, Megaphone, CalendarDays } from "lucide-react";
+import { Menu, X, Heart, ChevronDown, UserPlus, BookOpen, Image, Mail, Megaphone, IdCard, Users, Target, Shield, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import MemberFormModal from "./MemberFormModal";
@@ -19,6 +19,14 @@ const navLinks = [
   { name: "Gallery", path: "/gallery" },
   { name: "Contact", path: "/contact" },
   { name: "Members", path: "/members" },
+  { name: "Partners", path: "/partners" },
+  { name: "Health", path: "/health" },
+  { name: "Ally", path: "/ally" },
+  { name: "Education", path: "/education" },
+  { name: "Impact", path: "/impact" },
+  { name: "Rights", path: "/rights" },
+  { name: "Volunteer", path: "/volunteer" },
+  { name: "Careers", path: "/careers" },
 ];
 
 // Map readable link names to contextual icons
@@ -27,8 +35,15 @@ const iconMap: Record<string, JSX.Element> = {
   Stories: <BookOpen className="h-4 w-4" />,
   Gallery: <Image className="h-4 w-4" />,
   Contact: <Mail className="h-4 w-4" />,
-  Blog: <Megaphone className="h-4 w-4" />,
-  Events: <CalendarDays className="h-4 w-4" />,
+  Members: <IdCard className="h-4 w-4" />,
+  Partners: <Heart className="h-4 w-4" />,
+  Health: <Heart className="h-4 w-4" />,
+  Ally: <Users className="h-4 w-4" />,
+  Education: <BookOpen className="h-4 w-4" />,
+  Impact: <Target className="h-4 w-4" />,
+  Rights: <Shield className="h-4 w-4" />,
+  Volunteer: <UserPlus className="h-4 w-4" />,
+  Careers: <Briefcase className="h-4 w-4" />,
 };
 
 const Navbar = () => {
