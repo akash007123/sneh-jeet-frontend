@@ -63,16 +63,14 @@ const AppointmentsPage = () => {
 
   // Queries
   const { data: appointments, isLoading: appointmentsLoading } = useQuery({
-    queryKey: ["appointments"],
+    queryKey: ["appointments", statusFilter],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/appointments`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/appointments` : `${import.meta.env.VITE_API_BASE_URL}/api/appointments?status=${statusFilter}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch appointments");
       return response.json();
     },
@@ -139,12 +137,9 @@ const AppointmentsPage = () => {
     },
   });
 
-  // Filtering
-  const filteredAppointments = statusFilter === "All" ? appointments : appointments?.filter(appointment => appointment.status === statusFilter);
-
   // Pagination calculations
-  const paginatedAppointments = filteredAppointments?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil((filteredAppointments?.length || 0) / itemsPerPage);
+  const paginatedAppointments = appointments?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((appointments?.length || 0) / itemsPerPage);
 
   // Handlers
   const handleViewAppointment = (appointment: Appointment) => {

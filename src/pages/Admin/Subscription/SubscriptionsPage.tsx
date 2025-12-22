@@ -7,6 +7,13 @@ import AdminLayout from "@/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -43,18 +50,19 @@ const SubscriptionsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // Filter state
+  const [statusFilter, setStatusFilter] = useState<string>("All");
+
   // Queries
   const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
-    queryKey: ["subscriptions"],
+    queryKey: ["subscriptions", statusFilter],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions` : `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions?status=${statusFilter}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch subscriptions");
       return response.json();
     },
@@ -209,7 +217,20 @@ const SubscriptionsPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Email Subscriptions</CardTitle>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="status-filter" className="text-sm font-medium">Filter by Status:</label>
+                    <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setCurrentPage(1); }}>
+                      <SelectTrigger id="status-filter" className="w-32">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All">All</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button variant="outline" onClick={exportToCSV}>
                     Export CSV
                   </Button>

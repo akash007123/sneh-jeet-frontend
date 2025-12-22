@@ -67,16 +67,14 @@ const ContactsPage = () => {
 
   // Queries
   const { data: contacts, isLoading: contactsLoading } = useQuery({
-    queryKey: ["contacts"],
+    queryKey: ["contacts", statusFilter],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/contact`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/contact` : `${import.meta.env.VITE_API_BASE_URL}/api/contact?status=${statusFilter}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch contacts");
       return response.json();
     },
@@ -143,12 +141,9 @@ const ContactsPage = () => {
     },
   });
 
-  // Filtering
-  const filteredContacts = statusFilter === "All" ? contacts : contacts?.filter(contact => contact.status === statusFilter);
-
   // Pagination calculations
-  const paginatedContacts = filteredContacts?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil((filteredContacts?.length || 0) / itemsPerPage);
+  const paginatedContacts = contacts?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((contacts?.length || 0) / itemsPerPage);
 
   // Handlers
   const handleViewContact = (contact: Contact) => {

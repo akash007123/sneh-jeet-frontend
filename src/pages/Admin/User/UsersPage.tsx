@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatDate } from "../../utils/formatDate";
 import {
   Table,
   TableBody,
@@ -54,18 +55,19 @@ const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  // Filter state
+  const [statusFilter, setStatusFilter] = useState<string>("All");
+
   // Queries
   const { data: users, isLoading: usersLoading } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", statusFilter],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/users` : `${import.meta.env.VITE_API_BASE_URL}/api/users?status=${statusFilter}`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch users");
       return response.json();
     },
@@ -207,7 +209,22 @@ const UsersPage = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>All Users</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>All Users</CardTitle>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="status-filter" className="text-sm font-medium">Filter by Status:</label>
+                  <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setCurrentPage(1); }}>
+                    <SelectTrigger id="status-filter" className="w-32">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All">All</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {usersLoading ? (
@@ -265,7 +282,7 @@ const UsersPage = () => {
                             </Select>
                           </TableCell>
                           <TableCell>
-                            {new Date(user.createdAt).toLocaleDateString()}
+                            {formatDate(user.createdAt)}
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
