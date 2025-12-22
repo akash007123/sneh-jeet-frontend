@@ -30,6 +30,7 @@ import Volunteer from "./pages/Volunteer";
 import Careers from "./pages/Careers";
 import Dashboard from "./pages/Admin/Dashboard";
 import ContactsPage from "./pages/Admin/Contact/ContactsPage";
+import AppointmentsPage from "./pages/Admin/AppointmentsPage";
 import SubscriptionsPage from "./pages/Admin/Subscription/SubscriptionsPage";
 import EventsPage from "./pages/Admin/Event/EventsPage";
 import GalleryPage from "./pages/Admin/Gallery/GalleryPage";
@@ -84,6 +85,7 @@ const AppRouter = () => (
     />
     <Route path="/admin" element={<Dashboard />} />
     <Route path="/admin/contacts" element={<ContactsPage />} />
+    <Route path="/admin/appointments" element={<AppointmentsPage />} />
     <Route path="/admin/subscriptions" element={<SubscriptionsPage />} />
     <Route path="/admin/events" element={<EventsPage />} />
     <Route path="/admin/gallery" element={<GalleryPage />} />

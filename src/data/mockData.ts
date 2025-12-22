@@ -80,39 +80,39 @@ export const partners = [
   {
     category: "NGO Partners",
     organizations: [
-      { name: "Community Foundation", logo: "CF", description: "Supporting local LGBTQIA+ initiatives" },
-      { name: "Health Alliance", logo: "HA", description: "Advancing healthcare access for marginalized communities" },
-      { name: "Youth Services", logo: "YS", description: "Empowering LGBTQIA+ youth through education and support" },
-      { name: "Legal Aid Society", logo: "LA", description: "Providing legal support for discrimination cases" },
-      { name: "Mental Health Network", logo: "MH", description: "Promoting mental wellness in underserved communities" },
-      { name: "Equality Now", logo: "EN", description: "Advocating for gender equality worldwide" },
+      { name: "Community Foundation", logo: "/partner/compar.png", description: "Supporting local LGBTQIA+ initiatives" },
+      { name: "Health Alliance", logo: "/partner/health.png", description: "Advancing healthcare access for marginalized communities" },
+      { name: "Youth Services", logo: "/partner/youth.png", description: "Empowering LGBTQIA+ youth through education and support" },
+      { name: "Legal Aid Society", logo: "/partner/legal1.png", description: "Providing legal support for discrimination cases" },
+      { name: "Mental Health Network", logo: "/partner/Network.jpg", description: "Promoting mental wellness in underserved communities" },
+      { name: "Equality Now", logo: "/partner/en.png", description: "Advocating for gender equality worldwide" },
     ]
   },
   {
     category: "Corporate Sponsors",
     organizations: [
-      { name: "TechCorp Solutions", logo: "TC", description: "Technology solutions for social impact" },
-      { name: "Green Energy Inc", logo: "GE", description: "Sustainable energy for a better future" },
-      { name: "Global Finance Group", logo: "GF", description: "Financial services with community focus" },
-      { name: "MediaWorks", logo: "MW", description: "Digital media and content creation" },
+      { name: "TechCorp Solutions", logo: "/partner/tc.jpeg", description: "Technology solutions for social impact" },
+      { name: "Green Energy Inc", logo: "/partner/green.jpeg", description: "Sustainable energy for a better future" },
+      { name: "Global Finance Group", logo: "/partner/global.jpg", description: "Financial services with community focus" },
+      { name: "MediaWorks", logo: "/partner/mw.jpg", description: "Digital media and content creation" },
     ]
   },
   {
     category: "Government Bodies",
     organizations: [
-      { name: "Ministry of Social Welfare", logo: "MSW", description: "Government support for social welfare programs" },
-      { name: "Department of Health", logo: "DH", description: "Public health initiatives and support" },
-      { name: "Education Authority", logo: "EA", description: "Educational programs and youth development" },
-      { name: "Human Rights Commission", logo: "HRC", description: "Protecting and promoting human rights" },
+      { name: "Ministry of Social Welfare", logo: "/partner/msw.jpeg", description: "Government support for social welfare programs" },
+      { name: "Department of Health", logo: "/partner/dh.svg", description: "Public health initiatives and support" },
+      { name: "Education Authority", logo: "/partner/ea.png", description: "Educational programs and youth development" },
+      { name: "Human Rights Commission", logo: "/partner/hrc.png", description: "Protecting and promoting human rights" },
     ]
   },
   {
     category: "Media Partners",
     organizations: [
-      { name: "Rainbow Media Network", logo: "RMN", description: "LGBTQIA+ focused media and journalism" },
-      { name: "Inclusive Broadcasting", logo: "IB", description: "Broadcasting diverse voices and stories" },
-      { name: "Digital Voices", logo: "DV", description: "Online media and social impact content" },
-      { name: "Community Press", logo: "CP", description: "Local news and community journalism" },
+      { name: "Rainbow Media Network", logo: "/partner/rmn.png", description: "LGBTQIA+ focused media and journalism" },
+      { name: "Inclusive Broadcasting", logo: "/partner/ib.png", description: "Broadcasting diverse voices and stories" },
+      { name: "Digital Voices", logo: "/partner/dv.png", description: "Online media and social impact content" },
+      { name: "Community Press", logo: "/partner/cp.png", description: "Local news and community journalism" },
     ]
   }
 ];

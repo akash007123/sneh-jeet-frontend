@@ -29,6 +29,22 @@ const navLinks = [
   { name: "Careers", path: "/careers" },
 ];
 
+const moreLinks = [
+  { name: "Get Involved", path: "/get-involved" },
+  { name: "Stories", path: "/stories" },
+  { name: "Gallery", path: "/gallery" },
+  { name: "Contact", path: "/contact" },
+  { name: "Health", path: "/health" },
+  { name: "Impact", path: "/impact" },
+  { name: "Careers", path: "/careers" },
+  { name: "Members", path: "/members" },
+  { name: "Ally", path: "/ally" },
+  { name: "Rights", path: "/rights" },
+  { name: "Partners", path: "/partners" },
+  { name: "Education", path: "/education" },
+  { name: "Volunteer", path: "/volunteer" },
+];
+
 // Map readable link names to contextual icons
 const iconMap: Record<string, JSX.Element> = {
   "Get Involved": <UserPlus className="h-4 w-4" />,
@@ -109,12 +125,32 @@ const Navbar = () => {
               </button>
               {/* Hover card container */}
               <div className="absolute top-full right-0 mt-2 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200">
-                <div className="bg-card rounded-2xl shadow-medium border border-border w-[560px] p-4">
-                  {/* Grid content */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Column 1: Primary shortcuts */}
-                    <div className="space-y-2">
-                      {navLinks.slice(7, 10).map((link) => (
+                <div className="bg-card rounded-2xl shadow-medium border border-border w-[800px] p-4">
+                  <div className="space-y-4">
+                    <div className="flex gap-4">
+                      {moreLinks.slice(0, 1).map((link) => (
+                        <Link
+                          key={link.path}
+                          to={link.path}
+                          className={cn(
+                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
+                            location.pathname === link.path
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-muted text-foreground/90"
+                          )}
+                        >
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                            {iconMap[link.name] ?? (
+                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
+                            )}
+                          </span>
+                          <span className="flex flex-col">
+                            <span className="text-sm font-medium">{link.name}</span>
+                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
+                          </span>
+                        </Link>
+                      ))}
+                      {moreLinks.slice(3, 7).map((link) => (
                         <Link
                           key={link.path}
                           to={link.path}
@@ -137,40 +173,97 @@ const Navbar = () => {
                         </Link>
                       ))}
                     </div>
-
-                    {/* Column 2: Secondary links */}
-                    <div className="space-y-1">
-                      <div className="px-2 pb-1 text-xs font-semibold tracking-wide text-muted-foreground">More</div>
-                      {navLinks.slice(10).map((link) => (
+                    <div className="flex gap-4">
+                      {moreLinks.slice(1, 2).map((link) => (
                         <Link
                           key={link.path}
                           to={link.path}
                           className={cn(
-                            "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
                             location.pathname === link.path
-                              ? "text-primary bg-primary/10"
-                              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-muted text-foreground/90"
                           )}
                         >
-                          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted/70">
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
                             {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.charAt(0)}</span>
+                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
                             )}
                           </span>
-                          <span className="truncate">{link.name}</span>
+                          <span className="flex flex-col">
+                            <span className="text-sm font-medium">{link.name}</span>
+                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
+                          </span>
                         </Link>
                       ))}
-                      <div className="pt-2 px-2">
+                      {moreLinks.slice(7, 10).map((link) => (
                         <Link
-                          to="/resources"
-                          className="inline-flex items-center text-xs font-medium text-muted-foreground hover:text-foreground"
+                          key={link.path}
+                          to={link.path}
+                          className={cn(
+                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
+                            location.pathname === link.path
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-muted text-foreground/90"
+                          )}
                         >
-                          See all links
-                          <svg className="ml-1 h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414-1.414L13.586 10H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                          </svg>
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                            {iconMap[link.name] ?? (
+                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
+                            )}
+                          </span>
+                          <span className="flex flex-col">
+                            <span className="text-sm font-medium">{link.name}</span>
+                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
+                          </span>
                         </Link>
-                      </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-4">
+                      {moreLinks.slice(2, 3).map((link) => (
+                        <Link
+                          key={link.path}
+                          to={link.path}
+                          className={cn(
+                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
+                            location.pathname === link.path
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-muted text-foreground/90"
+                          )}
+                        >
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                            {iconMap[link.name] ?? (
+                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
+                            )}
+                          </span>
+                          <span className="flex flex-col">
+                            <span className="text-sm font-medium">{link.name}</span>
+                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
+                          </span>
+                        </Link>
+                      ))}
+                      {moreLinks.slice(10).map((link) => (
+                        <Link
+                          key={link.path}
+                          to={link.path}
+                          className={cn(
+                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
+                            location.pathname === link.path
+                              ? "bg-primary/10 text-primary"
+                              : "hover:bg-muted text-foreground/90"
+                          )}
+                        >
+                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
+                            {iconMap[link.name] ?? (
+                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
+                            )}
+                          </span>
+                          <span className="flex flex-col">
+                            <span className="text-sm font-medium">{link.name}</span>
+                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
+                          </span>
+                        </Link>
+                      ))}
                     </div>
                   </div>
                 </div>

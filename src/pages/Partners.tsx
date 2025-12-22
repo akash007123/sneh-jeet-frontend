@@ -60,23 +60,18 @@ const Partners = () => {
                   >
                     <div className="flex items-start gap-4">
                       <motion.div
-                        className="w-12 h-12 rounded-lg
-    bg-gradient-to-r from-red-500 via-yellow-400 to-purple-600
-    flex items-center justify-center
-    text-lg font-bold text-white flex-shrink-0"
-                        animate={{
-                          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                        }}
-                        transition={{
-                          duration: 6,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        style={{
-                          backgroundSize: "300% 300%",
-                        }}
+                        className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center flex-shrink-0 overflow-hidden"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.2 }}
                       >
-                        {partner.logo}
+                        <img
+                          src={partner.logo}
+                          alt={`${partner.name} logo`}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg';
+                          }}
+                        />
                       </motion.div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-display text-lg font-semibold text-foreground mb-2">

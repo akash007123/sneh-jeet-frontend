@@ -107,10 +107,20 @@ interface Membership {
   createdAt: string;
 }
 
-type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story | Subscription | User | Membership;
+interface Appointment {
+  _id: string;
+  name: string;
+  mobile: string;
+  email: string;
+  message: string;
+  status: "New" | "Confirmed" | "Completed" | "Cancelled";
+  createdAt: string;
+}
+
+type DeletableItem = Contact | Event | GalleryItem | Blog | Media | Idea | Story | Subscription | User | Membership | Appointment;
 
 interface DeleteModalProps {
-  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story' | 'subscription' | 'user' | 'membership';
+  type: 'contact' | 'event' | 'gallery' | 'blog' | 'media' | 'idea' | 'story' | 'subscription' | 'user' | 'membership' | 'appointment';
   item: DeletableItem | null;
   isOpen: boolean;
   onClose: () => void;
@@ -131,6 +141,8 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, delet
       case 'story': return 'Delete Story';
       case 'subscription': return 'Delete Subscription';
       case 'user': return 'Delete User';
+      case 'membership': return 'Delete Membership';
+      case 'appointment': return 'Delete Appointment';
       default: return 'Delete Item';
     }
   };
@@ -152,6 +164,8 @@ const DeleteModal = ({ type, item, isOpen, onClose, onConfirm, isDeleting, delet
       case 'story': return (item as Story).title;
       case 'subscription': return (item as Subscription).email;
       case 'user': return (item as User).name;
+      case 'membership': return `${(item as Membership).firstName} ${(item as Membership).lastName}`;
+      case 'appointment': return (item as Appointment).name;
       default: return '';
     }
   };

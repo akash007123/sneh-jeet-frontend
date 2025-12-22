@@ -67,6 +67,12 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
+      title: "Appointments",
+      url: "/admin/appointments",
+      icon: Calendar,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
+    },
+    {
       title: "Subscriptions",
       url: "/admin/subscriptions",
       icon: Mail,

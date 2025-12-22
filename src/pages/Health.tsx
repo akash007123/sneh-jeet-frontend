@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import {
@@ -23,8 +24,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { healthServices } from "@/data/mockData";
+import AppointmentFormModal from "@/components/AppointmentFormModal";
 
 const Health = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <MainLayout>
       <Helmet>
@@ -140,7 +144,7 @@ const Health = () => {
                   Sessions are available in multiple languages and can be conducted via video or phone.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button size="lg">
+                  <Button size="lg" onClick={() => setIsModalOpen(true)}>
                     Book Appointment
                   </Button>
                   <Button variant="outline" size="lg">
@@ -553,6 +557,7 @@ const Health = () => {
           </motion.div>
         </div>
       </section>
+      <AppointmentFormModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </MainLayout>
   );
 };

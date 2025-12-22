@@ -6,6 +6,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDate } from "../../utils/formatDate";
 import {
   Table,
@@ -54,6 +61,9 @@ const ContactsPage = () => {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Filter state
+  const [statusFilter, setStatusFilter] = useState<string>("All");
 
   // Queries
   const { data: contacts, isLoading: contactsLoading } = useQuery({
@@ -133,9 +143,12 @@ const ContactsPage = () => {
     },
   });
 
+  // Filtering
+  const filteredContacts = statusFilter === "All" ? contacts : contacts?.filter(contact => contact.status === statusFilter);
+
   // Pagination calculations
-  const paginatedContacts = contacts?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-  const totalPages = Math.ceil((contacts?.length || 0) / itemsPerPage);
+  const paginatedContacts = filteredContacts?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil((filteredContacts?.length || 0) / itemsPerPage);
 
   // Handlers
   const handleViewContact = (contact: Contact) => {
@@ -244,7 +257,22 @@ const ContactsPage = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Contact Submissions</CardTitle>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="status-filter" className="text-sm font-medium">Filter by Status:</label>
+                    <Select value={statusFilter} onValueChange={(value) => { setStatusFilter(value); setCurrentPage(1); }}>
+                      <SelectTrigger id="status-filter" className="w-32">
+                        <SelectValue placeholder="All" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All">All</SelectItem>
+                        <SelectItem value="New">New</SelectItem>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Talk">Talk</SelectItem>
+                        <SelectItem value="Resolved">Resolved</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Button variant="outline" onClick={exportToCSV}>
                     Export CSV
                   </Button>
