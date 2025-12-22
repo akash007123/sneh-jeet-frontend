@@ -52,61 +52,73 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       title: "Dashboard",
       url: "/admin",
       icon: LayoutDashboard,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member', 'User'],
     },
     {
       title: "Profile",
       url: "/admin/profile",
       icon: User,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member', 'User'],
     },
     {
       title: "Contacts",
       url: "/admin/contacts",
       icon: MessageSquare,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Subscriptions",
       url: "/admin/subscriptions",
       icon: Mail,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Events",
       url: "/admin/events",
       icon: Calendar,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Gallery",
       url: "/admin/gallery",
       icon: Image,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Blogs",
       url: "/admin/blogs",
       icon: FileText,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Stories",
       url: "/admin/stories",
       icon: BookOpen,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Media",
       url: "/admin/media",
       icon: Film,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Ideas",
       url: "/admin/ideas",
       icon: Lightbulb,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Members",
       url: "/admin/members",
       icon: UserPlus,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
     {
       title: "Users",
       url: "/admin/users",
       icon: Users,
+      roles: ['Admin', 'Manager', 'Vice-manager', 'HR', 'Volunteer', 'Member'],
     },
   ];
 
@@ -135,7 +147,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {menuItems.map((item) => (
+                {menuItems.filter(item => item.roles.includes(user?.role)).map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
