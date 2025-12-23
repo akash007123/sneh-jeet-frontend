@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import {
@@ -544,11 +545,13 @@ const Health = () => {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg">
+              <Button size="lg" onClick={() => setIsModalOpen(true)}>
                 Schedule Consultation
               </Button>
               <Button variant="outline" size="lg">
+                <Link to="/contact">
                 Contact Health Team
+                </Link>
               </Button>
             </div>
           </motion.div>

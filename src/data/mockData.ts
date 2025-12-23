@@ -1758,14 +1758,15 @@ export const impactData = {
     title: "Where We Work",
     description: "Our programs reach individuals across multiple states through on-ground initiatives and secure online support platforms.",
     regions: [
-      "Delhi NCR",
-      "Mumbai",
-      "Bangalore",
-      "Chennai",
-      "Kolkata",
-      "Pune",
-      "Hyderabad",
-      "Ahmedabad"
+      "Indore",
+      "Ujjain",
+      "Dewas",
+      "Ratlam",
+      "Agar Malva",
+      "Bhopal",
+      "Chhatarpur",
+      "Mandsour",
+      "more cities in MP"
     ],
     coverage: {
       urban: "Direct on-ground programs in major cities",
