@@ -5,179 +5,135 @@ import {
   CheckCircle,
   Clock,
   Calendar,
-  Image,
+  Image as ImageIcon,
   FileText,
   BookOpen,
   Film,
   Lightbulb,
   UserPlus,
+  ArrowUpRight,
+  Activity,
+  Sparkles,
+  TrendingUp
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/layouts/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
-  // Queries
-  const { data: contacts, isLoading: contactsLoading } = useQuery({
+  // Queries (kept identical to original for data integrity)
+  const { data: contacts } = useQuery({
     queryKey: ["contacts"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/contact`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch contacts");
       return response.json();
     },
   });
 
-  const { data: events, isLoading: eventsLoading } = useQuery({
+  const { data: events } = useQuery({
     queryKey: ["events"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/event`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch events");
       return response.json();
     },
   });
 
-  const { data: gallery, isLoading: galleryLoading } = useQuery({
+  const { data: gallery } = useQuery({
     queryKey: ["gallery"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/gallery`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch gallery");
       return response.json();
     },
   });
 
-  const { data: blogs, isLoading: blogsLoading } = useQuery({
+  const { data: blogs } = useQuery({
     queryKey: ["blogs"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch blogs");
       return response.json();
     },
   });
 
-  const { data: stories, isLoading: storiesLoading } = useQuery({
+  const { data: stories } = useQuery({
     queryKey: ["stories"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/story`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch stories");
       return response.json();
     },
   });
 
-  const { data: media, isLoading: mediaLoading } = useQuery({
+  const { data: media } = useQuery({
     queryKey: ["media"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/media`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch media");
       return response.json();
     },
   });
 
-  const { data: ideas, isLoading: ideasLoading } = useQuery({
+  const { data: ideas } = useQuery({
     queryKey: ["ideas"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/ideas`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch ideas");
       return response.json();
     },
   });
 
-  const { data: members, isLoading: membersLoading } = useQuery({
+  const { data: members } = useQuery({
     queryKey: ["memberships"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/membership`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch memberships");
       return response.json();
     },
   });
 
-  const { data: users, isLoading: usersLoading } = useQuery({
+  const { data: users } = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error("Failed to fetch users");
       return response.json();
     },
   });
 
-
   const stats = {
     totalContacts: contacts?.length || 0,
-    newContacts: contacts?.filter((c) => c.status === "New").length || 0,
-    pendingContacts:
-      contacts?.filter((c) => c.status === "Pending").length || 0,
-    resolvedContacts:
-      contacts?.filter((c) => c.status === "Resolved").length || 0,
+    newContacts: contacts?.filter((c: any) => c.status === "New").length || 0,
+    pendingContacts: contacts?.filter((c: any) => c.status === "Pending").length || 0,
+    resolvedContacts: contacts?.filter((c: any) => c.status === "Resolved").length || 0,
     totalEvents: events?.length || 0,
     totalGallery: gallery?.length || 0,
     totalBlogs: blogs?.blogs?.length || 0,
-    featuredBlogs: blogs?.blogs?.filter((b) => b.isFeatured).length || 0,
+    featuredBlogs: blogs?.blogs?.filter((b: any) => b.isFeatured).length || 0,
     totalStories: stories?.stories?.length || 0,
     totalMedia: media?.media?.length || 0,
     totalIdeas: ideas?.ideas?.length || 0,
@@ -185,254 +141,190 @@ const Dashboard = () => {
     totalUsers: users?.length || 0,
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
     <AdminLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-          <p className="text-muted-foreground">
-            Welcome to your admin dashboard. Here's an overview of your NGO's data.
-          </p>
+      <div className="space-y-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent">
+              Welcome back, {user?.name?.split(' ')[0]} 👋
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Here's what's happening with your NGO today.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button>Download Report</Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Contacts
-                </CardTitle>
-                <Users className="h-4 w-4 text-blue-600" />
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+        >
+          {/* Main Stats Row */}
+          <motion.div variants={item} className="lg:col-span-2 row-span-2">
+            <Card className="h-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white border-0 shadow-xl overflow-hidden relative group">
+              <div className="absolute right-0 top-0 p-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
+              <CardHeader>
+                <CardTitle className="text-white/90 font-medium">Total Engagement</CardTitle>
+                <CardDescription className="text-blue-100">Across all platforms</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.totalContacts}
+              <CardContent className="space-y-4 relative z-10">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold">{stats.totalContacts + stats.totalUsers + stats.totalMembers}</span>
+                  <span className="text-sm bg-white/20 px-2 py-1 rounded-full">+12% from last month</span>
+                </div>
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+                  <div>
+                    <p className="text-blue-200 text-sm">Users</p>
+                    <p className="text-xl font-bold">{stats.totalUsers}</p>
+                  </div>
+                  <div>
+                    <p className="text-blue-200 text-sm">Members</p>
+                    <p className="text-xl font-bold">{stats.totalMembers}</p>
+                  </div>
+                  <div>
+                    <p className="text-blue-200 text-sm">Contacts</p>
+                    <p className="text-xl font-bold">{stats.totalContacts}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">New</CardTitle>
-                <MessageSquare className="h-4 w-4 text-green-600" />
+          {/* Quick Stat Cards */}
+          <motion.div variants={item}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium text-muted-foreground">New Inquiries</CardTitle>
+                <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                  <MessageSquare className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.newContacts}</div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.pendingContacts}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Resolved
-                </CardTitle>
-                <CheckCircle className="h-4 w-4 text-purple-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {stats.resolvedContacts}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Total Events
-                </CardTitle>
-                <Calendar className="h-4 w-4 text-orange-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalEvents}</div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Gallery Items
-                </CardTitle>
-                <Image className="h-4 w-4 text-pink-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalGallery}</div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Blog Posts
-                </CardTitle>
-                <FileText className="h-4 w-4 text-teal-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalBlogs}</div>
-                <p className="text-xs text-muted-foreground">
-                  {stats.featuredBlogs} featured
+                <p className="text-xs text-muted-foreground mt-1 text-green-600 font-medium flex items-center">
+                  <TrendingUp className="h-3 w-3 mr-1" /> Requires attention
                 </p>
               </CardContent>
             </Card>
           </motion.div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Stories
-                </CardTitle>
-                <BookOpen className="h-4 w-4 text-indigo-600" />
+          <motion.div variants={item}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Pending Issues</CardTitle>
+                <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                  <Clock className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalStories}</div>
+                <div className="text-2xl font-bold">{stats.pendingContacts}</div>
+                <p className="text-xs text-muted-foreground mt-1">Awaiting response</p>
               </CardContent>
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Media
+          {/* Content Group */}
+          <motion.div variants={item} className="lg:col-span-2">
+            <Card className="h-full border-l-4 border-l-orange-500">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-orange-500" /> Content Library
                 </CardTitle>
-                <Film className="h-4 w-4 text-red-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalMedia}</div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                  <div className="p-3 bg-secondary/50 rounded-lg">
+                    <FileText className="h-5 w-5 mx-auto mb-2 text-primary" />
+                    <div className="font-bold">{stats.totalBlogs}</div>
+                    <div className="text-xs text-muted-foreground">Blogs</div>
+                  </div>
+                  <div className="p-3 bg-secondary/50 rounded-lg">
+                    <ImageIcon className="h-5 w-5 mx-auto mb-2 text-primary" />
+                    <div className="font-bold">{stats.totalGallery}</div>
+                    <div className="text-xs text-muted-foreground">Photos</div>
+                  </div>
+                  <div className="p-3 bg-secondary/50 rounded-lg">
+                    <Film className="h-5 w-5 mx-auto mb-2 text-primary" />
+                    <div className="font-bold">{stats.totalMedia}</div>
+                    <div className="text-xs text-muted-foreground">Videos</div>
+                  </div>
+                  <div className="p-3 bg-secondary/50 rounded-lg">
+                    <BookOpen className="h-5 w-5 mx-auto mb-2 text-primary" />
+                    <div className="font-bold">{stats.totalStories}</div>
+                    <div className="text-xs text-muted-foreground">Stories</div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Ideas
+          {/* Ideas & Innovation */}
+          <motion.div variants={item} className="lg:row-span-2">
+            <Card className="h-full bg-gradient-to-b from-slate-900 to-slate-800 text-white border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-400" /> Ideas
                 </CardTitle>
-                <Lightbulb className="h-4 w-4 text-cyan-600" />
+                <CardDescription className="text-slate-400">Community Suggestions</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalIdeas}</div>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-center py-4">{stats.totalIdeas}</div>
+                <Button variant="secondary" className="w-full text-xs">View All Ideas</Button>
               </CardContent>
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Members
-                </CardTitle>
-                <UserPlus className="h-4 w-4 text-emerald-600" />
+          {/* Events Card */}
+          <motion.div variants={item}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium text-muted-foreground">Upcoming Events</CardTitle>
+                <Activity className="h-4 w-4 text-rose-500" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalMembers}</div>
+                <div className="text-2xl font-bold">{stats.totalEvents}</div>
+                <p className="text-xs text-muted-foreground mt-1">Scheduled events</p>
               </CardContent>
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2 }}
-            whileHover={{ scale: 1.02, y: -5 }}
-          >
-            <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border-violet-200 hover:shadow-lg transition-shadow">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Users
-                </CardTitle>
-                <Users className="h-4 w-4 text-violet-600" />
+          {/* Members Card */}
+          <motion.div variants={item}>
+            <Card className="hover:shadow-md transition-shadow bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-sm font-medium text-emerald-800 dark:text-emerald-300">Active Members</CardTitle>
+                <Users className="h-4 w-4 text-emerald-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalUsers}</div>
+                <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">{stats.totalMembers}</div>
+                <div className="h-1 w-full bg-emerald-200 mt-2 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 w-[70%]"></div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
-        </div>
+
+        </motion.div>
       </div>
     </AdminLayout>
   );

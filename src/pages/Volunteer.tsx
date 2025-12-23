@@ -20,7 +20,8 @@ import {
   Download,
   HelpCircle,
   Mail,
-  User
+  User,
+  Phone
 } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
@@ -389,6 +390,12 @@ const Volunteer = () => {
                           <Mail className="w-4 h-4" />
                           {volunteer.email}
                         </div>
+                        {volunteer.mobile && (
+                          <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                            <Phone className="w-4 h-4" />
+                            {volunteer.mobile}
+                          </div>
+                        )}
                         <Badge variant="secondary" className="text-xs">{volunteer.role}</Badge>
                       </div>
                     </div>

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Lock, User, Heart, Rainbow, Sparkles, Globe, Users } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Heart, Rainbow, Sparkles, Globe, Users, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AxiosError } from 'axios';
 
@@ -24,7 +24,7 @@ const PRIDE_COLORS = [
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ name: '', email: '', password: '', role: '' });
+  const [signupData, setSignupData] = useState({ name: '', email: '', password: '', role: '', mobile: '' });
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [isSignupLoading, setIsSignupLoading] = useState(false);
@@ -75,7 +75,7 @@ const Login = () => {
     e.preventDefault();
     setIsSignupLoading(true);
     try {
-      await signup(signupData.name, signupData.email, signupData.password, signupData.role, profilePic || undefined);
+      await signup(signupData.name, signupData.email, signupData.password, signupData.role, signupData.mobile || undefined, profilePic || undefined);
       toast({
         title: 'Signup successful',
         description: 'Account created successfully! 🎉',
@@ -297,7 +297,7 @@ const Login = () => {
                         transition={{ delay: index * 0.1 }}
                         className="relative group"
                       >
-                        <Label 
+                        <Label
                           htmlFor={`signup-${field.id}`}
                           className="text-gray-700 dark:text-gray-300 font-medium mb-2 block"
                         >
@@ -317,6 +317,33 @@ const Login = () => {
                         </div>
                       </motion.div>
                     ))}
+
+                    {/* Mobile Number Field */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="relative group"
+                    >
+                      <Label
+                        htmlFor="signup-mobile"
+                        className="text-gray-700 dark:text-gray-300 font-medium mb-2 block"
+                      >
+                        Mobile Number
+                      </Label>
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-500 transition-colors duration-200 group-hover:text-teal-500" />
+                        <Input
+                          id="signup-mobile"
+                          type="tel"
+                          placeholder="Enter mobile number"
+                          value={signupData.mobile}
+                          onChange={(e) => setSignupData({ ...signupData, mobile: e.target.value })}
+                          className="pl-12 pr-4 py-3 bg-white/50 dark:bg-gray-800/50 border-2 border-gray-200 dark:border-gray-700 rounded-xl transition-all duration-300 focus:border-blue-500 focus:scale-[1.02] focus:shadow-lg group-hover:border-blue-300"
+                        />
+                        <div className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-blue-500 to-teal-500 group-hover:w-full transition-all duration-300" />
+                      </div>
+                    </motion.div>
                     
                     {/* Role Selection with inclusive options */}
                     <motion.div

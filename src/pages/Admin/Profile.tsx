@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Lock, User, Camera } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Camera, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AxiosError } from 'axios';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -16,7 +16,8 @@ const Profile = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    mobile: ''
   });
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +31,8 @@ const Profile = () => {
         name: user.name,
         email: user.email,
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        mobile: user.mobile || ''
       });
     }
   }, [user]);
@@ -62,7 +64,8 @@ const Profile = () => {
         formData.name,
         formData.email,
         formData.password || undefined,
-        profilePic || undefined
+        profilePic || undefined,
+        formData.mobile || undefined
       );
       toast({
         title: 'Profile updated',
@@ -104,7 +107,7 @@ const Profile = () => {
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
               <CardDescription>
-                Update your name, email, and profile picture.
+                Update your name, email, mobile number, and profile picture.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -163,6 +166,22 @@ const Profile = () => {
                       onChange={handleInputChange}
                       className="pl-10"
                       required
+                    />
+                  </div>
+                </div>
+
+                {/* Mobile */}
+                <div className="space-y-2">
+                  <Label htmlFor="mobile">Mobile Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Input
+                      id="mobile"
+                      name="mobile"
+                      type="tel"
+                      value={formData.mobile}
+                      onChange={handleInputChange}
+                      className="pl-10"
                     />
                   </div>
                 </div>

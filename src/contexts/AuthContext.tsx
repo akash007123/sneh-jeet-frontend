@@ -7,6 +7,7 @@ interface User {
   email: string;
   role: string;
   profilePic?: string;
+  mobile?: string;
   isActive: boolean;
 }
 
@@ -15,8 +16,8 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string, role: string, profilePic?: File) => Promise<void>;
-  updateProfile: (name: string, email: string, password?: string, profilePic?: File) => Promise<void>;
+  signup: (name: string, email: string, password: string, role: string, mobile?: string, profilePic?: File) => Promise<void>;
+  updateProfile: (name: string, email: string, password?: string, profilePic?: File, mobile?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -87,12 +88,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (name: string, email: string, password: string, role: string, profilePic?: File) => {
+  const signup = async (name: string, email: string, password: string, role: string, mobile?: string, profilePic?: File) => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('email', email);
     formData.append('password', password);
     formData.append('role', role);
+    if (mobile) {
+      formData.append('mobile', mobile);
+    }
     if (profilePic) {
       formData.append('profilePic', profilePic);
     }
@@ -110,7 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
   };
 
-  const updateProfile = async (name: string, email: string, password?: string, profilePic?: File) => {
+  const updateProfile = async (name: string, email: string, password?: string, profilePic?: File, mobile?: string) => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('email', email);
@@ -119,6 +123,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
     if (profilePic) {
       formData.append('profilePic', profilePic);
+    }
+    if (mobile) {
+      formData.append('mobile', mobile);
     }
 
     const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/users/${user?.id}`, formData, {

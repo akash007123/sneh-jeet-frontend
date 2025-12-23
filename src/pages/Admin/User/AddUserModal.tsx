@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, Mail, Lock, Loader2 } from "lucide-react";
+import { X, User, Mail, Lock, Loader2, Phone } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -28,6 +28,7 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }: AddUserModalProps) => {
     email: "",
     password: "",
     role: "",
+    mobile: "",
   });
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const { toast } = useToast();
@@ -35,7 +36,7 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }: AddUserModalProps) => {
 
   const addUserMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signup`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,6 +72,7 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }: AddUserModalProps) => {
       email: "",
       password: "",
       role: "",
+      mobile: "",
     });
     setProfilePic(null);
   };
@@ -92,6 +94,9 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }: AddUserModalProps) => {
     submitData.append("email", formData.email);
     submitData.append("password", formData.password);
     submitData.append("role", formData.role);
+    if (formData.mobile) {
+      submitData.append("mobile", formData.mobile);
+    }
     if (profilePic) {
       submitData.append("profilePic", profilePic);
     }
@@ -143,6 +148,21 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }: AddUserModalProps) => {
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="pl-10"
                 required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mobile">Mobile Number (Optional)</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                id="mobile"
+                type="tel"
+                placeholder="Enter mobile number"
+                value={formData.mobile}
+                onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                className="pl-10"
               />
             </div>
           </div>
