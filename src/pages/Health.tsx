@@ -147,9 +147,6 @@ const Health = () => {
                   <Button size="lg" onClick={() => setIsModalOpen(true)}>
                     Book Appointment
                   </Button>
-                  <Button variant="outline" size="lg">
-                    Learn More
-                  </Button>
                 </div>
               </div>
             </div>

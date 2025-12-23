@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import {
@@ -17,7 +18,9 @@ import {
   Scale,
   Quote,
   Download,
-  HelpCircle
+  HelpCircle,
+  Mail,
+  User
 } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
@@ -28,8 +31,28 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { volunteerData } from "@/data/mockData";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Volunteer = () => {
+  const [volunteers, setVolunteers] = useState([]);
+
+  useEffect(() => {
+    const fetchVolunteers = async () => {
+      try {
+        const response = await fetch('/api/users/volunteers');
+        console.log(response, 'response')
+        if (response.ok) {
+          const data = await response.json();
+          setVolunteers(data);
+        }
+      } catch (error) {
+        console.error('Error fetching volunteers:', error);
+      }
+    };
+
+    fetchVolunteers();
+  }, []);
+
   return (
     <MainLayout>
       <Helmet>
@@ -343,9 +366,9 @@ const Volunteer = () => {
           />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {volunteerData.testimonials.map((testimonial, index) => (
+            {volunteers.map((volunteer, index) => (
               <motion.div
-                key={index}
+                key={volunteer._id || index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -353,14 +376,21 @@ const Volunteer = () => {
               >
                 <Card className="h-full">
                   <CardContent className="pt-8 pb-8">
-                    <Quote className="w-8 h-8 text-primary mb-4" />
-                    <blockquote className="text-foreground mb-4 italic leading-relaxed">
-                      "{testimonial.quote}"
-                    </blockquote>
-                    <div className="space-y-1">
-                      <div className="font-semibold text-foreground">{testimonial.author}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                      <Badge variant="outline" className="text-xs">{testimonial.duration}</Badge>
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <Avatar className="w-16 h-16">
+                        <AvatarImage src={volunteer.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${volunteer.profilePic}` : undefined} alt={volunteer.name} />
+                        <AvatarFallback>
+                          <User className="w-8 h-8" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-2">
+                        <div className="font-semibold text-foreground">{volunteer.name}</div>
+                        <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                          <Mail className="w-4 h-4" />
+                          {volunteer.email}
+                        </div>
+                        <Badge variant="secondary" className="text-xs">{volunteer.role}</Badge>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

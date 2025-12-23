@@ -109,53 +109,86 @@ const Programs = () => {
         subtitle="We offer a wide range of programs designed to meet the unique needs of the LGBTQIA+ community."
       />
 
-      <section className="section-padding bg-background">
-        <div className="container-padding mx-auto max-w-7xl">
-          <div className="space-y-16">
+      <section className="section-padding bg-background relative overflow-hidden">
+        {/* Decorative background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+          <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-primary/5 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[10%] right-[5%] w-96 h-96 bg-secondary/5 rounded-full blur-[120px]" />
+        </div>
+
+        <div className="container-padding mx-auto max-w-7xl relative z-10">
+          <div className="space-y-24 md:space-y-32">
             {detailedPrograms.map((program, index) => {
               const Icon = iconMap[program.icon] || Heart;
               const colors = colorMap[program.color] || colorMap.primary;
-              
+              const isEven = index % 2 === 0;
+
               return (
                 <motion.div
                   key={program.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-                  className={`grid lg:grid-cols-2 gap-8 items-center ${
-                    index % 2 === 1 ? "lg:flex-row-reverse" : ""
-                  }`}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                  className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${!isEven ? "lg:flex-row-reverse" : ""
+                    }`}
                 >
-                  <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                    <div className={`w-16 h-16 rounded-2xl ${colors.bg} ${colors.text} flex items-center justify-center mb-6`}>
-                      <Icon className="w-8 h-8" />
+                  {/* Content Side */}
+                  <div className={!isEven ? "lg:order-2" : ""}>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className={`w-14 h-14 rounded-2xl ${colors.bg} ${colors.text} flex items-center justify-center shadow-sm`}>
+                        <Icon className="w-7 h-7" />
+                      </div>
+                      <span className={`text-sm font-bold uppercase tracking-wider ${colors.text} bg-background px-3 py-1 rounded-full border border-border`}>
+                        Program
+                      </span>
                     </div>
-                    <h2 className="font-display text-3xl font-bold text-foreground mb-4">
+
+                    <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
                       {program.title}
                     </h2>
-                    <p className="text-lg text-muted-foreground mb-6">
+                    <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                       {program.description}
                     </p>
-                    <ul className="space-y-3 mb-8">
-                      {program.details.map((detail, i) => (
-                        <li key={i} className="flex items-start gap-3 text-muted-foreground">
-                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-                          {detail}
-                        </li>
-                      ))}
-                    </ul>
-                    <Button asChild variant="outline">
+
+                    <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm mb-8 hover:shadow-md transition-shadow duration-300">
+                      <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        Key Offerings
+                      </h4>
+                      <ul className="grid sm:grid-cols-2 gap-3">
+                        {program.details.map((detail, i) => (
+                          <li key={i} className="flex items-start gap-2.5 text-muted-foreground text-sm">
+                            <div className={`w-1.5 h-1.5 rounded-full ${colors.bg.replace('/10', '')} mt-2 shrink-0`} />
+                            {detail}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <Button asChild variant="outline" className="group border-foreground/10 hover:border-foreground/20 hover:bg-foreground/5">
                       <Link to="/contact">
                         Get Started
-                        <ArrowRight className="w-4 h-4 ml-1" />
+                        <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
                       </Link>
                     </Button>
                   </div>
 
-                  <div className={`${index % 2 === 1 ? "lg:order-1" : ""}`}>
-                    <div className={`aspect-[4/3] rounded-3xl ${colors.bg} flex items-center justify-center`}>
-                      <Icon className={`w-24 h-24 ${colors.text} opacity-50`} />
+                  {/* Visual Side */}
+                  <div className={`${!isEven ? "lg:order-1" : ""} relative group`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-[2.5rem] -rotate-3 group-hover:rotate-0 transition-transform duration-500" />
+                    <div className={`aspect-[4/3] rounded-[2.5rem] ${colors.bg} border border-white/20 dark:border-black/20 flex items-center justify-center relative overflow-hidden backdrop-blur-xl shadow-2xl transition-transform duration-500 group-hover:-translate-y-2`}>
+                      {/* Abstract Shapes overlay */}
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 dark:bg-black/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                      <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/5 dark:bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+
+                      <Icon className={`w-32 h-32 ${colors.text} drop-shadow-2xl relative z-10 transition-transform duration-500 group-hover:scale-110`} strokeWidth={1} />
+
+                      <div className="absolute bottom-8 left-8 right-8 bg-white/90 dark:bg-black/80 backdrop-blur-md rounded-xl p-4 border border-white/20 dark:border-white/10 shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
+                        <p className="font-display font-bold text-center text-foreground">
+                          Transforming Lives Together
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -166,25 +199,35 @@ const Programs = () => {
       </section>
 
       {/* CTA */}
-      <section className="section-padding bg-muted/30">
-        <div className="container-padding mx-auto max-w-7xl text-center">
+      <section className="section-padding relative overflow-hidden">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-foreground to-foreground/90 z-0" />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay z-0" />
+
+        {/* Animated shapes */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] mix-blend-overlay animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/20 rounded-full blur-[120px] mix-blend-overlay animate-pulse" style={{ animationDuration: '12s' }} />
+
+        <div className="container-padding mx-auto max-w-4xl text-center relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            className="bg-white/5 backdrop-blur-3xl rounded-[3rem] p-12 md:p-20 border border-white/10 shadow-2xl"
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Need Help Finding the Right Program?
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+              Ready to find the support <br />
+              <span className="text-primary-foreground">that's right for you?</span>
             </h2>
-            <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-              Our team is here to help you navigate our services and find the support that's right for you.
+            <p className="text-white/70 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+              Our compassionate team is standing by to help you navigate our services, answer your questions, and welcome you to our community.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button asChild variant="hero" size="lg">
-                <Link to="/contact">Contact Us</Link>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <Button asChild size="lg" className="h-14 px-8 text-base rounded-full bg-white text-foreground hover:bg-white/90 font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                <Link to="/contact">Generic Inquiry</Link>
               </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/resources">View Resources</Link>
+              <Button asChild variant="outline" size="lg" className="h-14 px-8 text-base rounded-full border-white/20 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
+                <Link to="/resources">Browse Resources</Link>
               </Button>
             </div>
           </motion.div>
