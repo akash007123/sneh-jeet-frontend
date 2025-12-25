@@ -324,24 +324,6 @@ const ProgramsSection = () => {
                       )}
                     </div>
                     
-                    {/* Learn more button */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      className="flex items-center justify-between mt-auto pt-6 border-t border-white/10"
-                    >
-                      <span className="text-sm font-medium text-primary">
-                        Learn More
-                      </span>
-                      <motion.div
-                        animate={{ x: hoveredCard === index ? 5 : 0 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                      </motion.div>
-                    </motion.div>
-                    
                     {/* Hover overlay */}
                     <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>

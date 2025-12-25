@@ -250,7 +250,7 @@ const AboutPreview = () => {
                 variants={fadeInUp}
                 className="text-muted-foreground text-lg md:text-xl mb-6 leading-relaxed"
               >
-                Since 2010, <span className="font-semibold text-foreground">PrideConnect</span> has been a beacon of hope and support for the 
+                Since 2010, <span className="font-semibold text-foreground">Sneh Jeet Social Welfare Society</span> has been a beacon of hope and support for the 
                 LGBTQIA+ community. We believe every person deserves to live authentically, 
                 free from discrimination and fear.
               </motion.p>
