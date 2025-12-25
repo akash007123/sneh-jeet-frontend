@@ -19,6 +19,8 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string, role: string, mobile?: string, profilePic?: File) => Promise<void>;
   updateProfile: (name: string, email: string, password?: string, profilePic?: File, mobile?: string) => Promise<void>;
   logout: () => void;
+  forgotPassword: (email: string) => Promise<void>;
+  resetPassword: (token: string, password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -138,6 +140,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
+  const forgotPassword = async (email: string) => {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, { email });
+  };
+
+  const resetPassword = async (token: string, password: string) => {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password`, { token, password });
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -146,6 +156,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signup,
     updateProfile,
     logout,
+    forgotPassword,
+    resetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

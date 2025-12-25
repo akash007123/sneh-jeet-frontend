@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
@@ -28,9 +29,12 @@ const Login = () => {
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
   const [isSignupLoading, setIsSignupLoading] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
   const [activeColorIndex, setActiveColorIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
-  const { login, signup, user } = useAuth();
+  const { login, signup, forgotPassword, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -90,6 +94,29 @@ const Login = () => {
       });
     } finally {
       setIsSignupLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsForgotPasswordLoading(true);
+    try {
+      await forgotPassword(forgotPasswordEmail);
+      toast({
+        title: 'Reset email sent',
+        description: 'Check your email for password reset instructions.',
+      });
+      setIsForgotPasswordOpen(false);
+      setForgotPasswordEmail('');
+    } catch (error) {
+      const description = error instanceof AxiosError && error.response?.data?.error ? error.response.data.error : 'An error occurred';
+      toast({
+        title: 'Error',
+        description,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsForgotPasswordLoading(false);
     }
   };
 
@@ -267,7 +294,17 @@ const Login = () => {
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </Button>
                     </motion.div>
-                    
+                
+                    <div className="text-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setIsForgotPasswordOpen(true)}
+                        className="text-purple-500 hover:text-purple-700 underline text-sm"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                
                     <div className="text-center pt-4 border-t border-gray-200 dark:border-gray-700">
                       <p className="text-gray-600 dark:text-gray-400 text-sm">
                         ✨ Inclusive space for all identities
@@ -461,7 +498,38 @@ const Login = () => {
           {/* Decorative pride elements at bottom */}
           <div className="h-2 w-full bg-gradient-to-r from-red-400 via-orange-400 via-yellow-400 via-green-400 via-blue-400 via-indigo-400 to-purple-400" />
         </Card>
-        
+
+        <Dialog open={isForgotPasswordOpen} onOpenChange={setIsForgotPasswordOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Forgot Password</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="forgot-email">Email Address</Label>
+                <Input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotPasswordEmail}
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isForgotPasswordLoading}>
+                {isForgotPasswordLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  'Send Reset Email'
+                )}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
+
         {/* Accessibility statement */}
         <motion.div 
           initial={{ opacity: 0 }}

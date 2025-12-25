@@ -42,6 +42,7 @@ import MembersPage from "./pages/Admin/Membership/MembersPage";
 import UsersPage from "./pages/Admin/User/UsersPage";
 import Profile from "./pages/Admin/Profile";
 import Login from "./pages/Admin/Login";
+import ResetPassword from './pages/Admin/ResetPassword';
 import NotFound from "./pages/NotFound";
 
 const AppRouter = () => (
@@ -75,6 +76,7 @@ const AppRouter = () => (
     <Route path="/volunteer" element={<Volunteer />} />
     <Route path="/careers" element={<Careers />} />
     <Route path="/admin/login" element={<Login />} />
+    <Route path="/reset-password" element={<ResetPassword />} />
     <Route
       path="/admin/profile"
       element={

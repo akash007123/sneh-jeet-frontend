@@ -1,10 +1,36 @@
 // Mock data for the LGBTQIA+ NGO Website
 
+// export const stats = [
+//   { value: "50,000+", label: "Lives Impacted" },
+//   { value: "24/7", label: "Crisis Support" },
+//   { value: "150+", label: "Community Events" },
+//   { value: "98%", label: "Satisfaction Rate" },
+// ];
+
+// data/mockData.ts
 export const stats = [
-  { value: "50,000+", label: "Lives Impacted" },
-  { value: "24/7", label: "Crisis Support" },
-  { value: "150+", label: "Community Events" },
-  { value: "98%", label: "Satisfaction Rate" },
+  {
+    value: "50,000+",
+    label: "Lives Impacted",
+    icon: "users" as const,
+    suffix: "+",
+  },
+  {
+    value: "150+",
+    label: "Community Events",
+    icon: "award" as const,
+  },
+  {
+    value: "98%",
+    label: "Satisfaction Rate",
+    icon: "growth" as const,
+  },
+  {
+    value: "24/7",
+    label: "Support Available",
+    icon: "clock" as const,
+    isStatic: true,
+  },
 ];
 
 export const programs = [
@@ -14,6 +40,7 @@ export const programs = [
     description: "Confidential counseling, peer support groups, and crisis intervention services tailored for LGBTQIA+ individuals.",
     icon: "Heart",
     color: "primary",
+    features: ["24/7 Crisis Support", "Peer Support Groups", "Affirmative Counseling"]
   },
   {
     id: "legal-aid",
@@ -21,6 +48,7 @@ export const programs = [
     description: "Free legal consultations, name/gender marker changes, discrimination cases, and family law support.",
     icon: "Scale",
     color: "secondary",
+    features: ["Legal Consultations", "Name Change Support", "Discrimination Cases"]
   },
   {
     id: "healthcare",
@@ -28,6 +56,7 @@ export const programs = [
     description: "Connecting community members with affirming healthcare providers and supporting access to gender-affirming care.",
     icon: "Stethoscope",
     color: "accent",
+    features: ["Affirming Providers", "Gender-Affirming Care", "Health Navigation"]
   },
   {
     id: "community-events",
@@ -35,6 +64,7 @@ export const programs = [
     description: "Pride celebrations, workshops, social gatherings, and networking events that bring our community together.",
     icon: "Users",
     color: "primary",
+    features: ["Pride Celebrations", "Workshops", "Social Gatherings"]
   },
   {
     id: "youth-support",
@@ -42,6 +72,7 @@ export const programs = [
     description: "Safe spaces, mentorship programs, and resources specifically designed for LGBTQIA+ youth and young adults.",
     icon: "Sparkles",
     color: "secondary",
+    features: ["Safe Spaces", "Mentorship", "Youth Resources"]
   },
   {
     id: "education",
@@ -49,6 +80,7 @@ export const programs = [
     description: "Workplace diversity training, school programs, and community education to foster understanding and inclusion.",
     icon: "GraduationCap",
     color: "accent",
+    features: ["Diversity Training", "School Programs", "Community Education"]
   },
 ];
 
@@ -59,6 +91,99 @@ export const testimonials = [
     role: "Community Member",
     quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
     avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
+  },
+    {
+    id: 1,
+    name: "Jitendra Thakur",
+    role: "Community Member",
+    quote: "Finding this organization changed my life. For the first time, I felt seen and supported for who I truly am.",
+    avatar: "AR",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    year:"2025",
+    rating:5
   },
   {
     id: 2,
@@ -66,6 +191,8 @@ export const testimonials = [
     role: "Youth Program Participant",
     quote: "The youth program gave me a safe space to explore my identity and connect with others who understood my journey.",
     avatar: "JC",
+    year:"2025",
+    rating:4
   },
   {
     id: 3,
@@ -73,6 +200,8 @@ export const testimonials = [
     role: "Volunteer",
     quote: "Volunteering here has been incredibly rewarding. The impact we make on people's lives is truly meaningful.",
     avatar: "SW",
+    year:"2025",
+    rating:5
   },
 ];
 
