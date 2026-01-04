@@ -177,9 +177,7 @@ const Events = () => {
                       </div>
                     </div>
 
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                      {event.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2" dangerouslySetInnerHTML={{ __html: event.description }} />
 
                     <Button
                       variant="outline"
