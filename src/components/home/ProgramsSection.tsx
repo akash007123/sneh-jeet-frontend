@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Heart, Scale, Stethoscope, Users, Sparkles, GraduationCap, ChevronRight, Star, Target, Calendar, CheckCircle } from "lucide-react";
+import { ArrowRight, Heart, Scale, Stethoscope, Users, Sparkles, GraduationCap, ChevronRight, Star, Target, Calendar, CheckCircle, Home, PawPrint } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import SectionHeading from "@/components/SectionHeading";
@@ -14,6 +14,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Users,
   Sparkles,
   GraduationCap,
+  Home,
+  PawPrint,
 };
 
 const colorMap: Record<string, { bg: string; text: string; gradient: string }> = {
@@ -70,7 +72,7 @@ const ProgramsSection = () => {
 
   const iconVariants = {
     initial: { rotate: 0 },
-    hover: { rotate: 360, transition: { duration: 0.6, ease: "easeInOut" } }
+    hover: { rotate: 360, transition: { duration: 0.6 } }
   };
 
   return (

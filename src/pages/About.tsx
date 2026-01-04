@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Target, Eye, Heart, Users, Shield, Sparkles } from "lucide-react";
+import { Target, Eye, Heart, Users, Shield, Sparkles, Home, PawPrint } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
@@ -27,6 +27,16 @@ const values = [
     title: "Empowerment",
     description: "Supporting individuals to advocate for themselves and others.",
   },
+  {
+    icon: Home,
+    title: "Elder Care",
+    description: "Honoring and supporting elderly citizens with dignity, care, and companionship.",
+  },
+  {
+    icon: PawPrint,
+    title: "Animal Welfare",
+    description: "Protecting and caring for animals through rescue, feeding, and advocacy efforts.",
+  },
 ];
 
 const About = () => {
@@ -34,23 +44,23 @@ const About = () => {
     <MainLayout>
       <Helmet>
         <title>About Us - Sneh Jeet NGO</title>
-        <meta name="description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community. Learn about our values, team, and 15 years of impact." />
-        <meta name="keywords" content="LGBTQIA+, NGO, support, advocacy, community, compassion, safety, empowerment" />
+        <meta name="description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community, elderly citizens, and animal welfare. Learn about our values, team, and 15 years of impact." />
+        <meta name="keywords" content="LGBTQIA+, NGO, support, advocacy, community, compassion, safety, empowerment, elder care, animal protection" />
         <link rel="canonical" href="/about" />
         <meta property="og:title" content="About Us - Sneh Jeet NGO" />
-        <meta property="og:description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community. Learn about our values, team, and 15 years of impact." />
+        <meta property="og:description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community, elderly citizens, and animal welfare. Learn about our values, team, and 15 years of impact." />
         <meta property="og:image" content="/logo.png" />
         <meta property="og:url" content="/about" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="About Us - Sneh Jeet NGO" />
-        <meta name="twitter:description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community. Learn about our values, team, and 15 years of impact." />
+        <meta name="twitter:description" content="Discover Sneh Jeet NGO's mission to support and advocate for the LGBTQIA+ community, elderly citizens, and animal welfare. Learn about our values, team, and 15 years of impact." />
         <meta name="twitter:image" content="/logo.png" />
       </Helmet>
       <PageHero
         badge="About Us"
         title="Our Story & Mission"
-        subtitle="For over a decade, we've been dedicated to creating a world where every LGBTQIA+ individual can thrive."
+        subtitle="For over a decade, we've been dedicated to creating a world where LGBTQIA+ individuals, elderly citizens, and animals can thrive."
       />
 
       {/* Mission & Vision - Split Layout with floating visuals */}
@@ -77,7 +87,7 @@ const About = () => {
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                 To provide comprehensive support, resources, and advocacy for LGBTQIA+
-                individuals and communities, fostering environments where everyone can
+                individuals, elderly citizens, and animals, fostering environments where everyone can
                 live authentically and with dignity.
               </p>
 
@@ -106,8 +116,8 @@ const About = () => {
 
                 <h3 className="font-display text-2xl font-bold text-foreground mb-4">Our Vision</h3>
                 <p className="text-muted-foreground leading-relaxed text-lg">
-                  A world where LGBTQIA+ people are fully accepted, celebrated, and
-                  protected—where identity is honored, and every person has equal access
+                  A world where LGBTQIA+ people, elderly citizens, and animals are fully accepted, celebrated, and
+                  protected—where identity and dignity are honored, and every being has equal access
                   to opportunity and justice.
                 </p>
               </div>
@@ -263,9 +273,9 @@ const About = () => {
               Our 2035 Vision
             </h3>
             <p className="text-muted-foreground text-lg md:text-xl leading-relaxed max-w-4xl mx-auto relative z-10">
-              By 2035, we envision a world where LGBTQIA+ individuals are not just tolerated, but truly celebrated.
-              Where coming out is met with joy, where love is love in every sense, and where
-              identity is never a barrier to opportunity.
+              By 2035, we envision a world where LGBTQIA+ individuals, elderly citizens, and animals are not just tolerated, but truly celebrated.
+              Where coming out is met with joy, where love extends to all beings, and where
+              identity and dignity are never barriers to opportunity.
             </p>
           </motion.div>
         </div>
@@ -281,7 +291,7 @@ const About = () => {
             align="left"
           />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {values.map((value, index) => (
               <motion.div
                 key={value.title}

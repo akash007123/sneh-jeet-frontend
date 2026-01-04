@@ -82,6 +82,22 @@ export const programs = [
     color: "accent",
     features: ["Diversity Training", "School Programs", "Community Education"]
   },
+  {
+    id: "elder-care",
+    title: "Elder Care Support",
+    description: "Comprehensive support for elderly citizens including companionship, healthcare assistance, and social programs to ensure dignity and well-being.",
+    icon: "Home",
+    color: "primary",
+    features: ["Companionship Programs", "Healthcare Assistance", "Social Activities", "Emergency Support"]
+  },
+  {
+    id: "animal-protection",
+    title: "Animal Protection & Welfare",
+    description: "Programs dedicated to animal rescue, feeding initiatives, and advocacy for animal rights and welfare.",
+    icon: "PawPrint",
+    color: "secondary",
+    features: ["Feeding Programs", "Rescue Operations", "Adoption Support", "Animal Welfare Advocacy"]
+  },
 ];
 
 export const testimonials = [
@@ -581,6 +597,40 @@ export const resources = {
       link: "#",
     },
   ],
+  elderCare: [
+    {
+      name: "Senior Companion Program",
+      description: "Companionship and social support for elderly individuals",
+      link: "#",
+    },
+    {
+      name: "Healthcare Assistance",
+      description: "Help with medical appointments and health management",
+      link: "#",
+    },
+    {
+      name: "Dignity and Rights",
+      description: "Resources for maintaining dignity and legal rights in later years",
+      link: "#",
+    },
+  ],
+  animalWelfare: [
+    {
+      name: "Animal Rescue Network",
+      description: "Connect with local animal rescue organizations",
+      link: "#",
+    },
+    {
+      name: "Feeding Programs",
+      description: "Information on community feeding initiatives for stray animals",
+      link: "#",
+    },
+    {
+      name: "Adoption Resources",
+      description: "Guides for adopting and caring for rescued animals",
+      link: "#",
+    },
+  ],
 };
 
 export const faqs = [
@@ -603,6 +653,18 @@ export const faqs = [
   {
     question: "How can I volunteer or get involved?",
     answer: "We'd love to have you! Visit our Get Involved page to learn about volunteer opportunities, or contact us directly to discuss how you can contribute.",
+  },
+  {
+    question: "What elder care services do you provide?",
+    answer: "We offer companionship programs, healthcare assistance, and social activities to support elderly citizens with dignity and well-being.",
+  },
+  {
+    question: "How can I help with animal welfare?",
+    answer: "You can volunteer for feeding programs, participate in rescue operations, or support adoption initiatives. Contact us for more information.",
+  },
+  {
+    question: "Are your services available to non-LGBTQIA+ individuals?",
+    answer: "Yes, our elder care and animal welfare programs are open to everyone who needs support or wants to contribute.",
   },
 ];
 

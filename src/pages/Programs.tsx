@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Heart, Scale, Stethoscope, Users, Sparkles, GraduationCap, ArrowRight } from "lucide-react";
+import { Heart, Scale, Stethoscope, Users, Sparkles, GraduationCap, ArrowRight, Home, PawPrint } from "lucide-react";
 import { Link } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
@@ -14,6 +14,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Users,
   Sparkles,
   GraduationCap,
+  Home,
+  PawPrint,
 };
 
 const colorMap: Record<string, { bg: string; text: string }> = {
@@ -81,6 +83,26 @@ const detailedPrograms = [
       "Community education workshops",
       "Ally development courses",
       "Professional certifications",
+    ],
+  },
+  {
+    ...programs[6],
+    details: [
+      "Companionship visits for elderly",
+      "Healthcare coordination and assistance",
+      "Social activity programs",
+      "Emergency response support",
+      "Dignity and respect initiatives",
+    ],
+  },
+  {
+    ...programs[7],
+    details: [
+      "Daily feeding programs for animals",
+      "Animal rescue operations",
+      "Adoption facilitation services",
+      "Veterinary care support",
+      "Animal welfare advocacy",
     ],
   },
 ];

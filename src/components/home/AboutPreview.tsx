@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { ArrowRight, Heart, Users, Shield, Sparkles } from "lucide-react";
+import { ArrowRight, Heart, Users, Shield, Sparkles, Home, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
@@ -259,9 +259,19 @@ const AboutPreview = () => {
                 variants={fadeInUp}
                 className="text-muted-foreground mb-8 leading-relaxed"
               >
-                Our team of dedicated advocates, counselors, and volunteers work tirelessly 
-                to provide mental health support, legal aid, healthcare access, and 
+                Our team of dedicated advocates, counselors, and volunteers work tirelessly
+                to provide mental health support, legal aid, healthcare access, and
                 community programs that make a real difference in people's lives.
+              </motion.p>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-muted-foreground mb-8 leading-relaxed"
+              >
+                Expanding our mission, we also support elderly citizens through care programs
+                that promote dignity and well-being in their later years. Our animal protection
+                initiatives include feeding programs, rescue efforts, and advocacy to ensure
+                animals receive the compassion and safety they deserve.
               </motion.p>
             </motion.div>
 
@@ -276,7 +286,9 @@ const AboutPreview = () => {
               {[
                 { icon: Shield, label: "Safe Space", color: "text-safe" },
                 { icon: Heart, label: "Compassion", color: "text-warm" },
-                { icon: Users, label: "Inclusion", color: "text-hope" }
+                { icon: Users, label: "Inclusion", color: "text-hope" },
+                { icon: Home, label: "Elder Care", color: "text-primary" },
+                { icon: PawPrint, label: "Animal Protection", color: "text-safe" }
               ].map((item, index) => (
                 <motion.div
                   key={item.label}
