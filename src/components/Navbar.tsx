@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Heart, ChevronDown, UserPlus, BookOpen, Image, Mail, Megaphone, IdCard, Users, Target, Shield, Briefcase } from "lucide-react";
+import { Menu, X, Heart, ChevronDown, UserPlus, BookOpen, Image, Mail, IdCard, Users, Target, Shield, Briefcase, HeartPulse, GraduationCap, Handshake, HandHeart, ArrowRight, Sparkles, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import MemberFormModal from "./MemberFormModal";
@@ -29,43 +29,70 @@ const navLinks = [
   { name: "Careers", path: "/careers" },
 ];
 
-const moreLinks = [
-  { name: "Get Involved", path: "/get-involved" },
-  { name: "Stories", path: "/stories" },
-  { name: "Gallery", path: "/gallery" },
-  { name: "Contact", path: "/contact" },
-  { name: "Health", path: "/health" },
-  { name: "Impact", path: "/impact" },
-  { name: "Careers", path: "/careers" },
-  { name: "Members", path: "/members" },
-  { name: "Ally", path: "/ally" },
-  { name: "Rights", path: "/rights" },
-  { name: "Partners", path: "/partners" },
-  { name: "Education", path: "/education" },
-  { name: "Volunteer", path: "/volunteer" },
-];
+interface MoreLink {
+  name: string;
+  path: string;
+  desc: string;
+  icon: LucideIcon;
+}
 
-// Map readable link names to contextual icons
-const iconMap: Record<string, JSX.Element> = {
-  "Get Involved": <UserPlus className="h-4 w-4" />,
-  Stories: <BookOpen className="h-4 w-4" />,
-  Gallery: <Image className="h-4 w-4" />,
-  Contact: <Mail className="h-4 w-4" />,
-  Members: <IdCard className="h-4 w-4" />,
-  Partners: <Heart className="h-4 w-4" />,
-  Health: <Heart className="h-4 w-4" />,
-  Ally: <Users className="h-4 w-4" />,
-  Education: <BookOpen className="h-4 w-4" />,
-  Impact: <Target className="h-4 w-4" />,
-  Rights: <Shield className="h-4 w-4" />,
-  Volunteer: <UserPlus className="h-4 w-4" />,
-  Careers: <Briefcase className="h-4 w-4" />,
-};
+interface MoreGroup {
+  label: string;
+  chip: string;
+  links: MoreLink[];
+}
+
+// Themed groups powering the "More" mega-menu
+const moreGroups: MoreGroup[] = [
+  {
+    label: "Community",
+    chip: "bg-warm text-warm-foreground group-hover/item:bg-primary group-hover/item:text-primary-foreground",
+    links: [
+      { name: "Get Involved", path: "/get-involved", desc: "Join events & take action", icon: UserPlus },
+      { name: "Stories", path: "/stories", desc: "Voices from our community", icon: BookOpen },
+      { name: "Gallery", path: "/gallery", desc: "Moments captured in photos", icon: Image },
+      { name: "Members", path: "/members", desc: "Meet our member family", icon: IdCard },
+      { name: "Partners", path: "/partners", desc: "Organisations walking with us", icon: Handshake },
+    ],
+  },
+  {
+    label: "Support",
+    chip: "bg-safe text-safe-foreground group-hover/item:bg-accent group-hover/item:text-accent-foreground",
+    links: [
+      { name: "Health", path: "/health", desc: "Care & wellness resources", icon: HeartPulse },
+      { name: "Ally", path: "/ally", desc: "Learn to stand with us", icon: Users },
+      { name: "Education", path: "/education", desc: "Workshops & learning", icon: GraduationCap },
+      { name: "Rights", path: "/rights", desc: "Know your legal rights", icon: Shield },
+      { name: "Volunteer", path: "/volunteer", desc: "Give your time & skills", icon: HandHeart },
+    ],
+  },
+  {
+    label: "Organisation",
+    chip: "bg-hope text-hope-foreground group-hover/item:bg-secondary group-hover/item:text-secondary-foreground",
+    links: [
+      { name: "Impact", path: "/impact", desc: "The change we've made", icon: Target },
+      { name: "Careers", path: "/careers", desc: "Come work with our team", icon: Briefcase },
+      { name: "Contact", path: "/contact", desc: "Get in touch with us", icon: Mail },
+    ],
+  },
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreCloseTimer = useRef<number | null>(null);
   const location = useLocation();
+
+  const openMore = () => {
+    if (moreCloseTimer.current) window.clearTimeout(moreCloseTimer.current);
+    setMoreOpen(true);
+  };
+
+  const scheduleMoreClose = () => {
+    if (moreCloseTimer.current) window.clearTimeout(moreCloseTimer.current);
+    moreCloseTimer.current = window.setTimeout(() => setMoreOpen(false), 140);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,7 +103,16 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  useEffect(() => {
     setIsOpen(false);
+    setMoreOpen(false);
   }, [location.pathname]);
 
   return (
@@ -118,156 +154,117 @@ const Navbar = () => {
               </Link>
             ))}
             
-            {/* More dropdown for remaining links - mega menu with icons */}
-            <div className="relative group">
-              <button className="px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center gap-1">
-                More <ChevronDown className="w-4 h-4" />
+            {/* More mega-menu */}
+            <div
+              className="relative"
+              onMouseEnter={openMore}
+              onMouseLeave={scheduleMoreClose}
+            >
+              <button
+                aria-expanded={moreOpen}
+                aria-haspopup="true"
+                onClick={() => setMoreOpen((v) => !v)}
+                onFocus={openMore}
+                className={cn(
+                  "px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1",
+                  moreOpen
+                    ? "text-primary bg-primary/10"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                More
+                <ChevronDown
+                  className={cn(
+                    "w-4 h-4 transition-transform duration-300",
+                    moreOpen && "rotate-180"
+                  )}
+                />
               </button>
-              {/* Hover card container */}
-              <div className="absolute top-full right-0 mt-2 opacity-0 invisible translate-y-1 group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-200">
-                <div className="bg-card rounded-2xl shadow-medium border border-border w-[800px] p-4">
-                  <div className="space-y-4">
-                    <div className="flex gap-4">
-                      {moreLinks.slice(0, 1).map((link) => (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          className={cn(
-                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
-                            location.pathname === link.path
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-foreground/90"
-                          )}
-                        >
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                            {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
-                            )}
+              <AnimatePresence>
+                {moreOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12, x: "-50%", scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, x: "-50%", scale: 1 }}
+                    exit={{ opacity: 0, y: 8, x: "-50%", scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    className="absolute left-1/2 top-full z-50 w-[760px] max-w-[calc(100vw-2rem)] pt-3"
+                  >
+                    <div className="overflow-hidden rounded-2xl border border-border bg-card/95 shadow-medium backdrop-blur-xl">
+                      <div className="h-1 pride-gradient" />
+                      <div className="grid grid-cols-3 gap-2 p-4">
+                        {moreGroups.map((group) => (
+                          <div key={group.label} className="rounded-xl p-2">
+                            <p className="px-3 pb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                              {group.label}
+                            </p>
+                            <div className="space-y-1">
+                              {group.links.map((link) => {
+                                const Icon = link.icon;
+                                const active = location.pathname === link.path;
+                                return (
+                                  <Link
+                                    key={link.path}
+                                    to={link.path}
+                                    onClick={() => setMoreOpen(false)}
+                                    className={cn(
+                                      "group/item relative flex items-start gap-3 rounded-xl px-3 py-2.5 transition-all duration-200 hover:-translate-y-px",
+                                      active ? "bg-primary/10" : "hover:bg-muted"
+                                    )}
+                                  >
+                                    {active && (
+                                      <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full pride-gradient" />
+                                    )}
+                                    <span
+                                      className={cn(
+                                        "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-soft transition-all duration-200 group-hover/item:scale-110 group-hover/item:shadow-glow",
+                                        group.chip
+                                      )}
+                                    >
+                                      <Icon className="h-4 w-4" />
+                                    </span>
+                                    <span className="flex min-w-0 flex-col">
+                                      <span
+                                        className={cn(
+                                          "text-sm font-semibold",
+                                          active ? "text-primary" : "text-foreground"
+                                        )}
+                                      >
+                                        {link.name}
+                                      </span>
+                                      <span className="truncate text-xs text-muted-foreground">
+                                        {link.desc}
+                                      </span>
+                                    </span>
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <Link
+                        to="/get-involved"
+                        onClick={() => setMoreOpen(false)}
+                        className="group/cta flex items-center justify-between gap-3 border-t border-border bg-muted/50 px-6 py-3.5 transition-colors hover:bg-muted"
+                      >
+                        <span className="flex items-center gap-2 text-sm">
+                          <Sparkles className="h-4 w-4 text-primary" />
+                          <span className="font-semibold text-foreground">
+                            Ready to make a difference?
                           </span>
-                          <span className="flex flex-col">
-                            <span className="text-sm font-medium">{link.name}</span>
-                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
+                          <span className="hidden text-muted-foreground sm:inline">
+                            Explore ways to contribute
                           </span>
-                        </Link>
-                      ))}
-                      {moreLinks.slice(3, 7).map((link) => (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          className={cn(
-                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
-                            location.pathname === link.path
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-foreground/90"
-                          )}
-                        >
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                            {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
-                            )}
-                          </span>
-                          <span className="flex flex-col">
-                            <span className="text-sm font-medium">{link.name}</span>
-                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
-                          </span>
-                        </Link>
-                      ))}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                          Get started
+                          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover/cta:translate-x-1" />
+                        </span>
+                      </Link>
                     </div>
-                    <div className="flex gap-4">
-                      {moreLinks.slice(1, 2).map((link) => (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          className={cn(
-                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
-                            location.pathname === link.path
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-foreground/90"
-                          )}
-                        >
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                            {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
-                            )}
-                          </span>
-                          <span className="flex flex-col">
-                            <span className="text-sm font-medium">{link.name}</span>
-                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
-                          </span>
-                        </Link>
-                      ))}
-                      {moreLinks.slice(7, 10).map((link) => (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          className={cn(
-                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
-                            location.pathname === link.path
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-foreground/90"
-                          )}
-                        >
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                            {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
-                            )}
-                          </span>
-                          <span className="flex flex-col">
-                            <span className="text-sm font-medium">{link.name}</span>
-                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="flex gap-4">
-                      {moreLinks.slice(2, 3).map((link) => (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          className={cn(
-                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
-                            location.pathname === link.path
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-foreground/90"
-                          )}
-                        >
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                            {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
-                            )}
-                          </span>
-                          <span className="flex flex-col">
-                            <span className="text-sm font-medium">{link.name}</span>
-                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
-                          </span>
-                        </Link>
-                      ))}
-                      {moreLinks.slice(10).map((link) => (
-                        <Link
-                          key={link.path}
-                          to={link.path}
-                          className={cn(
-                            "flex items-start gap-3 px-3 py-3 rounded-xl transition-colors",
-                            location.pathname === link.path
-                              ? "bg-primary/10 text-primary"
-                              : "hover:bg-muted text-foreground/90"
-                          )}
-                        >
-                          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted">
-                            {iconMap[link.name] ?? (
-                              <span className="text-[10px] font-semibold">{link.name.slice(0, 2)}</span>
-                            )}
-                          </span>
-                          <span className="flex flex-col">
-                            <span className="text-sm font-medium">{link.name}</span>
-                            <span className="text-xs text-muted-foreground">Explore {link.name.toLowerCase()}</span>
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
