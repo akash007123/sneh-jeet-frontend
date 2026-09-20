@@ -4,6 +4,8 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { assetUrl } from "@/services/apiClient";
+import { fetchGalleryCategories, fetchGalleryItems } from "@/services/galleryApi";
 
 interface GalleryItem {
   _id: string;
@@ -40,14 +42,10 @@ export default function Gallery() {
     const fetchGalleryData = async () => {
       try {
         setLoading(true);
-        const [itemsRes, catsRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`),
-          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery/categories`),
+        const [items, cats] = await Promise.all([
+          fetchGalleryItems(),
+          fetchGalleryCategories(),
         ]);
-        if (!itemsRes.ok || !catsRes.ok)
-          throw new Error("Failed to fetch gallery");
-        const items = await itemsRes.json();
-        const cats = await catsRes.json();
         setGalleryItems(items);
         setCategories([
           { id: "all", label: "All" },
@@ -129,9 +127,7 @@ export default function Gallery() {
                   >
                     {img.imageUrl ? (
                       <img
-                        src={`${import.meta.env.VITE_API_BASE_URL}${
-                          img.imageUrl
-                        }`}
+                        src={assetUrl(img.imageUrl)}
                         alt={img.title}
                         className="w-full object-contain"
                       />
@@ -236,9 +232,7 @@ export default function Gallery() {
                     {/* Image */}
                     {item?.imageUrl ? (
                       <img
-                        src={`${import.meta.env.VITE_API_BASE_URL}${
-                          item.imageUrl
-                        }`}
+                        src={assetUrl(item.imageUrl)}
                         alt={item.title}
                         className="w-full rounded-2xl aspect-video object-cover"
                       />

@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import {formatDate} from "../pages/utils/formatDate";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { fetchEventBySlug } from "@/services/eventsApi";
 
 const categoryColors: Record<string, string> = {
   celebration: "bg-pride-pink/10 text-pride-pink",
@@ -35,11 +36,7 @@ const EventDetail = () => {
 
   const { data: event, isLoading } = useQuery({
     queryKey: ['event', slug],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event/slug/${slug}`);
-      if (!response.ok) throw new Error('Failed to fetch event');
-      return response.json();
-    },
+    queryFn: () => fetchEventBySlug(slug as string),
   });
 
   if (isLoading) {

@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { createStory } from "@/services/storyApi";
 
 interface AddStoryModalProps {
   isOpen: boolean;
@@ -47,14 +48,7 @@ const AddStoryModal = ({ isOpen, onClose, onSuccess }: AddStoryModalProps) => {
   const [image, setImage] = useState<File | null>(null);
 
   const createStoryMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story`, {
-        method: 'POST',
-        body: data,
-      });
-      if (!response.ok) throw new Error('Failed to create story');
-      return response.json();
-    },
+    mutationFn: (data: FormData) => createStory(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
       toast({ title: "Success", description: "Story created successfully" });

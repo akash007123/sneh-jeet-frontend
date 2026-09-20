@@ -26,6 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import AdminTablePagination from "@/components/ui/admin-table-pagination";
 import DeleteModal from "../Shared/DeleteModal";
 import {formatDate} from "../../utils/formatDate";
+import { fetchSubscriptions, updateSubscriptionStatus, deleteSubscription } from "@/services/subscriptionsApi";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
@@ -57,33 +58,14 @@ const SubscriptionsPage = () => {
   const { data: subscriptions, isLoading: subscriptionsLoading } = useQuery({
     queryKey: ["subscriptions", statusFilter],
     queryFn: async () => {
-      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions` : `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions?status=${statusFilter}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch subscriptions");
-      return response.json();
+      return fetchSubscriptions(statusFilter, token);
     },
   });
 
   // Mutations
   const updateSubscriptionStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
+      return updateSubscriptionStatus(id, status, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });
@@ -100,17 +82,7 @@ const SubscriptionsPage = () => {
 
   const deleteSubscriptionMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/subscriptions/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete subscription");
-      return response.json();
+      return deleteSubscription(id, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subscriptions"] });

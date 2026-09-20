@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Blog } from "@/types/blog";
+import { assetUrl } from "@/services/apiClient";
 
 interface ViewBlogModalProps {
   blog: Blog | null;
@@ -107,7 +108,7 @@ const ViewBlogModal = ({ blog, isOpen, onClose }: ViewBlogModalProps) => {
                 <div>
                   <h4 className="font-semibold text-sm text-muted-foreground">Featured Image</h4>
                   <img
-                    src={`${import.meta.env.VITE_API_BASE_URL}${blog.featuredImage}`}
+                    src={assetUrl(blog.featuredImage)}
                     alt={blog.title}
                     className="w-full max-w-sm h-32 object-cover rounded-md mt-2"
                   />
@@ -164,7 +165,7 @@ const ViewBlogModal = ({ blog, isOpen, onClose }: ViewBlogModalProps) => {
                             Image
                           </h5>
                           <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}${section.sectionImage}`}
+                            src={assetUrl(section.sectionImage)}
                             alt={section.sectionTitle}
                             className="w-full max-w-sm h-24 object-cover rounded-md mt-1"
                           />

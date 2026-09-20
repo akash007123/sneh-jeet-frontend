@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
+import { subscribe } from "@/services/subscriptionsApi";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -16,13 +17,7 @@ const Footer = () => {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/subscriptions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const response = await subscribe(email);
 
       const data = await response.json();
 

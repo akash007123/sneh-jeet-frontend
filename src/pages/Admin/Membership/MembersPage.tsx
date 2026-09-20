@@ -33,6 +33,8 @@ import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
 import {formatDate} from "../../utils/formatDate"
+import { fetchMemberships, updateMembership, deleteMembership } from "@/services/membershipApi";
+import { assetUrl } from "@/services/apiClient";
 
 interface Membership {
   _id: string;
@@ -116,33 +118,14 @@ const MembersPage = () => {
   const { data: memberships, isLoading: membershipsLoading } = useQuery({
     queryKey: ["memberships", statusFilter],
     queryFn: async () => {
-      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/membership` : `${import.meta.env.VITE_API_BASE_URL}/api/membership?status=${statusFilter}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch memberships");
-      return response.json();
+      return fetchMemberships(statusFilter, token);
     },
   });
 
   // Mutations
   const updateMembershipStatusMutation = useMutation({
     mutationFn: async ({ id, status, position }: { id: string; status: string; position: string }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/membership/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status, position }),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update membership");
-      return response.json();
+      return updateMembership(id, { status, position }, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["memberships"] });
@@ -161,17 +144,7 @@ const MembersPage = () => {
 
   const deleteMembershipMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/membership/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete membership");
-      return response.json();
+      return deleteMembership(id, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["memberships"] });
@@ -353,7 +326,7 @@ const MembersPage = () => {
                           <TableCell>
                             <Avatar className="w-10 h-10">
                               <AvatarImage
-                                src={membership.image ? `${import.meta.env.VITE_API_BASE_URL}${membership.image}` : undefined}
+                                src={assetUrl(membership.image)}
                                 alt={`${membership.firstName} ${membership.lastName}`}
                               />
                               <AvatarFallback>

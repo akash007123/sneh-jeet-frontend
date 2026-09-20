@@ -34,6 +34,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Media } from "@/types/media";
 import { cn } from "@/lib/utils";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { assetUrl } from "@/services/apiClient";
+import { fetchMediaBySlug } from "@/services/mediaApi";
 
 const typeIcons: Record<string, React.ReactNode> = {
   "short-film": <Film className="w-4 h-4" />,
@@ -200,11 +202,7 @@ const MediaDetail = () => {
 
   const { data: media, isLoading } = useQuery({
     queryKey: ['media', slug],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media/slug/${slug}`);
-      if (!response.ok) throw new Error('Failed to fetch media');
-      return response.json();
-    },
+    queryFn: () => fetchMediaBySlug(slug as string),
   });
 
   if (isLoading) {
@@ -367,12 +365,12 @@ const MediaDetail = () => {
                       onPause={() => setIsPlaying(false)}
                       onEnded={() => setIsPlaying(false)}
                       onContextMenu={(e) => e.preventDefault()}
-                      poster={media.thumbnailUrl ? `${import.meta.env.VITE_API_BASE_URL}${media.thumbnailUrl}` : undefined}
+                      poster={assetUrl(media.thumbnailUrl)}
                       className="w-full h-full object-contain"
                       preload="metadata"
                       playsInline
                     >
-                      <source src={`${import.meta.env.VITE_API_BASE_URL}${media.videoUrl}`} type="video/mp4" />
+                      <source src={assetUrl(media.videoUrl)} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
 

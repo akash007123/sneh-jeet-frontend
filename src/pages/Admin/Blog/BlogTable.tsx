@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Blog } from "@/types/blog";
 import { useAuth } from "@/contexts/AuthContext";
 import {formatDate} from "../../utils/formatDate";
+import { fetchBlogs } from "@/services/blogApi";
 
 interface BlogTableProps {
   onView: (blog: Blog) => void;
@@ -28,13 +29,7 @@ const BlogTable = ({ onView, onEdit, onAdd, onDelete }: BlogTableProps) => {
 
   const { data: blogs, isLoading } = useQuery({
     queryKey: ["blogs"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog`
-      );
-      if (!response.ok) throw new Error("Failed to fetch blogs");
-      return response.json();
-    },
+    queryFn: () => fetchBlogs(),
   });
 
 

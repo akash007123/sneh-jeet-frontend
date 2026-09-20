@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createMemberAdmin } from "@/services/membershipApi";
 
 interface AdminAddMemberProps {
   isOpen: boolean;
@@ -77,18 +78,7 @@ const AdminAddMember = ({ isOpen, onClose }: AdminAddMemberProps) => {
 
   const addMembershipMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/membership/admin`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: data,
-        }
-      );
-      if (!response.ok) throw new Error("Failed to add member");
-      return response.json();
+      return createMemberAdmin(data, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["memberships"] });

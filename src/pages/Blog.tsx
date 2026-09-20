@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { assetUrl } from "@/services/apiClient";
+import { fetchBlogCategories, fetchBlogs } from "@/services/blogApi";
 
 const Blog = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,21 +19,13 @@ const Blog = () => {
   // Fetch blogs
   const { data: blogsData, isLoading: blogsLoading } = useQuery({
     queryKey: ['blogs'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`);
-      if (!response.ok) throw new Error('Failed to fetch blogs');
-      return response.json();
-    },
+    queryFn: () => fetchBlogs(),
   });
 
   // Fetch blog categories
   const { data: categoriesData } = useQuery({
     queryKey: ['blog-categories'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/categories`);
-      if (!response.ok) throw new Error('Failed to fetch categories');
-      return response.json();
-    },
+    queryFn: () => fetchBlogCategories(),
   });
 
   const blogPosts = blogsData?.blogs || [];
@@ -148,11 +142,11 @@ const Blog = () => {
                              {/* Featured Image or Gradient Header */}
                              <div className="h-32 relative overflow-hidden">
                                {post.featuredImage ? (
-                                 <img
-                                   src={`${import.meta.env.VITE_API_BASE_URL}${post.featuredImage}`}
-                                   alt={post.title}
-                                   className="w-full h-full object-cover"
-                                 />
+                                  <img
+                                    src={assetUrl(post.featuredImage)}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                  />
                                ) : (
                                  <div className="h-32 pride-gradient opacity-80"></div>
                                )}
@@ -227,7 +221,7 @@ const Blog = () => {
                           <div className="bg-card rounded-xl border border-border/50 overflow-hidden hover:shadow-soft transition-all duration-300 flex flex-col h-full">
                             {post.featuredImage && (
                               <img
-                                src={`${import.meta.env.VITE_API_BASE_URL}${post.featuredImage}`}
+                                src={assetUrl(post.featuredImage)}
                                 alt={post.title}
                                 className="w-full h-48 object-cover"
                               />

@@ -10,6 +10,7 @@ import { Loader2, Mail, Lock, User, Camera, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AxiosError } from 'axios';
 import AdminLayout from '@/layouts/AdminLayout';
+import { assetUrl } from '@/services/apiClient';
 
 const Profile = () => {
   const [formData, setFormData] = useState({
@@ -73,7 +74,11 @@ const Profile = () => {
       });
       navigate('/admin');
     } catch (error) {
-      const description = error instanceof AxiosError && error.response?.data?.error ? error.response.data.error : 'An error occurred';
+      const description = error instanceof AxiosError && error.response?.data?.error
+        ? error.response.data.error
+        : error instanceof Error && error.message
+          ? error.message
+          : 'An error occurred';
       toast({
         title: 'Update failed',
         description,
@@ -116,7 +121,7 @@ const Profile = () => {
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     <img
-                      src={profilePic ? URL.createObjectURL(profilePic) : (user.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : '/placeholder.svg')}
+                      src={profilePic ? URL.createObjectURL(profilePic) : (assetUrl(user.profilePic) ?? '/placeholder.svg')}
                       alt="Profile"
                       className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                     />

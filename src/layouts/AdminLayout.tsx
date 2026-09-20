@@ -58,6 +58,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { socketUrl, assetUrl } from "@/services/apiClient";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -76,7 +77,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   }, [user, navigate]);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001');
+    const socket = io(socketUrl());
 
     socket.on('newContact', (data) => {
       console.log('New contact received:', data);
@@ -218,7 +219,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
               <SidebarMenuButton size="lg" asChild>
                 <Link to="/admin">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={user.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : undefined} alt={user.name} />
+                    <AvatarImage src={assetUrl(user.profilePic)} alt={user.name} />
                     <AvatarFallback className="rounded-lg">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
@@ -261,7 +262,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={user.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : undefined} alt={user.name} />
+                      <AvatarImage src={assetUrl(user.profilePic)} alt={user.name} />
                       <AvatarFallback className="rounded-lg">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
@@ -280,7 +281,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                       <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src={user.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : undefined} alt={user.name} />
+                        <AvatarImage src={assetUrl(user.profilePic)} alt={user.name} />
                         <AvatarFallback className="rounded-lg">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">

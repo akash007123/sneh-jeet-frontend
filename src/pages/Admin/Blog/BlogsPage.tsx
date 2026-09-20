@@ -10,6 +10,7 @@ import EditBlogModal from "./EditBlogModal";
 import AddBlogModal from "./AddBlogModal";
 import DeleteModal from "../Shared/DeleteModal";
 import { Blog } from "@/types/blog";
+import { deleteBlog, fetchBlogs } from "@/services/blogApi";
 
 const BlogsPage = () => {
   const { toast } = useToast();
@@ -30,35 +31,12 @@ const BlogsPage = () => {
   // Queries
   const { data: blogs, isLoading: blogsLoading } = useQuery({
     queryKey: ["blogs"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch blogs");
-      return response.json();
-    },
+    queryFn: () => fetchBlogs(token),
   });
 
   // Mutations
   const deleteBlogMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/blog/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete blog");
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteBlog(id, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       toast({ title: "Success", description: "Blog deleted successfully" });

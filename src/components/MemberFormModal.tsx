@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { submitMembership } from "@/services/membershipApi";
 
 const MemberFormModal = () => {
   const { toast } = useToast();
@@ -60,10 +61,7 @@ const MemberFormModal = () => {
         formDataToSend.append('image', formData.image);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
-        method: 'POST',
-        body: formDataToSend,
-      });
+      const response = await submitMembership(formDataToSend);
       if (response.ok) {
         toast({
           title: 'Success',

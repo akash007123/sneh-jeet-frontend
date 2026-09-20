@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { createEvent } from "@/services/eventsApi";
 
 interface AddEventModalProps {
   isOpen: boolean;
@@ -33,15 +34,7 @@ const AddEventModal = ({ isOpen, onClose, onSuccess }: AddEventModalProps) => {
   });
 
   const addMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to add event');
-      return response.json();
-    },
+    mutationFn: (data: typeof formData) => createEvent(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast({ title: "Success", description: "Event added successfully" });

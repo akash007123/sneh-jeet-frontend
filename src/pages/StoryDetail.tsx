@@ -16,6 +16,8 @@ import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { assetUrl } from "@/services/apiClient";
+import { fetchStories, fetchStoryById } from "@/services/storyApi";
 
 interface Story {
   _id: string;
@@ -39,22 +41,14 @@ const StoryDetail = () => {
   // Fetch current story
   const { data: story, isLoading } = useQuery({
     queryKey: ['story', id],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/${id}`);
-      if (!response.ok) throw new Error('Failed to fetch story');
-      return response.json() as Promise<Story>;
-    },
+    queryFn: () => fetchStoryById(id as string),
     enabled: !!id,
   });
 
   // Fetch all stories for related stories
   const { data: storiesData } = useQuery({
     queryKey: ['stories'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story`);
-      if (!response.ok) throw new Error('Failed to fetch stories');
-      return response.json();
-    },
+    queryFn: () => fetchStories(),
   });
 
   const stories = storiesData?.stories || [];
@@ -119,7 +113,7 @@ const StoryDetail = () => {
         {story.image ? (
           <div className="absolute inset-0">
             <img
-              src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+              src={assetUrl(story.image)}
               alt={story.title}
               className="w-full h-full object-cover"
             />
@@ -322,7 +316,7 @@ const StoryDetail = () => {
                       {relatedStory.image && (
                         <div className="h-40 overflow-hidden">
                           <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}${relatedStory.image}`}
+                            src={assetUrl(relatedStory.image)}
                             alt={relatedStory.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />

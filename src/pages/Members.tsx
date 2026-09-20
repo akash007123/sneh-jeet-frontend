@@ -4,6 +4,8 @@ import { Mail, Phone, Users } from "lucide-react";
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { fetchMemberships } from "@/services/membershipApi";
+import { assetUrl } from "@/services/apiClient";
 
 interface Member {
   _id: string;
@@ -25,10 +27,7 @@ const Members = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/api/membership`
-        );
-        const data = await response.json();
+        const data = await fetchMemberships();
         const approvedMembers = data.filter(
           (member: Member) => member.status === "Approved"
         );
@@ -88,7 +87,7 @@ const Members = () => {
                         <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
                           {member.image ? (
                             <img
-                              src={`${import.meta.env.VITE_API_BASE_URL}${member.image}`}
+                              src={assetUrl(member.image)}
                               alt={`${member.firstName} ${member.lastName}`}
                               className="w-full h-full object-cover"
                             />

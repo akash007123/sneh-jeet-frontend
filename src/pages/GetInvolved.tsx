@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import LGBTLoading from "@/components/ui/LGBTLoading";
 import { volunteerOpportunities } from "@/data/mockData";
+import { fetchMemberships, submitMembership } from "@/services/membershipApi";
+import { assetUrl } from "@/services/apiClient";
 
 interface Member {
   _id: string;
@@ -44,8 +46,7 @@ const GetInvolved = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`);
-        const data = await response.json();
+        const data = await fetchMemberships();
         const approvedMembers = data.filter((member: Member) => member.status === "Approved");
         const sortedMembers = approvedMembers.sort((a: Member, b: Member) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setMembers(sortedMembers.slice(0, 3));
@@ -71,10 +72,7 @@ const GetInvolved = () => {
         formDataToSend.append('image', data.image);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
-        method: "POST",
-        body: formDataToSend,
-      });
+      const response = await submitMembership(formDataToSend);
       if (!response.ok) throw new Error("Failed to submit membership application");
       return response.json();
     },
@@ -277,7 +275,7 @@ const GetInvolved = () => {
                         <div className="w-full h-full rounded-full bg-background flex items-center justify-center overflow-hidden">
                           {member.image ? (
                             <img
-                              src={`${import.meta.env.VITE_API_BASE_URL}${member.image}`}
+                              src={assetUrl(member.image)}
                               alt={`${member.firstName} ${member.lastName}`}
                               className="w-full h-full object-cover"
                             />

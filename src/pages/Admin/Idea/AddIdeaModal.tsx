@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { createIdea } from "@/services/ideasApi";
 
 interface AddIdeaModalProps {
   isOpen: boolean;
@@ -35,17 +36,7 @@ const AddIdeaModal = ({ isOpen, onClose, onSuccess }: AddIdeaModalProps) => {
   });
 
   const createIdeaMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to create idea');
-      return response.json();
-    },
+    mutationFn: (data: typeof formData) => createIdea(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideas'] });
       toast({ title: "Success", description: "Idea created successfully" });

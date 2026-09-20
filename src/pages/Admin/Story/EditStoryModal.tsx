@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { assetUrl } from "@/services/apiClient";
+import { updateStory } from "@/services/storyApi";
 
 interface Story {
   _id: string;
@@ -61,14 +63,7 @@ const EditStoryModal = ({ story, isOpen, onClose, onSuccess }: EditStoryModalPro
   const [image, setImage] = useState<File | null>(null);
 
   const updateStoryMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/${story?._id}`, {
-        method: 'PUT',
-        body: data,
-      });
-      if (!response.ok) throw new Error('Failed to update story');
-      return response.json();
-    },
+    mutationFn: (data: FormData) => updateStory(story?._id as string, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stories'] });
       toast({ title: "Success", description: "Story updated successfully" });
@@ -273,7 +268,7 @@ const EditStoryModal = ({ story, isOpen, onClose, onSuccess }: EditStoryModalPro
                       Current image: {story.image.split('/').pop()}
                     </p>
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                      src={assetUrl(story.image)}
                       alt="Current story image"
                       className="w-32 h-20 object-cover rounded border"
                     />

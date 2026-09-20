@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import { api, setApiAuthToken } from '@/services/apiClient';
 
 interface User {
   id: string;
@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    delete axios.defaults.headers.common['Authorization'];
+    setApiAuthToken(null);
   };
 
   useEffect(() => {
@@ -56,12 +56,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+      setApiAuthToken(storedToken);
     }
     setLoading(false);
 
     // Add response interceptor to handle 401
-    const interceptor = axios.interceptors.response.use(
+    const interceptor = api.interceptors.response.use(
       (response) => response,
       (error) => {
         if (error.response?.status === 401) {
@@ -72,19 +72,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
 
     return () => {
-      axios.interceptors.response.eject(interceptor);
+      api.interceptors.response.eject(interceptor);
     };
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, { email, password });
+      const response = await api.post(`/api/auth/login`, { email, password });
       const { user: userData, token: newToken } = response.data;
       setUser(userData);
       setToken(newToken);
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      setApiAuthToken(newToken);
     } catch (error) {
       throw error;
     }
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       formData.append('profilePic', profilePic);
     }
 
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signup`, formData, {
+    const response = await api.post(`/api/auth/signup`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -113,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(newToken);
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(userData));
-    axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+    setApiAuthToken(newToken);
   };
 
   const updateProfile = async (name: string, email: string, password?: string, profilePic?: File, mobile?: string) => {
@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       formData.append('mobile', mobile);
     }
 
-    const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/users/${user?.id}`, formData, {
+    const response = await api.put(`/api/users/${user?.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -141,11 +141,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const forgotPassword = async (email: string) => {
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`, { email });
+    await api.post(`/api/auth/forgot-password`, { email });
   };
 
   const resetPassword = async (token: string, password: string) => {
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password`, { token, password });
+    await api.post(`/api/auth/reset-password`, { token, password });
   };
 
   const value: AuthContextType = {

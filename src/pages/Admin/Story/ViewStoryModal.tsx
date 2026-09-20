@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { assetUrl } from "@/services/apiClient";
 
 interface Story {
   _id: string;
@@ -51,7 +52,7 @@ const ViewStoryModal = ({ story, isOpen, onClose }: ViewStoryModalProps) => {
           {story.image && (
             <div className="w-full">
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                src={assetUrl(story.image)}
                 alt={story.title}
                 className="w-full h-64 object-cover rounded-lg"
               />

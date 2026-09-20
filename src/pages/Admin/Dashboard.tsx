@@ -21,6 +21,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import AdminLayout from "@/layouts/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { fetchContacts } from "@/services/contactApi";
+import { fetchEvents } from "@/services/eventsApi";
+import { fetchGalleryItems } from "@/services/galleryApi";
+import { fetchBlogs } from "@/services/blogApi";
+import { fetchStories } from "@/services/storyApi";
+import { fetchMedia } from "@/services/mediaApi";
+import { fetchIdeas } from "@/services/ideasApi";
+import { fetchMemberships } from "@/services/membershipApi";
+import { listUsers } from "@/services/usersApi";
 
 const Dashboard = () => {
   const { token, user } = useAuth();
@@ -28,101 +37,47 @@ const Dashboard = () => {
   // Queries (kept identical to original for data integrity)
   const { data: contacts } = useQuery({
     queryKey: ["contacts"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch contacts");
-      return response.json();
-    },
+    queryFn: () => fetchContacts("All", token),
   });
 
   const { data: events } = useQuery({
     queryKey: ["events"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch events");
-      return response.json();
-    },
+    queryFn: () => fetchEvents(token),
   });
 
   const { data: gallery } = useQuery({
     queryKey: ["gallery"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch gallery");
-      return response.json();
-    },
+    queryFn: () => fetchGalleryItems(token),
   });
 
   const { data: blogs } = useQuery({
     queryKey: ["blogs"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch blogs");
-      return response.json();
-    },
+    queryFn: () => fetchBlogs(token),
   });
 
   const { data: stories } = useQuery({
     queryKey: ["stories"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch stories");
-      return response.json();
-    },
+    queryFn: () => fetchStories(token),
   });
 
   const { data: media } = useQuery({
     queryKey: ["media"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch media");
-      return response.json();
-    },
+    queryFn: () => fetchMedia(token),
   });
 
   const { data: ideas } = useQuery({
     queryKey: ["ideas"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch ideas");
-      return response.json();
-    },
+    queryFn: () => fetchIdeas(token),
   });
 
   const { data: members } = useQuery({
     queryKey: ["memberships"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/membership`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch memberships");
-      return response.json();
-    },
+    queryFn: () => fetchMemberships("All", token),
   });
 
   const { data: users } = useQuery({
     queryKey: ["users"],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch users");
-      return response.json();
-    },
+    queryFn: () => listUsers("All", token),
   });
 
   const stats = {

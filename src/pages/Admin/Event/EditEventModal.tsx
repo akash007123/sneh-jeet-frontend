@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { updateEvent } from "@/services/eventsApi";
 
 interface Event {
   _id: string;
@@ -60,15 +61,8 @@ const EditEventModal = ({ event, isOpen, onClose, onSuccess }: EditEventModalPro
   }, [event]);
 
   const updateMutation = useMutation({
-    mutationFn: async (data: typeof formData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event/${event?._id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to update event');
-      return response.json();
-    },
+    mutationFn: (data: typeof formData) =>
+      updateEvent(event?._id as string, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast({ title: "Success", description: "Event updated successfully" });

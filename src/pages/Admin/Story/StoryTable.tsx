@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import {formatDate} from '../../utils/formatDate';
+import { deleteStory, fetchStories } from "@/services/storyApi";
 
 interface Story {
   _id: string;
@@ -44,26 +45,11 @@ const StoryTable = ({ onView, onEdit, onAdd, onDelete }: StoryTableProps) => {
 
   const { data: stories, isLoading } = useQuery({
     queryKey: ["stories"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/story`
-      );
-      if (!response.ok) throw new Error("Failed to fetch stories");
-      return response.json();
-    },
+    queryFn: () => fetchStories(),
   });
 
   const deleteStoryMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/story/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete story");
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteStory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stories"] });
       toast({ title: "Success", description: "Story deleted successfully" });

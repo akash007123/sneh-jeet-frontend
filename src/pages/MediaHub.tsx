@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { mediaContent, creativeIdeas } from "@/data/mockData";
 import { Media } from "@/types/media";
 import { Idea } from "@/types/idea";
+import { assetUrl, apiGet } from "@/services/apiClient";
+import { fetchPublishedMedia } from "@/services/mediaApi";
 
 const typeIcons: Record<string, React.ReactNode> = {
   "short-film": <Film className="w-4 h-4" />,
@@ -61,21 +63,13 @@ const MediaHub = () => {
   // Fetch media from API
   const { data: mediaData, isLoading: mediaLoading } = useQuery({
     queryKey: ["media", { published: true }],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media?published=true`);
-      if (!response.ok) throw new Error("Failed to fetch media");
-      return response.json();
-    },
+    queryFn: () => fetchPublishedMedia(),
   });
 
   // Fetch ideas from API
   const { data: ideasData, isLoading: ideasLoading } = useQuery({
     queryKey: ["ideas", { published: true }],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas?published=true`);
-      if (!response.ok) throw new Error("Failed to fetch ideas");
-      return response.json();
-    },
+    queryFn: () => apiGet<any>("/api/ideas?published=true"),
   });
 
   const mediaContent = mediaData?.media || [];
@@ -164,16 +158,16 @@ const MediaHub = () => {
                      onClick={() => navigate(`/media/${item.slug}`)}
                    >
                      <div className="relative aspect-video rounded-xl overflow-hidden mb-4">
-                       {item.thumbnailUrl ? (
-                         <img
-                           src={`${import.meta.env.VITE_API_BASE_URL}${item.thumbnailUrl}`}
-                           alt={item.title}
-                           className="w-full h-full object-cover"
-                         />
-                       ) : (
-                         <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
-                       )}
-                       <div className="absolute inset-0 bg-foreground/20 group-hover:bg-foreground/30 transition-colors flex items-center justify-center">
+                        {item.thumbnailUrl ? (
+                          <img
+                            src={assetUrl(item.thumbnailUrl)}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                        )}
+                        <div className="absolute inset-0 bg-foreground/20 group-hover:bg-foreground/30 transition-colors flex items-center justify-center">
                          <div className="w-16 h-16 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                            <Play className="w-6 h-6 text-primary ml-1" />
                          </div>
@@ -248,16 +242,16 @@ const MediaHub = () => {
                      onClick={() => navigate(`/media/${item.slug}`)}
                    >
                      <div className="relative aspect-video">
-                       {item.thumbnailUrl ? (
-                         <img
-                           src={`${import.meta.env.VITE_API_BASE_URL}${item.thumbnailUrl}`}
-                           alt={item.title}
-                           className="w-full h-full object-cover"
-                         />
-                       ) : (
-                         <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
-                       )}
-                       <div className="absolute inset-0 bg-foreground/10 group-hover:bg-foreground/20 transition-colors flex items-center justify-center">
+                        {item.thumbnailUrl ? (
+                          <img
+                            src={assetUrl(item.thumbnailUrl)}
+                            alt={item.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`} />
+                        )}
+                        <div className="absolute inset-0 bg-foreground/10 group-hover:bg-foreground/20 transition-colors flex items-center justify-center">
                          <div className="w-12 h-12 rounded-full bg-background/90 flex items-center justify-center group-hover:scale-110 transition-transform">
                            <Play className="w-5 h-5 text-primary ml-0.5" />
                          </div>

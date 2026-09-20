@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { updateGalleryItem } from "@/services/galleryApi";
 
 interface GalleryItem {
   _id: string;
@@ -47,14 +48,8 @@ const EditGalleryModal = ({ galleryItem, isOpen, onClose, onSuccess }: EditGalle
   }, [galleryItem]);
 
   const updateGalleryMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery/${galleryItem?._id}`, {
-        method: 'PUT',
-        body: data,
-      });
-      if (!response.ok) throw new Error('Failed to update gallery item');
-      return response.json();
-    },
+    mutationFn: (data: FormData) =>
+      updateGalleryItem(galleryItem?._id as string, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gallery'] });
       toast({ title: "Success", description: "Gallery item updated successfully" });

@@ -20,6 +20,7 @@ import ViewEventModal from "./ViewEventModal";
 import EditEventModal from "./EditEventModal";
 import AddEventModal from "./AddEventModal";
 import DeleteModal from "../Shared/DeleteModal";
+import { deleteEvent, fetchEvents } from "@/services/eventsApi";
 
 interface Event {
   _id: string;
@@ -53,35 +54,12 @@ const EventsPage = () => {
   // Queries
   const { data: events, isLoading: eventsLoading } = useQuery({
     queryKey: ["events"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/event`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch events");
-      return response.json();
-    },
+    queryFn: () => fetchEvents(token),
   });
 
   // Mutations
   const deleteEventMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/event/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete event");
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteEvent(id, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
       toast({ title: "Success", description: "Event deleted successfully" });

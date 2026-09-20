@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { createMedia } from "@/services/mediaApi";
 
 interface AddMediaModalProps {
   isOpen: boolean;
@@ -55,12 +56,7 @@ const AddMediaModal = ({ isOpen, onClose, onSuccess }: AddMediaModalProps) => {
         formDataToSend.append('thumbnailFile', data.thumbnailFile);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media`, {
-        method: 'POST',
-        body: formDataToSend,
-      });
-      if (!response.ok) throw new Error('Failed to create media');
-      return response.json();
+      return createMedia(formDataToSend);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });

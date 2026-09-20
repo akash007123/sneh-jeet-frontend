@@ -26,6 +26,7 @@ import {
 import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import SectionHeading from "@/components/SectionHeading";
+import { assetUrl } from "@/services/apiClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -379,7 +380,7 @@ const Volunteer = () => {
                   <CardContent className="pt-8 pb-8">
                     <div className="flex flex-col items-center text-center space-y-4">
                       <Avatar className="w-16 h-16">
-                        <AvatarImage src={volunteer.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${volunteer.profilePic}` : undefined} alt={volunteer.name} />
+                        <AvatarImage src={assetUrl(volunteer.profilePic)} alt={volunteer.name} />
                         <AvatarFallback>
                           <User className="w-8 h-8" />
                         </AvatarFallback>

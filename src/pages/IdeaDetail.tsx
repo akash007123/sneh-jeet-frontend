@@ -21,6 +21,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Idea } from "@/types/idea";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { assetUrl } from "@/services/apiClient";
+import { fetchIdeaBySlug } from "@/services/ideasApi";
 
 const statusColors: Record<string, string> = {
   "open": "bg-safe/20 text-safe border-safe/30",
@@ -41,11 +43,7 @@ const IdeaDetail = () => {
 
   const { data: idea, isLoading } = useQuery({
     queryKey: ['idea', slug],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas/slug/${slug}`);
-      if (!response.ok) throw new Error('Failed to fetch idea');
-      return response.json();
-    },
+    queryFn: () => fetchIdeaBySlug(slug as string),
   });
 
   if (isLoading) {
@@ -125,7 +123,7 @@ const IdeaDetail = () => {
                 <div className="relative max-w-md mx-auto">
                   <div className="aspect-square rounded-2xl overflow-hidden">
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${idea.imageUrl}`}
+                      src={assetUrl(idea.imageUrl)}
                       alt={idea.title}
                       className="w-full h-full object-cover"
                     />

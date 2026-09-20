@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { assetUrl } from "@/services/apiClient";
 
 interface User {
   _id: string;
@@ -63,7 +64,7 @@ const ViewUserModal = ({ user, isOpen, onClose }: ViewUserModalProps) => {
           <div className="flex flex-col items-center space-y-4">
             <Avatar className="h-24 w-24">
               <AvatarImage
-                src={user.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : undefined}
+                src={assetUrl(user.profilePic)}
                 alt={user.name}
               />
               <AvatarFallback className="text-2xl">

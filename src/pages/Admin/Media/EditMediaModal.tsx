@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Media } from "@/types/media";
+import { updateMedia } from "@/services/mediaApi";
 
 interface EditMediaModalProps {
   media: Media | null;
@@ -74,12 +75,7 @@ const EditMediaModal = ({ media, isOpen, onClose, onSuccess }: EditMediaModalPro
         formDataToSend.append('thumbnailFile', data.thumbnailFile);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media/${data.id}`, {
-        method: 'PUT',
-        body: formDataToSend,
-      });
-      if (!response.ok) throw new Error('Failed to update media');
-      return response.json();
+      return updateMedia(data.id, formDataToSend);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });

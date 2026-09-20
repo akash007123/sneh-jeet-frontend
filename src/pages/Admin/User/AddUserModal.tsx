@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { createUser } from "@/services/usersApi";
 
 interface AddUserModalProps {
   isOpen: boolean;
@@ -36,18 +37,15 @@ const AddUserModal = ({ isOpen, onClose, onSuccess }: AddUserModalProps) => {
 
   const addUserMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: data,
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to add user");
+      try {
+        return await createUser(data, token);
+      } catch (error) {
+        throw new Error(
+          error instanceof Error && error.message
+            ? error.message
+            : "Failed to add user"
+        );
       }
-      return response.json();
     },
     onSuccess: () => {
       toast({

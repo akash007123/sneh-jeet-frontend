@@ -9,6 +9,7 @@ import ViewStoryModal from "./ViewStoryModal";
 import EditStoryModal from "./EditStoryModal";
 import AddStoryModal from "./AddStoryModal";
 import DeleteModal from "../Shared/DeleteModal";
+import { deleteStory, fetchStories } from "@/services/storyApi";
 
 interface Story {
   _id: string;
@@ -43,35 +44,12 @@ const StoriesPage = () => {
   // Queries
   const { data: stories, isLoading: storiesLoading } = useQuery({
     queryKey: ["stories"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/story`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch stories");
-      return response.json();
-    },
+    queryFn: () => fetchStories(token),
   });
 
   // Mutations
   const deleteStoryMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/story/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete story");
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteStory(id, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stories"] });
       toast({ title: "Success", description: "Story deleted successfully" });

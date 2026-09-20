@@ -22,6 +22,7 @@ import ViewContactModal from "./ViewContactModal";
 import EditStatusModal from "../Shared/EditStatusModal";
 import DeleteModal from "../Shared/DeleteModal";
 import {formatDate} from "../../utils/formatDate";
+import { fetchContacts, updateContactStatus, deleteContact as deleteContactApi } from "@/services/contactApi";
 
 interface Contact {
   _id: string;
@@ -48,21 +49,13 @@ const ContactTable = () => {
   const { data: contacts, isLoading } = useQuery({
     queryKey: ['contacts'],
     queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`);
-      if (!response.ok) throw new Error('Failed to fetch contacts');
-      return response.json();
+      return fetchContacts("All");
     },
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) throw new Error('Failed to update status');
-      return response.json();
+      return updateContactStatus(id, status);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
@@ -77,11 +70,7 @@ const ContactTable = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete contact');
-      return response.json();
+      return deleteContactApi(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });

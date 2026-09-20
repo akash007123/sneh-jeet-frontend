@@ -17,6 +17,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Blog } from "@/types/blog";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
 import { useAuth } from "@/contexts/AuthContext";
+import { assetUrl } from "@/services/apiClient";
+import { updateBlog } from "@/services/blogApi";
 
 interface Section {
   sectionTitle: string;
@@ -57,15 +59,7 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
   const updateBlogMutation = useMutation({
     mutationFn: async (data: FormData) => {
       if (!token) throw new Error('Not authenticated');
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/${blog?._id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: data,
-      });
-      if (!response.ok) throw new Error('Failed to update blog');
-      return response.json();
+      return updateBlog(blog?._id as string, data, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
@@ -299,7 +293,7 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
                       Current image: {blog.featuredImage.split('/').pop()}
                     </p>
                     <img
-                      src={`${import.meta.env.VITE_API_BASE_URL}${blog.featuredImage}`}
+                      src={assetUrl(blog.featuredImage)}
                       alt="Current featured image"
                       className="w-32 h-20 object-cover rounded border"
                     />
@@ -419,7 +413,7 @@ const EditBlogModal = ({ blog, isOpen, onClose, onSuccess }: EditBlogModalProps)
                             Current image: {section.sectionImage.split('/').pop()}
                           </p>
                           <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}${section.sectionImage}`}
+                            src={assetUrl(section.sectionImage as string)}
                             alt="Current section image"
                             className="w-32 h-20 object-cover rounded border"
                           />

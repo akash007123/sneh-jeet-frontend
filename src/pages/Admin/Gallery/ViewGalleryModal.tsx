@@ -1,4 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { assetUrl } from "@/services/apiClient";
 
 interface GalleryItem {
   _id: string;
@@ -29,7 +30,7 @@ const ViewGalleryModal = ({ galleryItem, isOpen, onClose }: ViewGalleryModalProp
           {galleryItem.imageUrl && (
             <div className="flex justify-center">
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${galleryItem.imageUrl}`}
+                src={assetUrl(galleryItem.imageUrl)}
                 alt={galleryItem.title}
                 className="max-w-full max-h-96 object-cover rounded-lg"
               />

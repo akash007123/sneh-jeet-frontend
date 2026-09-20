@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Idea } from "@/types/idea";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { updateIdea } from "@/services/ideasApi";
 
 interface EditIdeaModalProps {
   idea: Idea | null;
@@ -51,17 +52,8 @@ const EditIdeaModal = ({ idea, isOpen, onClose, onSuccess }: EditIdeaModalProps)
   }, [idea]);
 
   const updateIdeaMutation = useMutation({
-    mutationFn: async (data: typeof formData & { id: string }) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas/${data.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to update idea');
-      return response.json();
-    },
+    mutationFn: (data: typeof formData & { id: string }) =>
+      updateIdea(data.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideas'] });
       toast({ title: "Success", description: "Idea updated successfully" });

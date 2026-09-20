@@ -31,6 +31,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { assetUrl } from "@/services/apiClient";
+import { fetchBlogBySlug, fetchBlogs } from "@/services/blogApi";
+import {
+  createComment,
+  deleteComment,
+  fetchCommentCountByBlog,
+  fetchCommentsByBlog,
+  updateComment,
+} from "@/services/commentsApi";
 
 interface Comment {
   _id: string;
@@ -78,22 +87,14 @@ const BlogArticle = () => {
   // Fetch current blog post
   const { data: articleData, isLoading: articleLoading } = useQuery({
     queryKey: ['blog', slug],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog/slug/${slug}`);
-      if (!response.ok) throw new Error('Failed to fetch blog post');
-      return response.json();
-    },
+    queryFn: () => fetchBlogBySlug(slug as string),
     enabled: !!slug,
   });
 
   // Fetch all blogs for related posts
   const { data: blogsData } = useQuery({
     queryKey: ['blogs'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/blog`);
-      if (!response.ok) throw new Error('Failed to fetch blogs');
-      return response.json();
-    },
+    queryFn: () => fetchBlogs(),
   });
 
   const article = articleData;
@@ -104,9 +105,7 @@ const BlogArticle = () => {
     queryKey: ['comments', article?._id],
     queryFn: async () => {
       if (!article?._id) return { comments: [], total: 0 };
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/blog/${article._id}`);
-      if (!response.ok) throw new Error('Failed to fetch comments');
-      return response.json();
+      return fetchCommentsByBlog(article._id);
     },
     enabled: !!article?._id,
   });
@@ -116,9 +115,7 @@ const BlogArticle = () => {
     queryKey: ['comment-count', article?._id],
     queryFn: async () => {
       if (!article?._id) return { count: 0 };
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/blog/${article._id}/count`);
-      if (!response.ok) throw new Error('Failed to fetch comment count');
-      return response.json();
+      return fetchCommentCountByBlog(article._id);
     },
     enabled: !!article?._id,
   });
@@ -167,7 +164,7 @@ const BlogArticle = () => {
       updateMetaTag('og:type', 'article');
       updateMetaTag('og:url', window.location.href);
       if (article.featuredImage) {
-        updateMetaTag('og:image', `${import.meta.env.VITE_API_BASE_URL}${article.featuredImage}`);
+        updateMetaTag('og:image', assetUrl(article.featuredImage) ?? '');
       }
     }
 
@@ -296,14 +293,7 @@ const BlogArticle = () => {
         formData.append('profileImage', commentForm.profileImage);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to submit comment');
-      }
+      await createComment(formData);
 
       // Reset form
       setCommentForm({
@@ -403,17 +393,7 @@ const BlogArticle = () => {
         formData.append('profileImage', editForm.profileImage);
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/${commentId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update comment');
-      }
+      await updateComment(commentId, formData, token);
 
       // Reset edit form
       cancelEditing();
@@ -444,16 +424,7 @@ const BlogArticle = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/comments/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete comment');
-      }
+      await deleteComment(commentId, token);
 
       // Refresh comments and count
       queryClient.invalidateQueries({ queryKey: ['comments', article._id] });
@@ -491,7 +462,7 @@ const BlogArticle = () => {
         {article.featuredImage ? (
           <div className="absolute inset-0">
             <img
-              src={`${import.meta.env.VITE_API_BASE_URL}${article.featuredImage}`}
+              src={assetUrl(article.featuredImage)}
               alt={article.title}
               className="w-full h-full object-cover"
             />
@@ -626,7 +597,7 @@ const BlogArticle = () => {
                   {section.sectionImage && (
                     <div className="mb-6">
                       <img
-                        src={`${import.meta.env.VITE_API_BASE_URL}${section.sectionImage}`}
+                        src={assetUrl(section.sectionImage)}
                         alt={section.sectionTitle}
                         className="w-full max-w-3xl mx-auto rounded-xl shadow-soft"
                       />
@@ -907,7 +878,7 @@ const BlogArticle = () => {
                             />
                           ) : comment.profileImage ? (
                             <img
-                              src={`${import.meta.env.VITE_API_BASE_URL}${comment.profileImage}`}
+                              src={assetUrl(comment.profileImage)}
                               alt={`${comment.name}'s profile`}
                               className="w-full h-full object-cover"
                             />
@@ -990,7 +961,7 @@ const BlogArticle = () => {
                       <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                         {comment.profileImage ? (
                           <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}${comment.profileImage}`}
+                            src={assetUrl(comment.profileImage)}
                             alt={`${comment.name}'s profile`}
                             className="w-full h-full object-cover"
                           />
@@ -1110,7 +1081,7 @@ const BlogArticle = () => {
                       {post.featuredImage && (
                         <div className="h-40 overflow-hidden">
                           <img
-                            src={`${import.meta.env.VITE_API_BASE_URL}${post.featuredImage}`}
+                            src={assetUrl(post.featuredImage)}
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />

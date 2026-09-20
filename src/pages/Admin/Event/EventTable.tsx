@@ -21,6 +21,7 @@ import ViewEventModal from "./ViewEventModal";
 import EditEventModal from "./EditEventModal";
 import DeleteModal from "./DeleteModal";
 import AddEventModal from "./AddEventModal";
+import { deleteEvent as deleteEventApi, fetchEvents } from "@/services/eventsApi";
 
 interface Event {
   _id: string;
@@ -47,21 +48,11 @@ const EventTable = () => {
 
   const { data: events, isLoading } = useQuery({
     queryKey: ['events'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event`);
-      if (!response.ok) throw new Error('Failed to fetch events');
-      return response.json();
-    },
+    queryFn: () => fetchEvents(),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete event');
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteEventApi(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       toast({ title: "Success", description: "Event deleted successfully" });

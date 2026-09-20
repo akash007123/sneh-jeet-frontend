@@ -24,6 +24,8 @@ import AddUserModal from "./AddUserModal";
 import EditUserModal from "./EditUserModal";
 import ViewUserModal from "./ViewUserModal";
 import DeleteModal from "../Shared/DeleteModal";
+import { listUsers, updateUserStatus, deleteUser } from "@/services/usersApi";
+import { assetUrl } from "@/services/apiClient";
 
 interface User {
   _id: string;
@@ -62,33 +64,14 @@ const UsersPage = () => {
   const { data: users, isLoading: usersLoading } = useQuery({
     queryKey: ["users", statusFilter],
     queryFn: async () => {
-      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/users` : `${import.meta.env.VITE_API_BASE_URL}/api/users?status=${statusFilter}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch users");
-      return response.json();
+      return listUsers(statusFilter, token);
     },
   });
 
   // Mutations
   const toggleStatusMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users/${id}/status`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isActive }),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update user status");
-      return response.json();
+      return updateUserStatus(id, isActive, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -105,17 +88,7 @@ const UsersPage = () => {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete user");
-      return response.json();
+      return deleteUser(id, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
@@ -249,7 +222,7 @@ const UsersPage = () => {
                           <TableCell>
                             <Avatar className="h-10 w-10">
                               <AvatarImage
-                                src={user.profilePic ? `${import.meta.env.VITE_API_BASE_URL}${user.profilePic}` : undefined}
+                                src={assetUrl(user.profilePic)}
                                 alt={user.name}
                               />
                               <AvatarFallback>

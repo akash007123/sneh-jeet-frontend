@@ -6,6 +6,8 @@ import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { assetUrl } from "@/services/apiClient";
+import { fetchStoriesByCategory, fetchStoryCategories } from "@/services/storyApi";
 
 interface Story {
   _id: string;
@@ -39,8 +41,7 @@ const Stories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/categories`);
-        const data = await response.json();
+        const data = await fetchStoryCategories();
         const dynamicCategories = data.map((cat: string) => ({
           id: cat,
           label: cat.charAt(0).toUpperCase() + cat.slice(1),
@@ -57,8 +58,7 @@ const Stories = () => {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story?category=${activeCategory}`);
-        const data = await response.json();
+        const data = await fetchStoriesByCategory(activeCategory);
         setStories(data.stories || []);
       } catch (error) {
         console.error('Error fetching stories:', error);
@@ -135,7 +135,7 @@ const Stories = () => {
                       {/* Image */}
                       {story.image ? (
                         <img
-                          src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                          src={assetUrl(story.image)}
                           alt={story.title}
                           className="aspect-video object-cover"
                         />
@@ -215,7 +215,7 @@ const Stories = () => {
                       <div className="mb-2 rounded">
                       {story.image ? (
                         <img
-                          src={`${import.meta.env.VITE_API_BASE_URL}${story.image}`}
+                          src={assetUrl(story.image)}
                           alt={story.title}
                           className="aspect-video object-cover rounded-sm"
                         />

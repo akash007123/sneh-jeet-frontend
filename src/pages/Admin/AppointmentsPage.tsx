@@ -28,6 +28,7 @@ import AdminTablePagination from "@/components/ui/admin-table-pagination";
 import ViewAppointmentModal from "./Appointment/ViewAppointmentModal";
 import EditAppointmentModal from "./Appointment/EditAppointmentModal";
 import DeleteModal from "./Shared/DeleteModal";
+import { fetchAppointments, updateAppointment, deleteAppointment } from "@/services/appointmentsApi";
 
 interface Appointment {
   _id: string;
@@ -65,33 +66,14 @@ const AppointmentsPage = () => {
   const { data: appointments, isLoading: appointmentsLoading } = useQuery({
     queryKey: ["appointments", statusFilter],
     queryFn: async () => {
-      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/appointments` : `${import.meta.env.VITE_API_BASE_URL}/api/appointments?status=${statusFilter}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch appointments");
-      return response.json();
+      return fetchAppointments(statusFilter, token);
     },
   });
 
   // Mutations
   const updateAppointmentMutation = useMutation({
     mutationFn: async ({ id, name, mobile, email, message, status }: { id: string; name: string; mobile: string; email: string; message: string; status: string }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/appointments/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ name, mobile, email, message, status }),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update appointment");
-      return response.json();
+      return updateAppointment(id, { name, mobile, email, message, status }, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
@@ -110,17 +92,7 @@ const AppointmentsPage = () => {
 
   const deleteAppointmentMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/appointments/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete appointment");
-      return response.json();
+      return deleteAppointment(id, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointments"] });

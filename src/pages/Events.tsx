@@ -8,6 +8,7 @@ import MainLayout from "@/layouts/MainLayout";
 import PageHero from "@/components/PageHero";
 import { Button } from "@/components/ui/button";
 import LGBTLoading from "@/components/ui/LGBTLoading";
+import { fetchEvents } from "@/services/eventsApi";
 
 const categories = [
   { id: "all", label: "All Events" },
@@ -32,11 +33,7 @@ const Events = () => {
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/event`);
-      if (!response.ok) throw new Error('Failed to fetch events');
-      return response.json();
-    },
+    queryFn: () => fetchEvents(),
   });
 
   const filteredEvents = activeCategory === "all"

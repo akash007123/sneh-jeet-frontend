@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Idea } from "@/types/idea";
+import { fetchIdeas, likeIdea } from "@/services/ideasApi";
 
 interface IdeasTableProps {
   onView: (idea: Idea) => void;
@@ -28,21 +29,11 @@ const IdeasTable = ({ onView, onEdit, onAdd, onDelete }: IdeasTableProps) => {
 
   const { data: ideas, isLoading } = useQuery({
     queryKey: ['ideas'],
-    queryFn: async () => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas`);
-      if (!response.ok) throw new Error('Failed to fetch ideas');
-      return response.json();
-    },
+    queryFn: () => fetchIdeas(),
   });
 
   const likeIdeaMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas/${id}/like`, {
-        method: 'PATCH',
-      });
-      if (!response.ok) throw new Error('Failed to like idea');
-      return response.json();
-    },
+    mutationFn: (id: string) => likeIdea(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideas'] });
     },

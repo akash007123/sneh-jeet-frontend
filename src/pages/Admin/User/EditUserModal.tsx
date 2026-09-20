@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { updateUser } from "@/services/usersApi";
 
 interface User {
   _id: string;
@@ -59,18 +60,15 @@ const EditUserModal = ({ user, isOpen, onClose, onSuccess }: EditUserModalProps)
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/users/${user?._id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: data,
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to update user");
+      try {
+        return await updateUser(user?._id ?? "", data, token);
+      } catch (error) {
+        throw new Error(
+          error instanceof Error && error.message
+            ? error.message
+            : "Failed to update user"
+        );
       }
-      return response.json();
     },
     onSuccess: () => {
       toast({

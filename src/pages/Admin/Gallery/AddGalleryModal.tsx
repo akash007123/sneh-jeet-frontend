@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import CKEditorComponent from "@/components/ui/CKEditorComponent";
+import { createGalleryItem } from "@/services/galleryApi";
 
 interface AddGalleryModalProps {
   isOpen: boolean;
@@ -26,14 +27,7 @@ const AddGalleryModal = ({ isOpen, onClose, onSuccess }: AddGalleryModalProps) =
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const addGalleryMutation = useMutation({
-    mutationFn: async (data: FormData) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/gallery`, {
-        method: 'POST',
-        body: data,
-      });
-      if (!response.ok) throw new Error('Failed to add gallery item');
-      return response.json();
-    },
+    mutationFn: (data: FormData) => createGalleryItem(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gallery'] });
       toast({ title: "Success", description: "Gallery item added successfully" });

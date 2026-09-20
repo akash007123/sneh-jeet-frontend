@@ -22,6 +22,8 @@ import EditGalleryModal from "./EditGalleryModal";
 import AddGalleryModal from "./AddGalleryModal";
 import DeleteModal from "../Shared//DeleteModal";
 import {formatDate} from "../../utils/formatDate";
+import { assetUrl } from "@/services/apiClient";
+import { deleteGalleryItem, fetchGalleryItems } from "@/services/galleryApi";
 
 interface GalleryItem {
   _id: string;
@@ -59,35 +61,12 @@ const GalleryPage = () => {
   // Queries
   const { data: gallery, isLoading: galleryLoading } = useQuery({
     queryKey: ["gallery"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/gallery`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch gallery");
-      return response.json();
-    },
+    queryFn: () => fetchGalleryItems(token),
   });
 
   // Mutations
   const deleteGalleryMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/gallery/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete gallery item");
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteGalleryItem(id, token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
       toast({
@@ -187,9 +166,7 @@ const GalleryPage = () => {
                           <TableCell>
                             {item.imageUrl ? (
                               <img
-                                src={`${import.meta.env.VITE_API_BASE_URL}${
-                                  item.imageUrl
-                                }`}
+                                src={assetUrl(item.imageUrl)}
                                 alt={item.title}
                                 className="w-12 h-12 object-cover rounded"
                               />

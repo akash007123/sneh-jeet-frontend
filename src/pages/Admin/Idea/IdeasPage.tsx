@@ -10,6 +10,7 @@ import AddIdeaModal from "./AddIdeaModal";
 import DeleteModal from "../Shared/DeleteModal";
 import { useToast } from "@/hooks/use-toast";
 import { Idea } from "@/types/idea";
+import { deleteIdea, fetchIdeas } from "@/services/ideasApi";
 
 const IdeasPage = () => {
   const queryClient = useQueryClient();
@@ -30,28 +31,11 @@ const IdeasPage = () => {
   // Queries
   const { data: ideas, isLoading: ideasLoading } = useQuery({
     queryKey: ["ideas"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/ideas`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch ideas");
-      return response.json();
-    },
+    queryFn: () => fetchIdeas(token),
   });
 
   const deleteIdeaMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ideas/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete idea');
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteIdea(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ideas'] });
       toast({ title: "Success", description: "Idea deleted successfully" });

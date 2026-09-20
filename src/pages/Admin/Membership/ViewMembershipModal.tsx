@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { assetUrl } from "@/services/apiClient";
 
 interface Membership {
   _id: string;
@@ -88,7 +89,7 @@ const ViewMembershipModal = ({ membership, isOpen, onClose }: ViewMembershipModa
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16">
                 <AvatarImage
-                  src={membership.image ? `${import.meta.env.VITE_API_BASE_URL}${membership.image}` : undefined}
+                  src={assetUrl(membership.image)}
                   alt={`${membership.firstName} ${membership.lastName}`}
                 />
                 <AvatarFallback className="text-lg">
@@ -232,7 +233,7 @@ const ViewMembershipModal = ({ membership, isOpen, onClose }: ViewMembershipModa
                     <label className="font-semibold">ID Proof File:</label>
                     <p>
                       <a
-                        href={`${import.meta.env.VITE_API_BASE_URL}${membership.idProofFile}`}
+                        href={assetUrl(membership.idProofFile)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline"

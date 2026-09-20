@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { submitContact } from "@/services/contactApi";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -27,13 +28,7 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await submitContact(formData);
       if (response.ok) {
         toast({
           title: 'Success',

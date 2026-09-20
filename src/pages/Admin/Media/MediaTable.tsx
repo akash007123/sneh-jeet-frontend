@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Media } from "@/types/media";
+import { deleteMedia, fetchMedia } from "@/services/mediaApi";
 
 interface MediaTableProps {
   onView: (media: Media) => void;
@@ -30,26 +31,11 @@ const MediaTable = ({ onView, onEdit, onAdd, onDelete }: MediaTableProps) => {
 
   const { data: media, isLoading } = useQuery({
     queryKey: ["media"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/media`
-      );
-      if (!response.ok) throw new Error("Failed to fetch media");
-      return response.json();
-    },
+    queryFn: () => fetchMedia(),
   });
 
   const deleteMediaMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/media/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete media");
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteMedia(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["media"] });
       toast({ title: "Success", description: "Media deleted successfully" });

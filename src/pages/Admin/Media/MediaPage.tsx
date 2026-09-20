@@ -10,6 +10,7 @@ import AddMediaModal from "./AddMediaModal";
 import DeleteModal from "../Shared/DeleteModal";
 import { useToast } from "@/hooks/use-toast";
 import { Media } from "@/types/media";
+import { deleteMedia, fetchMedia } from "@/services/mediaApi";
 
 const MediaPage = () => {
   const queryClient = useQueryClient();
@@ -30,28 +31,11 @@ const MediaPage = () => {
   // Queries
   const { data: media, isLoading: mediaLoading } = useQuery({
     queryKey: ["media"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/media`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to fetch media");
-      return response.json();
-    },
+    queryFn: () => fetchMedia(token),
   });
 
   const deleteMediaMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/media/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('Failed to delete media');
-      return response.json();
-    },
+    mutationFn: (id: string) => deleteMedia(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });
       toast({ title: "Success", description: "Media deleted successfully" });

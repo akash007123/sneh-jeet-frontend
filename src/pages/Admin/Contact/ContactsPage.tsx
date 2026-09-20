@@ -31,6 +31,7 @@ import DeleteModal from "../Shared/DeleteModal";
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
+import { fetchContacts, updateContactStatus, deleteContact } from "@/services/contactApi";
 
 interface Contact {
   _id: string;
@@ -69,33 +70,14 @@ const ContactsPage = () => {
   const { data: contacts, isLoading: contactsLoading } = useQuery({
     queryKey: ["contacts", statusFilter],
     queryFn: async () => {
-      const url = statusFilter === "All" ? `${import.meta.env.VITE_API_BASE_URL}/api/contact` : `${import.meta.env.VITE_API_BASE_URL}/api/contact?status=${statusFilter}`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch contacts");
-      return response.json();
+      return fetchContacts(statusFilter, token);
     },
   });
 
   // Mutations
   const updateContactStatusMutation = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
-      if (!response.ok) throw new Error("Failed to update status");
-      return response.json();
+      return updateContactStatus(id, status, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
@@ -114,17 +96,7 @@ const ContactsPage = () => {
 
   const deleteContactMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/contact/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) throw new Error("Failed to delete contact");
-      return response.json();
+      return deleteContact(id, token);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contacts"] });
